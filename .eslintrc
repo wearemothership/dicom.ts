@@ -1,33 +1,48 @@
 {
-  "parser": "babel-eslint",
-  "extends": [
-    "standard",
-    "standard-react",
-    "plugin:prettier/recommended",
-    "prettier/standard",
-    "prettier/react"
-  ],
-  "env": {
-    "node": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 2020,
-    "ecmaFeatures": {
-      "legacyDecorators": true,
-      "jsx": true
-    }
-  },
-  "settings": {
-    "react": {
-      "version": "16"
-    }
-  },
-  "rules": {
-    "space-before-function-paren": 0,
-    "react/prop-types": 0,
-    "react/jsx-handler-names": 0,
-    "react/jsx-fragments": 0,
-    "react/no-unused-prop-types": 0,
-    "import/export": 0
-  }
+	"env": {
+		"browser": true,
+		"es6": true,
+		"jest": true,
+		"jest/globals": true
+	},
+	"plugins": ["jest"],
+	"extends": [
+		"eslint-config-airbnb",
+		"airbnb/hooks",
+		"plugin:jest/recommended",
+		"plugin:jest/style"
+	],
+	"rules": {
+		"no-unused-vars": 1,
+		"indent": [2, "tab", { "SwitchCase": 1, "VariableDeclarator": 1 }],
+		"no-tabs": 0,
+		"react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
+		"react/no-did-update-set-state": 0,
+		"react/static-property-placement": 0, // maybe re-enable?
+		"react/prop-types": 0,
+		"react/jsx-indent": [2, "tab"],
+		"react/jsx-indent-props": [2, "tab"],
+		"comma-dangle": 0, // WTF air-bnb?!
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"quotes": [
+			"error",
+			"double"
+		],
+		"no-console": "off",
+		"curly": [2, "all"],
+		"brace-style": [2, "stroustrup"],
+		"semi": ["error", "always"],
+		"react/jsx-props-no-spreading": [2, {
+			"custom": "ignore"
+		}],
+		"react/jsx-fragments": [2, "syntax"]
+	},
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"parser": "babel-eslint",
+	"ignorePatterns": ["!.storybook"]
 }
