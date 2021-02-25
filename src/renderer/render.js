@@ -45,9 +45,6 @@ const render = async (image, canvasIn, scale = 1.0) => {
 	let windowCenter = image.getWindowCenter();
 	let windowWidth = image.getWindowWidth();
 
-	console.log(`min: ${minPixVal} max: ${maxPixVal}`);
-	console.log(`winCenter: ${windowCenter} winWidth: ${windowWidth}`);
-
 	if (!vertexShader) {
 		vertexShader = await loadShader("vertex.glsl");
 		minMaxShader = await loadShader("minMax.glsl");
@@ -66,7 +63,7 @@ const render = async (image, canvasIn, scale = 1.0) => {
 
 	const inColor = !(image.photometricInterpretation || "").startsWith("MONO");
 	if (inColor) {
-		console.log("color image");
+		// console.log("color image");
 		// we only cope with RGB8 images (or images that are decomressed to that, e.g. jpeg
 		// TODO:
 		// - RGB color palettes
@@ -81,7 +78,7 @@ const render = async (image, canvasIn, scale = 1.0) => {
 			outputHeight
 		});
 	}
-	console.log(`invert: ${invert}`);
+
 	if (windowWidth || maxPixVal) {
 		if (maxPixVal && !windowWidth) {
 			windowWidth = maxPixVal - minPixVal;
@@ -153,7 +150,6 @@ contrastify = async ({
 	outputWidth,
 	outputHeight
 }) => {
-	console.log("contrastify");
 	const ext = gl.getExtension("WEBGL_draw_buffers");
 	if (!ext) {
 		throw new Error("sample requires WEBGL_draw_buffers");
@@ -309,8 +305,6 @@ greyscaleRender = async ({
 	outputWidth,
 	outputHeight
 }) => {
-	console.log("window");
-
 	const getWordString = glslUnpackWordString(image);
 
 	const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShader.replace("$(word)", getWordString)]);
@@ -356,7 +350,6 @@ greyscaleLUTRender = async ({
 	outputWidth,
 	outputHeight
 }) => {
-	console.log("lut");
 	const getWordString = glslUnpackWordString(image);
 
 	let format = gl.LUMINANCE_ALPHA;

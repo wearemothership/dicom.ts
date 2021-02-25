@@ -1,12 +1,48 @@
 /* eslint-disable */
 import "./App.css";
-import { DICOMCanvas, DICOMDiv, FileInput } from "dicom.js";
+import cornerstone from "cornerstone-core";
+import { DICOMCanvas, FileInput } from "dicom.js";
 import React, { useEffect, useState, useRef } from "react";
 import readFile, { CPUDecode, NewDecode } from "./ReadDicom";
 import CornerstoneDecode from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
 
 const renderQ = [];
+
+
+const DICOMDiv = ({
+	heading,
+	id,
+	renderTime,
+	canvasRef,
+	width = 512,
+	height = 512
+}) => {
+	useEffect(() => {
+		const last = canvasRef.current;
+		if (canvasRef.current) {
+			cornerstone.enable(canvasRef.current);
+		}
+		return () => {
+			cornerstone.disable(last);
+		};
+	}, [canvasRef]);
+
+	return (
+		<div style={{ display: "inline-block" }}>
+			<div>{heading}</div>
+			<div
+				ref={canvasRef}
+				id={id}
+				width={width}
+				height={height}
+				style={{ width: `${width}px`, height: `${height}px` }}
+			/>
+			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
+		</div>
+	);
+};
+
 
 const Renderer = ({
 	renderMethod,

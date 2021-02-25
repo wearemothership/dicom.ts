@@ -3,7 +3,7 @@ import styles from "./styles.module.css";
 
 import Renderer from "./renderer";
 import { Parser, Series, parseImage } from "./parser";
-import { DICOMCanvas, DICOMDiv } from "./components/DICOMCanvas";
+import DICOMCanvas from "./components/DICOMCanvas";
 import FileInput from "./components/FileInput";
 
 export const dicomjs = {
@@ -23,6 +23,5 @@ export const ExampleComponent = ({ text }) => (
 
 export {
 	DICOMCanvas,
-	DICOMDiv,
 	FileInput
 };
