@@ -1,6 +1,6 @@
 {
   "name": "dicom.js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A small, fast, javascript DICOM renderer",
   "author": "mothershipsoft",
   "license": "MIT",
@@ -24,15 +24,15 @@
     "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "dependencies": {
+    "raw.macro": "^0.4.2",
     "dicom-character-set": "git+https://github.com/nickhingston/dicom-character-set.git#v1.0.2_nodefix",
     "jpeg-lossless-decoder-js": "git+https://github.com/rii-mango/JPEGLosslessDecoderJS.git#v2.0.4",
     "pako": "^1.0.10",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
     "twgl.js": "^4.18.0"
-  },
-  "dependencies": {
-    "raw.macro": "^0.4.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
