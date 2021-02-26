@@ -15,8 +15,8 @@
 		"cornerstone-wado-image-loader": "git+https://github.com/webnamics/cornerstoneWADOImageLoader.git",
 		"dicom-parser": "^1.8.7",
 		"dicom.js": "file:..",
-		"react": "file:../node_modules/react",
-		"react-dom": "file:../node_modules/react-dom",
+		"react": "^17.0.1",
+		"react-dom": "^17.0.1",
 		"react-scripts": "file:../node_modules/react-scripts"
 	},
 	"devDependencies": {
