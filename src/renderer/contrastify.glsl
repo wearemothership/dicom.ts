@@ -1,4 +1,4 @@
-precision mediump float;
+precision highp float;
 uniform bool u_invert;
 uniform sampler2D u_minColor;
 uniform sampler2D u_maxColor;
@@ -16,7 +16,7 @@ void main() {
   uv.y = 1.0 - uv.y;
   float minColor = greyscale(texture2D(u_minColor, vec2(0)));
   float maxColor = greyscale(texture2D(u_maxColor, vec2(0)));
-  float grey = greyscale(texture2D(u_texture, uv));     
+  float grey = greyscale(texture2D(u_texture, uv));
   float range = maxColor - minColor;
   grey = ((grey - minColor) / range);
   grey = (grey * u_slope) + u_intercept;

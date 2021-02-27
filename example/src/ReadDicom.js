@@ -142,7 +142,11 @@ export const NewDecode = (buf, canvas) => {
 	const data = new DataView(buf);
 	dicomjs.Parser.verbose = true;
 	const image = dicomjs.parseImage(data);
-	return dicomjs.render(image, canvas);
+	// const w = image.getCols();
+	// const h = image.getRows();
+	// const scale = Math.min(1, Math.min(4096 / w, 4096 / h));
+	const scale = 1.0;
+	return dicomjs.render(image, canvas, scale);
 };
 
 const readFile = (file) => new Promise((resolve, reject) => {

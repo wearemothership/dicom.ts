@@ -34,7 +34,7 @@ export const glslUnpackWordString = (image, integerVal = true) => {
 	const signed = image.pixelRepresentation;
 	if (image.bitsAllocated <= 8) {
 		// one byte
-		val = "(color.r * 256.0)";
+		val = "(color.r * 255.0)";
 		if (signed) {
 			return `float p = ${val}; return (p > 127.0 ? 255.0 - p : p)${divisor};`;
 		}
@@ -46,10 +46,10 @@ export const glslUnpackWordString = (image, integerVal = true) => {
 		// or green channel for RGB based 16bit greyscale
 		const byte2Chan = isRGB ? "g" : "a";
 		if (image.littleEndian) {
-			val = `(color.${byte2Chan} * 65536.0 + color.r * 256.0)`;
+			val = `(color.${byte2Chan} * 65535.0 + color.r * 255.0)`;
 		}
 		else {
-			val = `(color.r * 65536.0 + color.${byte2Chan} * 256.0)`;
+			val = `(color.r * 65535.0 + color.${byte2Chan} * 255.0)`;
 		}
 		if (signed) {
 			return `float p = ${val};return (p > 32767.0 ? 65535.0 - p : p)${divisor};`;
