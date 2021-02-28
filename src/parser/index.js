@@ -11,18 +11,18 @@ import * as Utils from "./utilities";
 import Siemens from "./siemens";
 
 export {
-	CompressionUtils,
+	// CompressionUtils,
 	Dictionary,
 	Image,
-	OrderedMapIterator,
-	OrderedMap,
+	// OrderedMapIterator,
+	// OrderedMap,
 	Parser,
-	RLE,
+	// RLE,
 	Series,
 	parseImage,
 	Tag,
-	Utils,
-	Siemens
+	// Utils,
+	// Siemens
 };
 
 // export default daikon;

@@ -3,7 +3,7 @@ import "./App.css";
 import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "dicom.js";
 import React, { useEffect, useState, useRef } from "react";
-import readFile, { CPUDecode, NewDecode } from "./ReadDicom";
+import { CPUDecode, GPUJSDecode } from "./ReadDicom";
 import CornerstoneDecode from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
 
@@ -43,6 +43,22 @@ const DICOMDiv = ({
 	);
 };
 
+const DICOMWrapper = ({
+	heading = "",
+	id,
+	renderTime = null,
+	canvasRef,
+	width = 512,
+	height = 512
+}) => (
+	(
+		<div style={{ display: "inline-block" }}>
+			<div>{heading}</div>
+			<DICOMCanvas heading={heading} id={id} canvasRef={canvasRef} width={width} height={height} />
+			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
+		</div>
+	)
+);
 
 const Renderer = ({
 	renderMethod,
@@ -92,7 +108,7 @@ const CPURenderer = ({ fileBuffer, children }) => (
 );
 
 const GPURenderer = ({ fileBuffer, children }) => (
-	<Renderer renderMethod={NewDecode} fileBuffer={fileBuffer}>
+	<Renderer renderMethod={GPUJSDecode} fileBuffer={fileBuffer}>
 		{children}
 	</Renderer>
 );
@@ -105,11 +121,8 @@ const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
 
 function App() {
 	const [fileBuffer, setFileBuffer] = useState(null);
-	const fileSelected = (f) => {
-		readFile(f).then((buff) => {
-			setFileBuffer(buff);
-		});
-
+	const fileSelected = (buff) => {
+		setFileBuffer(buff);
 	};
 	return (
 		<div className="App">
@@ -125,7 +138,7 @@ function App() {
 				<div style={{ height: "50px" }} />
 				<div style={{ display: "flex" }}>
 					<GPURenderer fileBuffer={fileBuffer}>
-						<DICOMCanvas heading="dicom.js" />
+						<DICOMWrapper heading="dicom.js" />
 					</GPURenderer>
 					<CornerstoneRenderer fileBuffer={fileBuffer}>
 						<DICOMDiv heading="Cornerstone.js" />

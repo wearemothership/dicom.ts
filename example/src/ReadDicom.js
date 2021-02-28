@@ -138,7 +138,7 @@ export const CPUDecode = (buf, canvas) => new Promise((resolve, reject) => {
 	return resolve();
 });
 
-export const NewDecode = (buf, canvas) => {
+export const GPUJSDecode = (buf, canvas) => {
 	const data = new DataView(buf);
 	dicomjs.Parser.verbose = true;
 	const image = dicomjs.parseImage(data);
@@ -148,24 +148,3 @@ export const NewDecode = (buf, canvas) => {
 	const scale = 1.0;
 	return dicomjs.render(image, canvas, scale);
 };
-
-const readFile = (file) => new Promise((resolve, reject) => {
-	if (!file) {
-		return reject(Error("no file!"));
-	}
-
-	const blob = file.slice(0, file.size);
-	const reader = new FileReader();
-	console.time("load");
-	reader.onloadend = (evt) => {
-		if (evt.target.readyState === FileReader.DONE) {
-			console.timeEnd("load");
-			return resolve(evt.target.result);
-		}
-		return reject(Error("could not load!"));
-	};
-	reader.readAsArrayBuffer(blob);
-	return null;
-});
-
-export default readFile;
