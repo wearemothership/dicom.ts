@@ -1,11 +1,6 @@
 import fs from "fs";
-import crypto from "crypto";
-
 import { parseImage } from ".";
-
-const shaFromJSON = (input) => crypto.createHash("sha1")
-	.update(JSON.stringify(input))
-	.digest("hex");
+import { shaFromJSON } from "../testUtils";
 
 describe("parser tests", () => {
 	const path = "./test/medical.nema.org/compsamples";

@@ -186,13 +186,13 @@ contrastify = async ({
 		// creates a framebuffer and creates and attaches 2 RGBA/UNSIGNED textures
 		const fbi = twgl.createFramebufferInfo(gl, [
 			{
-				// format: gl.LUMINANCE_ALPHA,
+				format: gl.RGBA,
 				min: gl.NEAREST,
 				mag: gl.NEAREST,
 				wrap: gl.CLAMP_TO_EDGE
 			},
 			{
-				// format: gl.LUMINANCE_ALPHA,
+				format: gl.RGBA,
 				min: gl.NEAREST,
 				mag: gl.NEAREST,
 				wrap: gl.CLAMP_TO_EDGE
@@ -376,7 +376,7 @@ greyscaleLUTRender = async ({
 
 	// 1D tex
 	const lutTex = twgl.createTexture(gl, {
-		src: new Uint8Array(lutData.buffer),
+		src: new Uint8Array(new Uint16Array(lutData).buffer),
 		width: lutData.length,
 		height: 1,
 		format,
