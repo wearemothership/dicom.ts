@@ -4,7 +4,6 @@ import Image from "./image";
 import OrderedMapIterator from "./iterator";
 import OrderedMap from "./orderedmap";
 import Parser from "./parser";
-import RLE from "./rle";
 import Series, { parseImage } from "./series";
 import Tag from "./tag";
 import * as Utils from "./utilities";

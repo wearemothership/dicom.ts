@@ -79,7 +79,7 @@ describe("dicom.js", () => {
 		expect(shaFromBuffer(buffer)).toEqual("60388cc0984e94d685f985ee0e343224056afb26");
 	});
 
-	it("renders OK - greyscale with LUT descriptor", async () => {
+	it("renders OK - uncompressed greyscale with LUT descriptor", async () => {
 		const data = fs.readFileSync("./test/vpop-pro.com/greyscale-with-lut.dcm");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
@@ -89,5 +89,64 @@ describe("dicom.js", () => {
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("7ebf07de7d6db444188249c3e592be8250b20098");
+	});
+
+	it("renders OK - jpeg lossless", async () => {
+		const data = fs.readFileSync("./test/medical.nema.org/compsamples_jpeg/IMAGES/JPLL/MR2_JPLL");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas, 1);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("e438e4c5a39aa15f41ead566a4fcd16ad17da94f");
+	});
+
+	it("renders OK - jpeg baseline 8bit (native decoder?)", async () => {
+		const data = fs.readFileSync("./test/vpop-pro.com/jpeg-baseline.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas, 1);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		expect(shaFromBuffer(buffer)).toEqual("0740edb1140d933966d64754e1b9d0d01db6541c");
+	});
+
+	it("renders OK - jpeg baseline", async () => {
+		const data = fs.readFileSync("./test/medical.nema.org/compsamples_jpeg/IMAGES/JPLY/MR1_JPLY");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas, 1);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("b195815c49a9f281746f8b377dcfa5f0c04fc3d8");
+	});
+
+	it("renders OK - jpeg LS", async () => {
+		const data = fs.readFileSync("./test/medical.nema.org/compsamples_jpegls/IMAGES/JLSL/XA1_JLSL");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas, 1);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("83f8d3c0d12794591f23fa859b1121ee18e2fdc6");
+	});
+
+	it("renders OK - jpeg2000", async () => {
+		const data = fs.readFileSync("./test/medical.nema.org/compsamples_j2k/IMAGES/J2KI/US1_J2KI");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas, 1);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("943302fe91302fd9ede3bb5f31b466bb403ed403");
 	});
 });

@@ -1,18 +1,17 @@
-import * as twgl from "twgl.js";
 import { Image } from "../parser";
+
+const hasCreateObjectURL = !!URL.createObjectURL;
 
 /**
  * Should we try and load the image into an Image element ans use HW decoder
  * @param {Daikon Image} image the parsed DICOM image
  * @returns Boolean if yes we can use native browser decoder
  */
-// const shouldUseNativeDecoder = () => false;
-const shouldUseNativeDecoder = (image) => (
-	Image && image.isCompressed()
-	&& !["1.2.840.10008.1.2.4.51", "1.2.840.10008.1.2.4.81"].includes(image.transferSyntax) // not extended JPEG or LS
-	&& (
-		image.isCompressedJPEGBaseline()
-		|| (
+export const shouldUseNativeDecoder = (image) => (
+	hasCreateObjectURL && (
+		(image.isCompressedJPEGBaseline()
+			&& !["1.2.840.10008.1.2.4.51", "1.2.840.10008.1.2.4.81"].includes(image.transferSyntax) // not extended JPEG or LS
+		) || (
 			image.isCompressedJPEG2000() // safar supports JPEG2000 netively
 			&& /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 		)
@@ -56,69 +55,4 @@ export const glslUnpackWordString = (image, integerVal = true) => {
 		}
 	}
 	return `return ${val}${divisor};`;
-};
-
-/**
- * Creates a webgl texture - Takes an object with the folloring params
- * @param {Object.gl} gl - webGl context
- * @param {Object.image} image - the parsed DICOM image
- * @param {Object.width} width - width of the texture
- * @param {Object.height} height - height of texture
- */
-export const createTexture = ({
-	gl,
-	image,
-	width,
-	height
-}) => {
-	// If JPEG baseline, or safari and JPEG2000 - use native decoder
-	if (shouldUseNativeDecoder(image)) {
-		const blob = new Blob([image.getJpegs()[0]]);
-		const src = URL.createObjectURL(blob);
-
-		return new Promise((resolve, reject) => {
-			twgl.createTexture(gl, {
-				src,
-				width,
-				height,
-				type: gl.UNSIGNED_BYTE,
-				min: gl.NEAREST,
-				mag: gl.NEAREST,
-				wrap: gl.CLAMP_TO_EDGE,
-			}, (err, texture) => {
-				URL.revokeObjectURL(src);
-				if (err) {
-					reject(err);
-				}
-				else {
-					resolve(texture);
-				}
-			});
-		});
-	}
-
-	const pixelData = image.getRawData();
-	const greyBuffer = new Uint8Array(new Uint16Array(pixelData).buffer);
-
-	let format = gl.LUMINANCE_ALPHA;
-	let internalFormat = gl.LUMINANCE_ALPHA;
-	if (image.dataType === Image.byteType.rgb) {
-		format = gl.RGB;
-		internalFormat = gl.RGB;
-	}
-	else if (image.bytesAllocated === 1) {
-		format = gl.LUMINANCE;
-		internalFormat = gl.LUMINANCE;
-	}
-	return Promise.resolve(twgl.createTexture(gl, {
-		src: greyBuffer,
-		width,
-		height,
-		format,
-		internalFormat,
-		type: gl.UNSIGNED_BYTE,
-		min: gl.NEAREST,
-		mag: gl.NEAREST,
-		wrap: gl.CLAMP_TO_EDGE,
-	}));
 };

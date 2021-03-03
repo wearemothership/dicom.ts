@@ -2,7 +2,9 @@
 import * as twgl from "twgl.js";
 import raw from "raw.macro";
 import { Tag } from "../parser";
-import { glslUnpackWordString, createTexture } from "./util";
+import { glslUnpackWordString } from "../decoder/util";
+
+import { decoderForImage } from "../decoder";
 
 let vertexShader = raw("./vertex.glsl");
 let minMaxShader = raw("./minMax.glsl");
@@ -165,12 +167,9 @@ contrastify = async ({
 
 	const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
-	const srcTex = await createTexture({
-		gl,
-		image,
-		width,
-		height
-	});
+	const decoder = decoderForImage(image);
+	decoder.outputSize = { width, height };
+	const srcTex = await decoder.createTexture(gl, 0);
 
 	const framebuffers = [];
 	let w = width;
@@ -315,12 +314,9 @@ greyscaleRender = async ({
 	gl.useProgram(programInfo.program);
 	twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
 
-	const srcTex = await createTexture({
-		gl,
-		image,
-		width,
-		height
-	});
+	const decoder = decoderForImage(image);
+	decoder.outputSize = { width, height };
+	const srcTex = await decoder.createTexture(gl, 0);
 
 	twgl.setUniforms(programInfo, {
 		u_resolution: [outputWidth, outputHeight],
@@ -367,12 +363,9 @@ greyscaleLUTRender = async ({
 	gl.useProgram(programInfo.program);
 	twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
 
-	const srcTex = await createTexture({
-		gl,
-		image,
-		width,
-		height
-	});
+	const decoder = decoderForImage(image);
+	decoder.outputSize = { width, height };
+	const srcTex = await decoder.createTexture(gl, 0);
 
 	// 1D tex
 	const lutTex = twgl.createTexture(gl, {
@@ -422,12 +415,9 @@ colorRender = async ({
 	gl.useProgram(programInfo.program);
 	twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
 
-	const srcTex = await createTexture({
-		gl,
-		image,
-		width,
-		height
-	});
+	const decoder = decoderForImage(image);
+	decoder.outputSize = { width, height };
+	const srcTex = await decoder.createTexture(gl, 0);
 
 	twgl.setUniforms(programInfo, {
 		u_resolution: [outputWidth, outputHeight],

@@ -1,15 +1,8 @@
 /* eslint no-use-before-define: ["error", { "classes": false }] */
-import { lossless as jpegLossless } from "jpeg-lossless-decoder-js";
 import CompressionUtils from "./compression-utils";
-import RLE from "./rle";
 import Tag, { createTagId, createTagIdWithTag } from "./tag";
 import * as Utils from "./utilities";
-import { JpegImage as JpegDecoder } from "../lib/jpeg-baseline";
-import JpegLSDecoder from "../lib/jpeg-ls";
-import JpxDecoder from "../lib/jpx";
 import { TransferSyntax } from "./constants";
-
-const JpegLosslessDecoder = jpegLossless.Decoder;
 
 const getSingleValueSafely = (tag, index) => (tag?.value?.[index] ?? null);
 
@@ -518,139 +511,6 @@ class DCMImage {
 			this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)].value = rgb;
 			this.convertedPalette = true;
 		}
-	}
-
-	decompressJPEG(jpg) {
-		if (this.isCompressedJPEGLossless()) {
-			const decoder = new JpegLosslessDecoder();
-			return decoder.decode(jpg);
-		}
-		if (this.isCompressedJPEGBaseline()) {
-			let decoded = null;
-			const decoder = new JpegDecoder();
-			decoder.parse(new Uint8Array(jpg));
-			const { width, height } = decoder;
-			if (this.bitsAllocated <= 8) {
-				decoded = decoder.getData(width, height);
-			}
-			else if (this.bitsAllocated === 16) {
-				decoded = decoder.getData16(width, height);
-			}
-
-			return decoded;
-		}
-		if (this.isCompressedJPEG2000()) {
-			const decoder = new JpxDecoder();
-			decoder.parse(new Uint8Array(jpg));
-			return decoder.tiles[0].items;
-		}
-		if (this.isCompressedJPEGLS()) {
-			const decoder = new JpegLSDecoder();
-			return decoder.decodeJPEGLS(
-				new Uint8Array(jpg),
-				this.dataType === DCMImage.byteType.integer
-			);
-		}
-		return null;
-	}
-
-	decompress() {
-		let decompressed = null;
-
-		if (!this.decompressed) {
-			this.decompressed = true;
-
-			const frameSize = this.rows
-				* this.columns
-				* this.bytesAllocated;
-
-			const numFrames = 1; // this.getNumberOfFrames();
-			// TODO: handle multiple frames
-			if (this.isCompressedJPEGLossless()) {
-				const jpegs = this.getJpegs();
-
-				const decoder = new JpegLosslessDecoder();
-				const temp = decoder.decode(jpegs[0]);
-				// const numComponents = decoder.numComp;
-				decompressed = new Uint8Array(temp.buffer);
-				// TODO: stop doing this - we should out to an output Image
-			}
-			else if (this.isCompressedJPEGBaseline()) {
-				const jpegs = this.getJpegs();
-
-				const decoder = new JpegDecoder();
-				decoder.parse(new Uint8Array(jpegs[0]));
-				const { width, height } = decoder;
-				let decoded = null;
-				if (this.bitsAllocated === 8) {
-					decoded = decoder.getData(width, height);
-				}
-				else {
-					decoded = decoder.getData16(width, height);
-				}
-				decompressed = decoded;
-				this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)].value = decoded;
-			}
-			else if (this.isCompressedJPEG2000()) {
-				const jpegs = this.getJpegs();
-				const decoder = new JpxDecoder();
-				decoder.parse(new Uint8Array(jpegs[0]));
-				// const { width, height } = decoder;
-				const decoded = decoder.tiles[0].items;
-				const numComponents = decoder.componentsCount;
-
-				// if (decompressed === null) {
-				//     decompressed = new DataView(new ArrayBuffer(frameSize * numFrames * numComponents));
-				// }
-
-				// Utils.fillBuffer(decoded, decompressed, (ctr * frameSize * numComponents),
-				//     parseInt(Math.ceil(this.getBitsAllocated() / 8)));
-				// if (this.getBitsAllocated() / 8 > 8) {
-				//     decompressed = decoded
-				// }
-				// else {
-				decompressed = new DataView(new ArrayBuffer(frameSize * numFrames * numComponents));
-				Utils.fillBuffer(
-					decoded,
-					decompressed,
-					0,
-					this.bytesAllocated
-				);
-
-				// decompressed = new Uint8Array(decoded.buffer, decoded.byteOffset, decoded.byteLength);
-				// }
-				// decoded = null;
-				//
-				// }
-			}
-			else if (this.isCompressedJPEGLS()) {
-				const jpegs = this.getJpegs();
-				decompressed = JpegLSDecoder({
-					rows: this.rows,
-					columns: this.columns,
-					samplesPerPixel: this.samplesPerPixel,
-					bitsAllocated: this.bitsAllocated,
-					planarConfiguration: this.getPlanarConfig(),
-					pixelRepresentation: this.pixelRepresentation
-				}, new Uint8Array(jpegs[0])).pixelData;
-			}
-			else if (this.isCompressedRLE()) {
-				const rle = this.getRLE();
-				// TODO: we only support single frame here,
-				// don't like the current arch of decoding all frames on asking for the pixel data
-				// for (ctr = 0; ctr < rle.length; ctr+=1) {
-				decompressed = RLE({
-					rows: this.rows,
-					columns: this.columns,
-					samplesPerPixel: this.samplesPerPixel,
-					bitsAllocated: this.bitsAllocated,
-					planarConfiguration: this.getPlanarConfig(),
-					pixelRepresentation: this.pixelRepresentation
-				},
-				rle[0]).pixelData;
-			}
-		}
-		this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)].value = decompressed;
 	}
 
 	/**

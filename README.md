@@ -15,10 +15,10 @@ This is the result!
 - fix microbundle warnings
 - fix cornerstone comparison example
 - add standalone React canvas example
-- add test framework
+- ~~add test framework~~
 - palette conversion does not work see ./test/issues
 - some images are not perfect with cornerstone
-- ll decoder can be slower than cornerstones
+- LL decoder can be slower than cornerstones
 - seperate out decoders from parser
 - currently only supports rendering frame 0!
 - accelerate palette conversion

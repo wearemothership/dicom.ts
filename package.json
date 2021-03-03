@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
+    "blob-util": "^2.0.2",
     "canvas": "^2.6.1",
     "cross-env": "^7.0.2",
     "dicom-test-files": "git+https://github.com/mothershipsoft/dicom-test-files.git",
