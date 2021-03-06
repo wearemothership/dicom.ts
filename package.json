@@ -7,7 +7,7 @@
   "repository": "mothershipsoft/dicom.js",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
-  "source": "src/index.js",
+  "source": "src/index.tsx",
   "engines": {
     "node": ">=10"
   },
@@ -28,11 +28,16 @@
     "react-dom": "^17.0.1"
   },
   "dependencies": {
-    "raw.macro": "^0.4.2",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.31",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.1",
     "dicom-character-set": "git+https://github.com/nickhingston/dicom-character-set.git#v1.0.2_nodefix",
     "jpeg-lossless-decoder-js": "git+https://github.com/rii-mango/JPEGLosslessDecoderJS.git#v2.0.4",
     "pako": "^1.0.10",
-    "twgl.js": "git+https://github.com/mothershipsoft/twgl.js#v4.19.1-node-canvas-webgl"
+    "raw.macro": "^0.4.2",
+    "twgl.js": "git+https://github.com/mothershipsoft/twgl.js#v4.19.1-node-canvas-webgl",
+    "typescript": "^4.2.3"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",

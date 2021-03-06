@@ -11,15 +11,17 @@ Was in need to display greyscale, single frame dicom files as quickly as possibl
 This is the result!
 
 ## Todo
+- ~~add typescript support~~
+- complete ts impl
 - make sure adhere to licenses...
 - fix microbundle warnings
-- fix cornerstone comparison example
+- ~~fix cornerstone comparison example~~
 - add standalone React canvas example
 - ~~add test framework~~
 - palette conversion does not work see ./test/issues
-- some images are not perfect with cornerstone
+- some images are not perfect with cornerstone, what is correct?
 - LL decoder can be slower than cornerstones
-- seperate out decoders from parser
+- ~~seperate out decoders from parser~~
 - currently only supports rendering frame 0!
 - accelerate palette conversion
 

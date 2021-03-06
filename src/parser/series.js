@@ -1,5 +1,4 @@
 import Image from "./image";
-import { bind } from "./utilities";
 import Parser from "./parser";
 import OrderedMap from "./orderedmap";
 
@@ -444,9 +443,9 @@ class Series {
 		this.images[0].clearPixelData();
 		const buffer = new Uint8Array(new ArrayBuffer(length * this.images.length));
 		buffer.set(new Uint8Array(data, 0, length), 0);
-		setTimeout(bind(this, () => (
+		setTimeout(this, () => (
 			this.concatenateNextImageData(buffer, length, progressMeter, 1, onFinishedImageRead)
-		)), 0);
+		), 0);
 	}
 
 	concatenateNextImageData(buffer, frameSize, progressMeter, index, onFinishedImageRead) {
@@ -466,14 +465,14 @@ class Series {
 			const length = this.validatePixelDataLength(this.images[index]);
 			this.images[index].clearPixelData();
 			buffer.set(new Uint8Array(data, 0, length), (frameSize * index));
-			setTimeout(bind(this, () => (
+			setTimeout(this, () => (
 				this.concatenateNextImageData(
 					buffer,
 					frameSize,
 					progressMeter,
 					index + 1,
 					onFinishedImageRead
-				))), 0);
+				)), 0);
 		}
 	}
 

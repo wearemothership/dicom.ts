@@ -134,7 +134,7 @@ describe("dicom.js", () => {
 		await dicomjs.render(image, canvas, 1);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("83f8d3c0d12794591f23fa859b1121ee18e2fdc6");
 	});
 

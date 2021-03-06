@@ -1,10 +1,15 @@
 /* eslint no-use-before-define: ["error", { "classes": false }] */
+// @ts-ignore
 import pako from "pako";
-
+// @ts-ignore
 import DCMImage from "./image";
+// @ts-ignore
 import Tag, { TagId } from "./tag";
+
 import * as Utils from "./utilities";
+// @ts-ignore
 import Dictionary from "./dictionary";
+
 import { TransferSyntax } from "./constants";
 
 /**
@@ -12,7 +17,7 @@ import { TransferSyntax } from "./constants";
  * @param {DataView} data
  * @returns {boolean}
  */
-const isMagicCookieFound = (data) => {
+const isMagicCookieFound = (data: DataView): boolean => {
 	const offset = Parser.MAGIC_COOKIE_OFFSET;
 	const magicCookieLength = Parser.MAGIC_COOKIE.length;
 	for (let ctr = 0; ctr < magicCookieLength; ctr += 1) {
@@ -23,7 +28,7 @@ const isMagicCookieFound = (data) => {
 	return true;
 };
 
-const findFirstTagOffset = (data) => {
+const findFirstTagOffset = (data: DataView): number => {
 	const magicCookieLength = Parser.MAGIC_COOKIE.length;
 	if (isMagicCookieFound(data)) {
 		return Parser.MAGIC_COOKIE_OFFSET + magicCookieLength;
@@ -52,12 +57,29 @@ const findFirstTagOffset = (data) => {
 	return offset;
 };
 
-class Parser {
+interface IParserPublic {
+	littleEndian:boolean;
+	explicit:boolean;
+	error?: Error | null;
+	charset?:string;
+}
+interface IParserPrivate {
+	metaFound:boolean;
+	metaFinished:boolean;
+	metaFinishedOffset:number;
+	needsDeflate:boolean;
+	inflated?: ArrayBuffer | null;
+	encapsulation:boolean;
+	level:number;
+	charset?:string;
+}
+
+class Parser implements IParserPublic, IParserPrivate {
 	/**
 	 * Global property to output string representation of tags as they are parsed.
 	 * @type {boolean}
 	 */
-	static verbose = false;
+	static verbose:boolean = false;
 
 	static MAGIC_COOKIE_OFFSET = 128;
 
@@ -71,25 +93,34 @@ class Parser {
 
 	static UNDEFINED_LENGTH = 0xFFFFFFFF;
 
-	constructor() {
-		this.littleEndian = true;
-		this.explicit = true;
-		this.metaFound = false;
-		this.metaFinished = false;
-		this.metaFinishedOffset = -1;
-		this.needsDeflate = false;
-		this.inflated = null;
-		this.encapsulation = false;
-		this.level = 0;
-		this.error = null;
-	}
+	littleEndian = true;
+
+	explicit = true;
+
+	metaFound = false;
+
+	metaFinished = false;
+
+	metaFinishedOffset= -1;
+
+	needsDeflate = false;
+
+	inflated: ArrayBuffer | null = null;
+
+	encapsulation = false;
+
+	level = 0;
+
+	error: Error | null = null;
+
+	charset = undefined;
 
 	/**
 	 * Parses this data and returns an image object.
 	 * @param {DataView} data
 	 * @returns {Image|null}
 	 */
-	parse(dataIn) {
+	parse(dataIn: DataView):any {
 		let image = null;
 		let data = dataIn;
 		try {
@@ -112,14 +143,17 @@ class Parser {
 					this.needsDeflate = false;
 					const copyMeta = data.buffer.slice(0, tag.offsetEnd);
 					const copyDeflated = data.buffer.slice(tag.offsetEnd);
-					this.inflated = Utils.concatArrayBuffers(copyMeta, pako.inflateRaw(copyDeflated));
-					data = new DataView(this.inflated);
+					this.inflated = Utils.concatArrayBuffers(
+						copyMeta,
+						<ArrayBuffer> pako.inflateRaw(copyDeflated)
+					);
+					data = new DataView(this.inflated!);
 				}
 				tag = this.getNextTag(data, tag.offsetEnd);
 			}
 		}
 		catch (err) {
-			this.error = err;
+			this.error = (<Error> err);
 		}
 
 		if (image !== null) {
@@ -130,7 +164,7 @@ class Parser {
 		return image;
 	}
 
-	parseEncapsulated(data) {
+	parseEncapsulated(data: DataView) {
 		this.encapsulation = true;
 		const tags = [];
 		try {
@@ -153,7 +187,7 @@ class Parser {
 		return tags;
 	}
 
-	testForValidTag(data) {
+	testForValidTag(data: DataView):any {
 		let tag = null;
 		try {
 			const offset = findFirstTagOffset(data);
@@ -165,7 +199,7 @@ class Parser {
 		return tag;
 	}
 
-	getNextTag(data, offsetStart, testForTag) {
+	getNextTag(data: DataView, offsetStart: number, testForTag:boolean = false):any {
 		let group = 0;
 		let value = null;
 		let offset = offsetStart;
@@ -270,24 +304,24 @@ class Parser {
 		});
 
 		if (tag.value) {
-			if (tag.is(TagId.TransferSyntax)) {
+			if (tag.is(<[number, number]> TagId.TransferSyntax)) {
 				const [val] = tag.value;
 				this.explicit = true;
 				this.littleEndian = true;
-				if (val === TransferSyntax.implicitLittle) {
+				if (val === TransferSyntax.ImplicitLittle) {
 					this.explicit = false;
 				}
-				else if (val === TransferSyntax.explicitBig) {
+				else if (val === TransferSyntax.ExplicitBig) {
 					this.littleEndian = false;
 				}
-				else if (val === TransferSyntax.compressionDeflate) {
+				else if (val === TransferSyntax.CompressionDeflate) {
 					this.needsDeflate = true;
 				}
 			}
-			else if (tag.is(TagId.MetaLength)) {
+			else if (tag.is(<[number, number]>TagId.MetaLength)) {
 				this.metaFinishedOffset = tag.value[0] + offset;
 			}
-			else if (tag.is(TagId.Charset)) {
+			else if (tag.is(<[number, number]>TagId.Charset)) {
 				let charset = tag.value;
 				if (charset.length === 2) {
 					charset = `${charset[0] || "ISO 2022 IR 6"}\\${charset[1]}`;
@@ -301,7 +335,7 @@ class Parser {
 		return tag;
 	}
 
-	parseSublist(data, offsetStart, length, raw) {
+	parseSublist(data: DataView, offsetStart:number, length:number, raw:boolean) {
 		const tags = [];
 		let offset = offsetStart;
 		const offsetEnd = offsetStart + length;
@@ -310,7 +344,7 @@ class Parser {
 		if (length === Parser.UNDEFINED_LENGTH) {
 			let sublistItem = this.parseSublistItem(data, offset, raw);
 
-			while (!sublistItem.is(TagId.SequenceDelim)) {
+			while (!sublistItem.is(<[number, number]>TagId.SequenceDelim)) {
 				tags.push(sublistItem);
 				offset = sublistItem.offsetEnd;
 				sublistItem = this.parseSublistItem(data, offset, raw);
@@ -331,7 +365,7 @@ class Parser {
 		return tags;
 	}
 
-	parseSublistItem(data, offsetStart, raw) {
+	parseSublistItem(data:DataView, offsetStart:number, raw:boolean) {
 		let offset = offsetStart;
 		let value = null;
 		const tags = [];
@@ -390,6 +424,6 @@ class Parser {
 	}
 }
 // give Image access to parser
-Image.Parser = Parser;
+DCMImage.Parser = Parser;
 
 export default Parser;

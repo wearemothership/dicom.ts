@@ -375,7 +375,7 @@ const getFloat64 = (rawData, littleEndian) => {
 };
 
 const getDoubleElscint = (rawData) => {
-	const data = [];
+	const data = Array(8);
 
 	for (let ctr = 0; ctr < 8; ctr += 1) {
 		data[ctr] = rawData.getUint8(ctr);

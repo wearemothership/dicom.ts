@@ -5,15 +5,26 @@
 		"jest": true,
 		"jest/globals": true
 	},
-	"plugins": ["jest"],
+	"plugins": ["jest", "@typescript-eslint"],
 	"extends": [
 		"eslint-config-airbnb",
 		"airbnb/hooks",
 		"plugin:jest/recommended",
 		"plugin:jest/style"
+		// "plugin:@typescript-eslint/eslint-recommended",
+        // "plugin:@typescript-eslint/recommended"
 	],
 	"rules": {
-		"no-unused-vars": 1,
+		"import/extensions": [
+			"error",
+			"ignorePackages",
+			{
+				"js": "never",
+				"jsx": "never",
+				"ts": "never",
+				"tsx": "never"
+			}
+		],
 		"indent": [2, "tab", { "SwitchCase": 1, "VariableDeclarator": 1 }],
 		"no-tabs": 0,
 		"react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
@@ -38,11 +49,22 @@
 		"react/jsx-props-no-spreading": [2, {
 			"custom": "ignore"
 		}],
-		"react/jsx-fragments": [2, "syntax"]
+		"react/jsx-fragments": [2, "syntax"],
+		"no-unused-vars": "off",
+		"@typescript-eslint/no-unused-vars": "error",
+		"no-shadow": "off",
+  		"@typescript-eslint/no-shadow": ["error"]
 	},
 	"parserOptions": {
 		"sourceType": "module"
 	},
-	"parser": "babel-eslint",
-	"ignorePatterns": ["!.storybook"]
+	"parser": "@typescript-eslint/parser",
+	"ignorePatterns": ["!.storybook"],
+	"settings": {
+		"import/resolver": {
+			"node": {
+			"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		}
+	}
 }

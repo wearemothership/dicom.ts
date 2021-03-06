@@ -71,6 +71,8 @@ class DCMImage {
 		rgb: 6
 	};
 
+	static Parser;
+
 	static obliquityThresholdCosineValue = 0.8;
 
 	static skipPaletteConversion = false;
@@ -773,10 +775,10 @@ class DCMImage {
 	isCompressed() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if (transferSyntax.indexOf(TransferSyntax.compressionJpeg) !== -1) {
+			if (transferSyntax.indexOf(TransferSyntax.CompressionJpeg) !== -1) {
 				return true;
 			}
-			if (transferSyntax.indexOf(TransferSyntax.compressionRLE) !== -1) {
+			if (transferSyntax.indexOf(TransferSyntax.CompressionRLE) !== -1) {
 				return true;
 			}
 		}
@@ -791,7 +793,7 @@ class DCMImage {
 	isCompressedJPEG() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if (transferSyntax.indexOf(TransferSyntax.compressionJpeg) !== -1) {
+			if (transferSyntax.indexOf(TransferSyntax.CompressionJpeg) !== -1) {
 				return true;
 			}
 		}
@@ -806,8 +808,8 @@ class DCMImage {
 	isCompressedJPEGLossless() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if ((transferSyntax.indexOf(TransferSyntax.compressionJpegLossless) !== -1)
-				|| (transferSyntax.indexOf(TransferSyntax.compressionJpegLosslessSel1) !== -1)) {
+			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpegLossless) !== -1)
+				|| (transferSyntax.indexOf(TransferSyntax.CompressionJpegLosslessSel1) !== -1)) {
 				return true;
 			}
 		}
@@ -822,8 +824,8 @@ class DCMImage {
 	isCompressedJPEGBaseline() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if ((transferSyntax.indexOf(TransferSyntax.compressionJpegBaseline8bit) !== -1)
-				|| (transferSyntax.indexOf(TransferSyntax.compressionJpegBaseline12bit)
+			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpegBaseline8bit) !== -1)
+				|| (transferSyntax.indexOf(TransferSyntax.CompressionJpegBaseline12bit)
 					!== -1)) {
 				return true;
 			}
@@ -839,8 +841,8 @@ class DCMImage {
 	isCompressedJPEG2000() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if ((transferSyntax.indexOf(TransferSyntax.compressionJpeg2000) !== -1)
-				|| (transferSyntax.indexOf(TransferSyntax.compressionJpeg2000lossless) !== -1)) {
+			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpeg2000) !== -1)
+				|| (transferSyntax.indexOf(TransferSyntax.CompressionJpeg2000lossless) !== -1)) {
 				return true;
 			}
 		}
@@ -855,8 +857,8 @@ class DCMImage {
 	isCompressedJPEGLS() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if ((transferSyntax.indexOf(TransferSyntax.compressionJpegLs) !== -1)
-				|| (transferSyntax.indexOf(TransferSyntax.compressionJpegLsLossless) !== -1)) {
+			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpegLs) !== -1)
+				|| (transferSyntax.indexOf(TransferSyntax.CompressionJpegLsLossless) !== -1)) {
 				return true;
 			}
 		}
@@ -871,7 +873,7 @@ class DCMImage {
 	isCompressedRLE() {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
-			if (transferSyntax.indexOf(TransferSyntax.compressionRLE) !== -1) {
+			if (transferSyntax.indexOf(TransferSyntax.CompressionRLE) !== -1) {
 				return true;
 			}
 		}
@@ -1056,7 +1058,7 @@ class DCMImage {
 	 */
 	getEncapsulatedData() {
 		const { buffer } = this.getPixelData().value;
-		const parser = new Image.Parser();
+		const parser = new DCMImage.Parser();
 		return parser.parseEncapsulated(new DataView(buffer));
 	}
 
@@ -1096,24 +1098,6 @@ class DCMImage {
 		}
 
 		return dataConcat;
-	}
-
-	getRLE() {
-		const encapTags = this.getEncapsulatedData();
-		const data = [];
-		// organize data as an array of an array of JPEG parts
-		if (encapTags) {
-			const numTags = encapTags.length;
-
-			// the first sublist item contains offsets, need offsets?
-			for (let ctr = 1; ctr < numTags; ctr += 1) {
-				if (encapTags[ctr].value) {
-					data.push(encapTags[ctr].value.buffer);
-				}
-			}
-		}
-
-		return data;
 	}
 
 	/**
