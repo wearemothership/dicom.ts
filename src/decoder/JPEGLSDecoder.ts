@@ -1,11 +1,14 @@
 import JpegLSDecoder from "./codecs/jpeg-ls";
 import Decoder from "./Decoder";
+import { getJpegData } from "./util";
 
 class JPEGLosslessDecoder extends Decoder {
-	decode(frameNo) {
+	private jpegs:Array<ArrayBuffer> | null = null
+
+	decode(frameNo: number) {
 		const { image } = this;
 		if (!this.jpegs) {
-			this.jpegs = image.getJpegs();
+			this.jpegs = getJpegData(image);
 		}
 		const decompressed = JpegLSDecoder({
 			rows: image.rows,

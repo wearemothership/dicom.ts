@@ -1,11 +1,14 @@
 import Decoder from "./Decoder";
 import RLE from "./codecs/rle";
+import { getEncapsulatedData } from "./util";
 
 class RLEDecoder extends Decoder {
-	decode(frameNo) {
+	private rleData: Array<ArrayBuffer> | null = null
+
+	protected decode(frameNo: number) {
 		const { image } = this;
 		if (!this.rleData) {
-			const encapTags = image.getEncapsulatedData();
+			const encapTags = getEncapsulatedData(image);
 			const numTags = encapTags?.length || 0;
 			const data = new Array(numTags);
 			// the first sublist item contains offsets - ignore

@@ -1,15 +1,26 @@
-// eslint-disable-next-line max-classes-per-file
 import * as twgl from "twgl.js";
-// import * as Utils from "../parser/utilities";
 import Image from "../parser/image";
 
-class Decoder {
+export interface ISize {
+	width: number,
+	height: number
+}
+
+interface IDecoder {
+	outputSize: ISize
+	image: any
+	createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture>
+}
+
+class Decoder implements IDecoder {
+	image:any;
+
 	outputSize = {
 		width: 1,
 		height: 1
 	}
 
-	constructor(image) {
+	constructor(image:any) {
 		this.image = image;
 		this.outputSize = {
 			width: image.width,
@@ -17,37 +28,36 @@ class Decoder {
 		};
 	}
 
-	decode(/* frameNo */) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected decode(frameNo:number):Promise<Uint8Array | Uint16Array> {
 		return Promise.resolve(this.image.getPixelData().value);
 	}
 
-	createTexture(gl, frameNo) {
-		return this.decode(frameNo).then((pixelData) => {
-			const greyBuffer = new Uint8Array(pixelData.buffer);
-
-			let format = gl.LUMINANCE_ALPHA;
-			let internalFormat = gl.LUMINANCE_ALPHA;
-			if (this.image.dataType === Image.byteType.rgb) {
-				format = gl.RGB;
-				internalFormat = gl.RGB;
-			}
-			else if (this.image.bytesAllocated === 1) {
-				format = gl.LUMINANCE;
-				internalFormat = gl.LUMINANCE;
-			}
-			const { width, height } = this.outputSize;
-			return Promise.resolve(twgl.createTexture(gl, {
-				src: greyBuffer,
-				width,
-				height,
-				format,
-				internalFormat,
-				type: gl.UNSIGNED_BYTE,
-				min: gl.NEAREST,
-				mag: gl.NEAREST,
-				wrap: gl.CLAMP_TO_EDGE,
-			}));
-		});
+	async createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture> {
+		const pixelData = await this.decode(frameNo);
+		const greyBuffer = new Uint8Array(pixelData.buffer);
+		let format = gl.LUMINANCE_ALPHA;
+		let internalFormat = gl.LUMINANCE_ALPHA;
+		if (this.image.dataType === Image.byteType.rgb) {
+			format = gl.RGB;
+			internalFormat = gl.RGB;
+		}
+		else if (this.image.bytesAllocated === 1) {
+			format = gl.LUMINANCE;
+			internalFormat = gl.LUMINANCE;
+		}
+		const { width, height } = this.outputSize;
+		return Promise.resolve(twgl.createTexture(gl, {
+			src: greyBuffer,
+			width,
+			height,
+			format,
+			internalFormat,
+			type: gl.UNSIGNED_BYTE,
+			min: gl.NEAREST,
+			mag: gl.NEAREST,
+			wrap: gl.CLAMP_TO_EDGE,
+		}));
 	}
 }
 

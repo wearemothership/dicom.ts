@@ -10,7 +10,7 @@ import { shouldUseNativeDecoder } from "./util";
 
 export { Decoder };
 
-export const decoderForImage = (image) => {
+export const decoderForImage = (image:any):Decoder | null => {
 	if (!image.isCompressed()) {
 		return new Decoder(image);
 	}

@@ -1,0 +1,4 @@
+// class Renderer {
+// 	constructor(canvas) {
+// 	}
+// }

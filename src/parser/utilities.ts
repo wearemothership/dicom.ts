@@ -85,42 +85,6 @@ export const concatArrayBuffers = (buffer1: ArrayBuffer, buffer2:ArrayBuffer):Ar
 	return tmp.buffer;
 };
 
-export const concatArrayBuffers2 = (buffers:Array<ArrayBuffer>):ArrayBuffer => {
-	let length = 0;
-	let offset = 0;
-
-	for (let ctr = 0; ctr < buffers.length; ctr += 1) {
-		length += buffers[ctr].byteLength;
-	}
-
-	const tmp = new Uint8Array(length);
-
-	for (let ctr = 0; ctr < buffers.length; ctr += 1) {
-		tmp.set(new Uint8Array(buffers[ctr]), offset);
-		offset += buffers[ctr].byteLength;
-	}
-
-	return tmp.buffer;
-};
-
-export const fillBuffer = (
-	array: Array<number>,
-	buffer: DataView,
-	offset:number,
-	numBytes:number
-) => {
-	if (numBytes === 1) {
-		for (let ctr = 0; ctr < array.length; ctr += 1) {
-			buffer.setUint8(offset + ctr, array[ctr]);
-		}
-	}
-	else if (numBytes === 2) {
-		for (let ctr = 0; ctr < array.length; ctr += 1) {
-			buffer.setUint16(offset + (ctr * 2), array[ctr], true);
-		}
-	}
-};
-
 export const fillBufferRGB = (array: Array<number>, buffer:DataView, offset:number) => {
 	const numElements = array.length || 0;
 

@@ -1,7 +1,5 @@
 /* eslint no-use-before-define: ["error", { "classes": false }] */
-import CompressionUtils from "./compression-utils";
 import Tag, { createTagId, createTagIdWithTag } from "./tag";
-import * as Utils from "./utilities";
 import { TransferSyntax } from "./constants";
 
 const getSingleValueSafely = (tag, index) => (tag?.value?.[index] ?? null);
@@ -1049,55 +1047,6 @@ class DCMImage {
 			}
 		}
 		return DCMImage.sliceDirection.oblique;
-	}
-
-	// returns an array of tags
-	/**
-	 * Returns encapsulated data tags.
-	 * @returns {daikon.Tag[]}
-	 */
-	getEncapsulatedData() {
-		const { buffer } = this.getPixelData().value;
-		const parser = new DCMImage.Parser();
-		return parser.parseEncapsulated(new DataView(buffer));
-	}
-
-	getJpegs() {
-		const encapTags = this.getEncapsulatedData();
-		const data = [];
-		const dataConcat = [];
-
-		let currentJpeg;
-		// organize data as an array of an array of JPEG parts
-		if (encapTags) {
-			const numTags = encapTags.length;
-
-			for (let ctr = 0; ctr < numTags; ctr += 1) {
-				if (CompressionUtils.isHeaderJPEG(encapTags[ctr].value)
-					|| CompressionUtils.isHeaderJPEG2000(encapTags[ctr].value)) {
-					currentJpeg = [];
-					currentJpeg.push(encapTags[ctr].value.buffer);
-					data.push(currentJpeg);
-				}
-				else if (currentJpeg && encapTags[ctr].value) {
-					currentJpeg.push(encapTags[ctr].value.buffer);
-				}
-			}
-		}
-
-		// concat into an array of full JPEGs
-		for (let ctr = 0; ctr < data.length; ctr += 1) {
-			if (data[ctr].length > 1) {
-				dataConcat[ctr] = Utils.concatArrayBuffers2(data[ctr]);
-			}
-			else {
-				[dataConcat[ctr]] = data[ctr];
-			}
-
-			data[ctr] = null;
-		}
-
-		return dataConcat;
 	}
 
 	/**

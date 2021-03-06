@@ -164,7 +164,7 @@ class Parser implements IParserPublic, IParserPrivate {
 		return image;
 	}
 
-	parseEncapsulated(data: DataView) {
+	parseEncapsulated(data: DataView): Array<any> {
 		this.encapsulation = true;
 		const tags = [];
 		try {
@@ -423,7 +423,5 @@ class Parser implements IParserPublic, IParserPrivate {
 		return (this.error !== null);
 	}
 }
-// give Image access to parser
-DCMImage.Parser = Parser;
 
 export default Parser;

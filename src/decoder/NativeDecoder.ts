@@ -1,13 +1,16 @@
 import * as twgl from "twgl.js";
 import Decoder from "./Decoder";
+import { getJpegData } from "./util";
 
 class NativeDecoder extends Decoder {
-	constructor(image) {
+	private jpegData:Array<ArrayBuffer>
+
+	constructor(image:any) {
 		super(image);
-		this.jpegData = image.getJpegs();
+		this.jpegData = getJpegData(image);
 	}
 
-	createTexture(gl, frameNo) {
+	createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture> {
 		const { width, height } = this.outputSize;
 		const jpegFrameData = this.jpegData?.[frameNo];
 		if (!jpegFrameData) {

@@ -21,8 +21,8 @@
     "noEmit": true
   },
   "include": [
-    "src/**/*"
-  ],
+    "src/**/*",
+	"types/jpeg-lossless-decoder-js.d.ts"  ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"
