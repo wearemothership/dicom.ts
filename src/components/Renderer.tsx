@@ -1,8 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
-import Parser, { parseImage } from "../parser";
+import React, {
+	ReactNode,
+	ReactElement,
+	useState,
+	useRef,
+	useEffect,
+	ReactChildren,
+} from "react";
+import { Parser, parseImage } from "../parser";
 import render from "../renderer/render";
 
-const parseDecodeAndRender = (buf, canvas) => {
+const parseDecodeAndRender = (buf: ArrayBuffer, canvas: HTMLCanvasElement): Promise<void> => {
 	const data = new DataView(buf);
 	Parser.verbose = true;
 	const image = parseImage(data);
@@ -13,32 +20,44 @@ const parseDecodeAndRender = (buf, canvas) => {
 	return render(image, canvas, scale);
 };
 
+type RenderProps = {
+	renderMethod: (buf: ArrayBuffer, canvas: HTMLCanvasElement) => Promise<void>;
+	dataBuffer: ArrayBuffer,
+	children: ReactChildren
+}
+
 const Renderer = ({
-	renderMethod,
-	fileBuffer,
+	renderMethod = parseDecodeAndRender,
+	dataBuffer,
 	children
-}) => {
-	const [renderTime, setRenderTime] = useState(null);
-	const canvasRef = useRef();
+}: RenderProps) => {
+	const [renderTime, setRenderTime] = useState<number | null>(null);
+	const canvasRef = useRef<HTMLCanvasElement>();
 	useEffect(() => {
-		if (fileBuffer) {
+		if (dataBuffer && canvasRef.current) {
 			const startTime = new Date();
-			parseDecodeAndRender(fileBuffer, canvasRef.current).then(() => {
-				setRenderTime(new Date() - startTime);
+			renderMethod(dataBuffer, canvasRef.current!).then(() => {
+				const diff = +new Date() - +startTime!;
+				setRenderTime(diff);
 			});
 		}
 		return	() => {};
-	}, [fileBuffer, renderMethod]);
+	}, [dataBuffer, renderMethod]);
 
 	return (
 		<>
 			{
-				React.Children.map(
+				React.Children.map<ReactNode, ReactNode>(
 					children,
-					(element) => React.cloneElement(
-						element,
-						{ renderTime, canvasRef }
-					)
+					(child) => {
+						if (React.isValidElement(child)) {
+							return React.cloneElement(
+								child as ReactElement<any>,
+								{ renderTime, canvasRef }
+							);
+						}
+						return null;
+					}
 				)
 			}
 		</>
