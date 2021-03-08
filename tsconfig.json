@@ -22,7 +22,8 @@
   },
   "include": [
     "src/**/*",
-	"types/jpeg-lossless-decoder-js.d.ts"  ],
+    "types/jpeg-lossless-decoder-js.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"

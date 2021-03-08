@@ -1,3 +1,4 @@
 {
-    "jestrunner.jestCommand": "npm run test:unit --"
+    "jestrunner.jestCommand": "npm run test:unit --",
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

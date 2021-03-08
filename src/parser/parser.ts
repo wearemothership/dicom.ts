@@ -12,16 +12,19 @@ import Dictionary from "./dictionary";
 
 import { TransferSyntax } from "./constants";
 
+const MAGIC_COOKIE_OFFSET = 128;
+const MAGIC_COOKIE = [68, 73, 67, 77];
+
 /**
  * Returns true if the DICOM magic cookie is found.
  * @param {DataView} data
  * @returns {boolean}
  */
 const isMagicCookieFound = (data: DataView): boolean => {
-	const offset = Parser.MAGIC_COOKIE_OFFSET;
-	const magicCookieLength = Parser.MAGIC_COOKIE.length;
+	const offset = MAGIC_COOKIE_OFFSET;
+	const magicCookieLength = MAGIC_COOKIE.length;
 	for (let ctr = 0; ctr < magicCookieLength; ctr += 1) {
-		if (data.getUint8(offset + ctr) !== Parser.MAGIC_COOKIE[ctr]) {
+		if (data.getUint8(offset + ctr) !== MAGIC_COOKIE[ctr]) {
 			return false;
 		}
 	}
@@ -29,21 +32,21 @@ const isMagicCookieFound = (data: DataView): boolean => {
 };
 
 const findFirstTagOffset = (data: DataView): number => {
-	const magicCookieLength = Parser.MAGIC_COOKIE.length;
+	const magicCookieLength = MAGIC_COOKIE.length;
 	if (isMagicCookieFound(data)) {
-		return Parser.MAGIC_COOKIE_OFFSET + magicCookieLength;
+		return MAGIC_COOKIE_OFFSET + magicCookieLength;
 	}
 
-	const searchOffsetMax = Parser.MAGIC_COOKIE_OFFSET * 5;
+	const searchOffsetMax = MAGIC_COOKIE_OFFSET * 5;
 	let found = false;
 	let offset = 0;
 
 	for (let ctr = 0; ctr < searchOffsetMax; ctr += 1) {
 		const ch = data.getUint8(ctr);
-		if (ch === Parser.MAGIC_COOKIE[0]) {
+		if (ch === MAGIC_COOKIE[0]) {
 			found = true;
 			for (let ctrIn = 1; ctrIn < magicCookieLength; ctrIn += 1) {
-				if (data.getUint8(ctr + ctrIn) !== Parser.MAGIC_COOKIE[ctrIn]) {
+				if (data.getUint8(ctr + ctrIn) !== MAGIC_COOKIE[ctrIn]) {
 					found = false;
 				}
 			}
@@ -63,27 +66,16 @@ interface IParserPublic {
 	error?: Error | null;
 	charset?:string;
 }
-interface IParserPrivate {
-	metaFound:boolean;
-	metaFinished:boolean;
-	metaFinishedOffset:number;
-	needsDeflate:boolean;
-	inflated?: ArrayBuffer | null;
-	encapsulation:boolean;
-	level:number;
-	charset?:string;
-}
 
-class Parser implements IParserPublic, IParserPrivate {
+/**
+ * Parser class
+ */
+class Parser implements IParserPublic {
 	/**
 	 * Global property to output string representation of tags as they are parsed.
 	 * @type {boolean}
 	 */
 	static verbose:boolean = false;
-
-	static MAGIC_COOKIE_OFFSET = 128;
-
-	static MAGIC_COOKIE = [68, 73, 67, 77];
 
 	static VRS = ["AE", "AS", "AT", "CS", "DA", "DS", "DT", "FL", "FD", "IS", "LO", "LT", "OB", "OD", "OF", "OW", "PN", "SH", "SL", "SS", "ST", "TM", "UI", "UL", "UN", "US", "UT"];
 
@@ -113,7 +105,7 @@ class Parser implements IParserPublic, IParserPrivate {
 
 	error: Error | null = null;
 
-	charset = undefined;
+	charset?:string = undefined;
 
 	/**
 	 * Parses this data and returns an image object.

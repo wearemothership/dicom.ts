@@ -1,5 +1,6 @@
 import * as twgl from "twgl.js";
 import Image from "../parser/image";
+import FrameInfo from "../image/FrameInfo";
 
 export interface ISize {
 	width: number,
@@ -9,7 +10,8 @@ export interface ISize {
 interface IDecoder {
 	outputSize: ISize
 	image: any
-	createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture>
+	getFrame(gl:WebGL2RenderingContext, frameNo:number):Promise<FrameInfo>
+	// createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture>
 }
 
 class Decoder implements IDecoder {
@@ -22,10 +24,20 @@ class Decoder implements IDecoder {
 
 	constructor(image:any) {
 		this.image = image;
+
 		this.outputSize = {
 			width: image.width,
 			height: image.height
 		};
+	}
+
+	async getFrame(gl:WebGLRenderingContext, frameNo:number):Promise<FrameInfo> {
+		const texture = await this.createTexture(gl, frameNo);
+		return new FrameInfo({
+			imageInfo: this.image,
+			frameNo,
+			texture
+		});
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,7 +45,7 @@ class Decoder implements IDecoder {
 		return Promise.resolve(this.image.getPixelData().value);
 	}
 
-	async createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture> {
+	protected async createTexture(gl:WebGLRenderingContext, frameNo:number):Promise<WebGLTexture> {
 		const pixelData = await this.decode(frameNo);
 		const greyBuffer = new Uint8Array(pixelData.buffer);
 		let format = gl.LUMINANCE_ALPHA;

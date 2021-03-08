@@ -48,7 +48,9 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
+
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -60,7 +62,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -72,7 +75,9 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
+		// await dicomjs.render(image, canvas, 1);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -84,7 +89,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -96,7 +102,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -108,7 +115,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		expect(shaFromBuffer(buffer)).toEqual("0740edb1140d933966d64754e1b9d0d01db6541c");
@@ -119,7 +127,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -131,7 +140,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
@@ -143,7 +153,8 @@ describe("dicom.js", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		await dicomjs.render(image, canvas, 1);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);

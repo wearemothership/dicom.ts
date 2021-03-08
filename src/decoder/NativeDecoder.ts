@@ -10,7 +10,7 @@ class NativeDecoder extends Decoder {
 		this.jpegData = getJpegData(image);
 	}
 
-	createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture> {
+	protected createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture> {
 		const { width, height } = this.outputSize;
 		const jpegFrameData = this.jpegData?.[frameNo];
 		if (!jpegFrameData) {

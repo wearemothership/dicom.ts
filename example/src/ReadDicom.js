@@ -145,6 +145,7 @@ export const GPUJSDecode = (buf, canvas) => {
 	// const w = image.getCols();
 	// const h = image.getRows();
 	// const scale = Math.min(1, Math.min(4096 / w, 4096 / h));
-	const scale = 1.0;
-	return dicomjs.render(image, canvas, scale);
+	// const scale = 1.0;
+	const renderer = new dicomjs.Renderer(canvas);
+	return renderer.render(image, 0);
 };

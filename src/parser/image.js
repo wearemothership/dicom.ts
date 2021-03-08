@@ -1139,7 +1139,50 @@ class DCMImage {
 		// this needs to happen before this.getDataType
 		this.photometricInterpretation = this.getPhotometricInterpretation();
 
+		// should we invert any output
+		let invert = this.getTagValueIndexed(Tag.TAG_LUT_SHAPE) === "INVERSE";
+		invert = invert || this.photometricInterpretation === "MONOCHROME1";
+		this.invert = invert;
+
+		this.isRGB = !(this.photometricInterpretation || "").startsWith("MONO");
+
 		this.dataType = this.getDataType();
+
+		this.slope = this.getDataScaleSlope() || 1.0;
+		this.intercept = this.getDataScaleIntercept() || 0.0;
+
+		const lutDescriptor = this.getTagValue(Tag.TAG_VOI_LUT_DESCRIPTOR);
+		if (lutDescriptor?.length === 3) {
+			const [nEntries, firstValue, bitsStored] = lutDescriptor;
+			if (!nEntries < 2 ** bitsStored - 1) {
+				let ArrayType = Uint8Array;
+				if (bitsStored > 8) {
+					ArrayType = Uint16Array;
+				}
+				const lutDataTagValue = this.getTagValue(Tag.TAG_VOI_LUT_DATA);
+				if (lutDataTagValue) {
+					const data = new ArrayType(
+						lutDataTagValue,
+						0,
+						Math.min(lutDescriptor[0] || 2 ** 16, lutDataTagValue.length)
+					);
+
+					this.lut = {
+						nEntries,
+						firstValue,
+						bitsStored,
+						data
+					};
+				}
+			}
+		}
+		if (!this.lutData) {
+			this.minPixVal = this.getImageMin();
+			this.maxPixVal = this.getImageMax();
+
+			this.windowCenter = this.getWindowCenter();
+			this.windowWidth = this.getWindowWidth();
+		}
 	}
 }
 

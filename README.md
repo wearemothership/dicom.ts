@@ -6,7 +6,7 @@
 
 
 # background
-Was in need to display greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task.
+Was in the need of displaying greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task, it also seemed slow even using the webgl renderer.  By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 1.1 to 10 times faster, depending on the image and wether it was the first decode of the library.
 
 This is the result!
 
@@ -22,8 +22,11 @@ This is the result!
 - some images are not perfect with cornerstone, what is correct?
 - LL decoder can be slower than cornerstones
 - ~~seperate out decoders from parser~~
-- currently only supports rendering frame 0!
+- ~~seperate programs~~
+- currently only supports rendering frame 0! - done, but test it!
 - accelerate palette conversion
+- load series
+- scale / maxsize
 
 
 ## Install
