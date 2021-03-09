@@ -15,4 +15,8 @@ export enum TransferSyntax {
 	CompressionDeflate = "1.2.840.10008.1.2.1.99"
 }
 
+export type Charset = string | null;
+
+export const DefaultCharset:Charset = "ISO 2022 IR 6";
+
 export const AnotherParserConst = 0;

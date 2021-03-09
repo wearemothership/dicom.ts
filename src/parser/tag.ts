@@ -1,165 +1,144 @@
-/* eslint-disable no-use-before-define */
 import * as Utils from "./utilities";
 import Dictionary from "./dictionary";
 import Siemens from "./siemens";
+import { Charset } from "./constants";
 
 const PRIVATE_DATA_READERS = [Siemens];
 
+export const TagIds: Record<string, TagTupleID> = {
+	// metadata
+	TransferSyntax: [0x0002, 0x0010],
+	MetaLength: [0x0002, 0x0000],
+
+	// sublists
+	SublistItem: [0xFFFE, 0xE000],
+	SublistItemDelim: [0xFFFE, 0xE00D],
+	SequenceDelim: [0xFFFE, 0xE0DD],
+
+	// image dims
+	Rows: [0x0028, 0x0010],
+	Cols: [0x0028, 0x0011],
+	AcquisitionMatrix: [0x0018, 0x1310],
+	NumberOfFrames: [0x0028, 0x0008],
+	NumberTemporalPositions: [0x0020, 0x0105],
+
+	// voxel dims
+	PixelSpacing: [0x0028, 0x0030],
+	SliceThickness: [0x0018, 0x0050],
+	SliceGap: [0x0018, 0x0088],
+	Tr: [0x0018, 0x0080],
+	FrameTime: [0x0018, 0x1063],
+
+	// datatype
+	BitsAllocated: [0x0028, 0x0100],
+	BitsStored: [0x0028, 0x0101],
+	PixelRepresentation: [0x0028, 0x0103],
+	HighBit: [0x0028, 0x0102],
+	PhotometricInterpretation: [0x0028, 0x0004],
+	SamplesPerPixel: [0x0028, 0x0002],
+	PlanarConfig: [0x0028, 0x0006],
+	PaletteRed: [0x0028, 0x1201],
+	PaletteGreen: [0x0028, 0x1202],
+	PaletteBlue: [0x0028, 0x1203],
+
+	// data scale
+	DataScaleSlope: [0x0028, 0x1053],
+	DataScaleIntercept: [0x0028, 0x1052],
+	DataScaleElscint: [0x0207, 0x101f],
+	PixelBandwidth: [0x0018, 0x0095],
+
+	// LUT
+	VoiLutSequence: [0x0028, 0x3010],
+	VoiLutDescriptor: [0x0028, 0x3002],
+	// VoiLutExplanation: [0x0028, 0x3003],
+	VoiLutData: [0x0028, 0x3006],
+
+	// range
+	ImageMin: [0x0028, 0x0106],
+	ImageMax: [0x0028, 0x0107],
+	WindowCenter: [0x0028, 0x1050],
+	WindowWidth: [0x0028, 0x1051],
+
+	// descriptors
+	Charset: [0x0008, 0x0005],
+	PatientName: [0x0010, 0x0010],
+	PatientId: [0x0010, 0x0020],
+	StudyDate: [0x0008, 0x0020],
+	StudyTime: [0x0008, 0x0030],
+	StudyDes: [0x0008, 0x1030],
+	ImageType: [0x0008, 0x0008],
+	ImageComments: [0x0020, 0x4000],
+	SequenceName: [0x0018, 0x0024],
+	Modality: [0x0008, 0x0060],
+
+	// session ID
+	FrameOfRefUid: [0x0020, 0x0052],
+
+	// study ID
+	StudyUid: [0x0020, 0x000d],
+
+	// volume ID
+	SeriesDescription: [0x0008, 0x103e],
+	SeriesInstanceUid: [0x0020, 0x000e],
+	SeriesNumber: [0x0020, 0x0011],
+	EchoNumber: [0x0018, 0x0086],
+	TemporalPosition: [0x0020, 0x0100],
+
+	// slice ID
+	ImageNum: [0x0020, 0x0013],
+	SliceLocation: [0x0020, 0x1041],
+
+	// orientation
+	ImageOrientation: [0x0020, 0x0037],
+	ImagePosition: [0x0020, 0x0032],
+	SliceLocationVector: [0x0018, 0x2005],
+
+	// LUT shape
+	LutShape: [0x2050, 0x0020],
+
+	// pixel data
+	PixelData: [0x7fe0, 0x0010],
+};
+
 /**
- * The Tag constuctor.
- * @property {number} group
- * @property {number} element
- * @property {string} vr
- * @property {number} offsetStart
- * @property {number} offsetValue
- * @property {number} offsetEnd
- * @property {boolean} sublist - true if this tag is a sublist
- * @property {number|number[]|string|string[]|object} value
- * @type {Function}
+ * Create an ID string based on the specified group and element
+ * @param {number} group
+ * @param {number} element
+ * @returns {string}
  */
-class Tag {
-	static isEqual({ group, element }, tagId) {
-		return group === tagId[0] && element === tagId[1];
-	}
+export const createTagId = (group:number, element:number):TagStringID => {
+	const groupStr = Utils.dec2hex(group);
+	const elemStr = Utils.dec2hex(element);
+	return groupStr + elemStr;
+};
 
-	constructor({
-		group,
-		element,
-		vr = null,
-		value = null,
-		offsetStart = null,
-		offsetValue = null,
-		offsetEnd = null,
-		littleEndian = null,
-		charset = null
-	}) {
-		this.group = group;
-		this.element = element;
-		this.vr = vr;
-		this.offsetStart = offsetStart;
-		this.offsetValue = offsetValue;
-		this.offsetEnd = offsetEnd;
-		this.sublist = false;
-		this.preformatted = false;
-		this.id = createTagId(group, element);
+interface ITagKey {
+	group: number;
+	element: number;
+}
 
-		if (value instanceof Array) {
-			this.value = value;
-			this.sublist = true;
-		}
-		else if (value !== null) {
-			const dv = new DataView(value);
-			this.value = convertValue(vr, dv, littleEndian, charset);
+type TagTupleID = [number, number];
 
-			if ((this.value === dv) && this.isPrivateData()) {
-				this.value = convertPrivateValue(group, element, dv);
-				this.preformatted = (this.value !== dv);
-			}
-		}
-		else {
-			this.value = null;
-		}
-	}
+type TagStringID = string;
 
-	/**
-	 * Returns true if this is the transform syntax tag.
-	 * @returns {boolean}
-	 */
-	is([group, element]) {
-		return ((this.group === group) && (this.element === element));
-	}
+type TagValue =
+	Tag[]
+	| ArrayBuffer
+	| DataView
+	| string
+	| string[]
+	| number[]
+	| Date[]
+	| null;
 
-	/**
-	 * Returns true if this tag contains private data.
-	 * @returns {boolean}
-	 */
-	isPrivateData() {
-		/* eslint-disable no-bitwise */
-		return ((this.group & 1) === 1);
-	}
-
-	/**
-	 * Returns true if this tag contains private data that can be read.
-	 * @returns {boolean}
-	 */
-	hasInterpretedPrivateData() {
-		return this.isPrivateData() && Utils.isString(this.value);
-	}
-
-	/**
-	 * Returns a string representation of this tag.
-	 * @param {number} [level] - the indentation level
-	 * @param {boolean} [html]
-	 * @returns {string}
-	 */
-	toString(level, html) {
-		let valueStr = "";
-		const groupStr = Utils.dec2hex(this.group);
-		const elemStr = Utils.dec2hex(this.element);
-		let tagStr = `(${groupStr},${elemStr})`;
-		let des = "";
-		let padding;
-
-		if (level === undefined) {
-			// eslint-disable-next-line no-param-reassign
-			level = 0;
-		}
-
-		padding = "";
-		for (let ctr = 0; ctr < level; ctr += 1) {
-			if (html) {
-				padding += "&nbsp;&nbsp;";
-			}
-			else {
-				padding += "  ";
-			}
-		}
-
-		if (this.sublist) {
-			for (let ctr = 0; ctr < this.value.length; ctr += 1) {
-				valueStr += `\n${(this.value[ctr].toString(level + 1, html))}`;
-			}
-		}
-		else if (this.vr === "SQ" || this.is(TagId.PixelData) || !this.value) {
-			valueStr = "";
-		}
-		else if (html && this.preformatted) {
-			valueStr = `[<pre>${this.value}</pre>]`;
-		}
-		else {
-			valueStr = `[${this.value}]`;
-		}
-
-		if (this.is(TagId.SublistItem)) {
-			tagStr = "Sequence Item";
-		}
-		else if (this.is(TagId.SublistItemDelim)) {
-			tagStr = "Sequence Item Delimiter";
-		}
-		else if (this.is(TagId.SequenceDelim)) {
-			tagStr = "Sequence Delimiter";
-		}
-		else if (this.is(TagId.PixelData)) {
-			tagStr = "Pixel Data";
-		}
-		else {
-			des = Utils.convertCamcelCaseToTitleCase(Dictionary.getDescription(this.group, this.element));
-		}
-
-		if (html) {
-			return `${padding}<span style='color:#B5CBD3'>${tagStr}</span>&nbsp;&nbsp;&nbsp;${des}&nbsp;&nbsp;&nbsp;${valueStr}`;
-		}
-		return `${padding} ${tagStr} ${des} ${valueStr}`;
-	}
-
-	/**
-	 * Returns an HTML string representation of this tag.
-	 * @param {number} level - the indentation level
-	 * @returns {string}
-	 */
-	toHTMLString(level) {
-		return this.toString(level, true);
-	}
+interface ITagContstuctor extends ITagKey {
+	vr?: string | null
+	value?: any
+	offsetStart?: number | null
+	offsetValue?: number | null
+	offsetEnd?: number | null
+	littleEndian: boolean,
+	charset?: Charset
 }
 
 const VRMaxLength = {
@@ -192,111 +171,6 @@ const VRMaxLength = {
 	UT: -1
 };
 
-// metadata
-Tag.TAG_TRANSFER_SYNTAX = [0x0002, 0x0010];
-Tag.TAG_META_LENGTH = [0x0002, 0x0000];
-
-// sublists
-Tag.TAG_SUBLIST_ITEM = [0xFFFE, 0xE000];
-Tag.TAG_SUBLIST_ITEM_DELIM = [0xFFFE, 0xE00D];
-Tag.TAG_SUBLIST_SEQ_DELIM = [0xFFFE, 0xE0DD];
-
-// image dims
-Tag.TAG_ROWS = [0x0028, 0x0010];
-Tag.TAG_COLS = [0x0028, 0x0011];
-Tag.TAG_ACQUISITION_MATRIX = [0x0018, 0x1310];
-Tag.TAG_NUMBER_OF_FRAMES = [0x0028, 0x0008];
-Tag.TAG_NUMBER_TEMPORAL_POSITIONS = [0x0020, 0x0105];
-
-// voxel dims
-Tag.TAG_PIXEL_SPACING = [0x0028, 0x0030];
-Tag.TAG_SLICE_THICKNESS = [0x0018, 0x0050];
-Tag.TAG_SLICE_GAP = [0x0018, 0x0088];
-Tag.TAG_TR = [0x0018, 0x0080];
-Tag.TAG_FRAME_TIME = [0x0018, 0x1063];
-
-// datatype
-Tag.TAG_BITS_ALLOCATED = [0x0028, 0x0100];
-Tag.TAG_BITS_STORED = [0x0028, 0x0101];
-Tag.TAG_PIXEL_REPRESENTATION = [0x0028, 0x0103];
-Tag.TAG_HIGH_BIT = [0x0028, 0x0102];
-Tag.TAG_PHOTOMETRIC_INTERPRETATION = [0x0028, 0x0004];
-Tag.TAG_SAMPLES_PER_PIXEL = [0x0028, 0x0002];
-Tag.TAG_PLANAR_CONFIG = [0x0028, 0x0006];
-Tag.TAG_PALETTE_RED = [0x0028, 0x1201];
-Tag.TAG_PALETTE_GREEN = [0x0028, 0x1202];
-Tag.TAG_PALETTE_BLUE = [0x0028, 0x1203];
-
-// data scale
-Tag.TAG_DATA_SCALE_SLOPE = [0x0028, 0x1053];
-Tag.TAG_DATA_SCALE_INTERCEPT = [0x0028, 0x1052];
-Tag.TAG_DATA_SCALE_ELSCINT = [0x0207, 0x101F];
-Tag.TAG_PIXEL_BANDWIDTH = [0x0018, 0x0095];
-
-// LUT
-Tag.TAG_VOI_LUT_SEQUENCE = [0x0028, 0x3010];
-Tag.TAG_VOI_LUT_DESCRIPTOR = [0x0028, 0x3002];
-// Tag.TAG_VOI_LUT_EXPLANATION = [0x0028, 0x3003];
-Tag.TAG_VOI_LUT_DATA = [0x0028, 0x3006];
-
-// range
-Tag.TAG_IMAGE_MIN = [0x0028, 0x0106];
-Tag.TAG_IMAGE_MAX = [0x0028, 0x0107];
-Tag.TAG_WINDOW_CENTER = [0x0028, 0x1050];
-Tag.TAG_WINDOW_WIDTH = [0x0028, 0x1051];
-
-// descriptors
-Tag.TAG_SPECIFIC_CHAR_SET = [0x0008, 0x0005];
-Tag.TAG_PATIENT_NAME = [0x0010, 0x0010];
-Tag.TAG_PATIENT_ID = [0x0010, 0x0020];
-Tag.TAG_STUDY_DATE = [0x0008, 0x0020];
-Tag.TAG_STUDY_TIME = [0x0008, 0x0030];
-Tag.TAG_STUDY_DES = [0x0008, 0x1030];
-Tag.TAG_IMAGE_TYPE = [0x0008, 0x0008];
-Tag.TAG_IMAGE_COMMENTS = [0x0020, 0x4000];
-Tag.TAG_SEQUENCE_NAME = [0x0018, 0x0024];
-Tag.TAG_MODALITY = [0x0008, 0x0060];
-
-// session ID
-Tag.TAG_FRAME_OF_REF_UID = [0x0020, 0x0052];
-
-// study ID
-Tag.TAG_STUDY_UID = [0x0020, 0x000D];
-
-// volume ID
-Tag.TAG_SERIES_DESCRIPTION = [0x0008, 0x103E];
-Tag.TAG_SERIES_INSTANCE_UID = [0x0020, 0x000E];
-Tag.TAG_SERIES_NUMBER = [0x0020, 0x0011];
-Tag.TAG_ECHO_NUMBER = [0x0018, 0x0086];
-Tag.TAG_TEMPORAL_POSITION = [0x0020, 0x0100];
-
-// slice ID
-Tag.TAG_IMAGE_NUM = [0x0020, 0x0013];
-Tag.TAG_SLICE_LOCATION = [0x0020, 0x1041];
-
-// orientation
-Tag.TAG_IMAGE_ORIENTATION = [0x0020, 0x0037];
-Tag.TAG_IMAGE_POSITION = [0x0020, 0x0032];
-Tag.TAG_SLICE_LOCATION_VECTOR = [0x0018, 0x2005];
-
-// LUT shape
-Tag.TAG_LUT_SHAPE = [0x2050, 0x0020];
-
-// pixel data
-Tag.TAG_PIXEL_DATA = [0x7FE0, 0x0010];
-
-/**
- * Create an ID string based on the specified group and element
- * @param {number} group
- * @param {number} element
- * @returns {string}
- */
-export const createTagId = (group, element) => {
-	const groupStr = Utils.dec2hex(group);
-	const elemStr = Utils.dec2hex(element);
-	return groupStr + elemStr;
-};
-
 /**
  * Create an ID string based on the specified group and element
  * @param {Array} tupple with
@@ -304,13 +178,13 @@ export const createTagId = (group, element) => {
  * 		@param {number} element
  * @returns {string}
  */
-export const createTagIdWithTag = ([group, element]) => {
+export const createTagIdWithTag = ([group, element]: TagTupleID):string => {
 	const groupStr = Utils.dec2hex(group);
 	const elemStr = Utils.dec2hex(element);
 	return groupStr + elemStr;
 };
 
-const getUnsignedInteger16 = (rawData, littleEndian) => {
+const getUnsignedInteger16 = (rawData: DataView, littleEndian: boolean):Array<number> => {
 	const data = [];
 	const mul = rawData.byteLength / 2;
 	for (let ctr = 0; ctr < mul; ctr += 1) {
@@ -320,7 +194,7 @@ const getUnsignedInteger16 = (rawData, littleEndian) => {
 	return data;
 };
 
-const getSignedInteger16 = (rawData, littleEndian) => {
+const getSignedInteger16 = (rawData: DataView, littleEndian: boolean):Array<number> => {
 	const data = [];
 	const mul = rawData.byteLength / 2;
 	for (let ctr = 0; ctr < mul; ctr += 1) {
@@ -330,7 +204,7 @@ const getSignedInteger16 = (rawData, littleEndian) => {
 	return data;
 };
 
-const getFloat32 = (rawData, littleEndian) => {
+const getFloat32 = (rawData: DataView, littleEndian: boolean):Array<number> => {
 	const data = [];
 	const mul = rawData.byteLength / 4;
 	for (let ctr = 0; ctr < mul; ctr += 1) {
@@ -340,7 +214,7 @@ const getFloat32 = (rawData, littleEndian) => {
 	return data;
 };
 
-const getSignedInteger32 = (rawData, littleEndian) => {
+const getSignedInteger32 = (rawData: DataView, littleEndian: boolean):Array<number> => {
 	const data = [];
 	const mul = rawData.byteLength / 4;
 	for (let ctr = 0; ctr < mul; ctr += 1) {
@@ -350,7 +224,7 @@ const getSignedInteger32 = (rawData, littleEndian) => {
 	return data;
 };
 
-const getUnsignedInteger32 = (rawData, littleEndian) => {
+const getUnsignedInteger32 = (rawData: DataView, littleEndian: boolean):Array<number> => {
 	const data = [];
 	const mul = rawData.byteLength / 4;
 	for (let ctr = 0; ctr < mul; ctr += 1) {
@@ -360,9 +234,9 @@ const getUnsignedInteger32 = (rawData, littleEndian) => {
 	return data;
 };
 
-const getFloat64 = (rawData, littleEndian) => {
+const getFloat64 = (rawData: DataView, littleEndian: boolean):Array<number> => {
 	if (rawData.byteLength < 8) {
-		return 0;
+		return [0];
 	}
 
 	const data = [];
@@ -374,11 +248,17 @@ const getFloat64 = (rawData, littleEndian) => {
 	return data;
 };
 
-const getDoubleElscint = (rawData) => {
+const getDoubleElscint = (rawData: DataView, littleEndian: boolean) => {
 	const data = Array(8);
-
-	for (let ctr = 0; ctr < 8; ctr += 1) {
-		data[ctr] = rawData.getUint8(ctr);
+	if (littleEndian) {
+		for (let ctr = 0; ctr < 8; ctr += 1) {
+			data[ctr] = rawData.getUint8(ctr);
+		}
+	}
+	else {
+		for (let ctr = 0; ctr < 8; ctr += 1) {
+			data[ctr] = rawData.getUint8(7 - ctr);
+		}
 	}
 
 	const reordered = [
@@ -395,16 +275,21 @@ const getDoubleElscint = (rawData) => {
 	return [Utils.bytesToDouble(reordered)];
 };
 
-const getFixedLengthStringValue = (rawData, maxLength, charset, vr) => {
+const getFixedLengthStringValue = (
+	rawData: DataView,
+	maxLength: number,
+	charset?: string,
+	vr?: string
+):string[] => {
 	const mul = Math.floor(rawData.byteLength / maxLength);
-	const data = [];
+	const data = Array(mul);
 	for (let ctr = 0; ctr < mul; ctr += 1) {
 		data[ctr] = Utils.getStringAt(rawData, ctr * maxLength, maxLength, charset, vr);
 	}
 	return data;
 };
 
-const getStringValue = (rawData, charset, vr) => {
+const getStringValue = (rawData: DataView, charset?: Charset, vr?: string) => {
 	const data = Utils.getStringAt(rawData, 0, rawData.byteLength, charset, vr).split("\\");
 
 	for (let ctr = 0; ctr < data.length; ctr += 1) {
@@ -414,11 +299,21 @@ const getStringValue = (rawData, charset, vr) => {
 	return data;
 };
 
-const getDateStringValue = (rawData) => {
+const getSingleStringValue = (
+	rawData: DataView,
+	maxLength: number = 0,
+	charset?: Charset,
+	vr?: string
+):[string] => {
+	const len = Math.min(rawData.byteLength, maxLength);
+	return [Utils.getStringAt(rawData, 0, len, charset, vr).trim()];
+};
+
+const getDateStringValue = (rawData: DataView): TagValue => {
 	const dotFormat = (getSingleStringValue(rawData)[0].indexOf(".") !== -1);
 	const stringData = getFixedLengthStringValue(rawData, dotFormat ? 10 : VRMaxLength.DA);
 	let parts = null;
-	const data = [];
+	const data:TagValue = [];
 
 	for (let ctr = 0; ctr < stringData.length; ctr += 1) {
 		if (dotFormat) {
@@ -449,15 +344,15 @@ const getDateStringValue = (rawData) => {
 	return data;
 };
 
-const getDateTimeStringValue = (rawData) => {
+const getDateTimeStringValue = (rawData: DataView): TagValue => {
 	const stringData = getStringValue(rawData);
-	const data = [];
-	let year = null;
-	let month = null;
-	let date = null;
-	let hours = null;
-	let minutes = null;
-	let seconds = null;
+	const data:TagValue = [];
+	let year = 0;
+	let month = 0;
+	let date = 0;
+	let hours = 0;
+	let minutes = 0;
+	let seconds = 0;
 
 	for (let ctr = 0; ctr < stringData.length; ctr += 1) {
 		const str = stringData[ctr];
@@ -499,7 +394,7 @@ const getDateTimeStringValue = (rawData) => {
 	return data;
 };
 
-const getTimeStringValue = (rawData, ms) => {
+const getTimeStringValue = (rawData: DataView, ms: boolean = false) => {
 	const stringData = getStringValue(rawData);
 	const data = [];
 
@@ -545,7 +440,7 @@ const getTimeStringValue = (rawData, ms) => {
 	return stringData;
 };
 
-const getDoubleStringValue = (rawData) => {
+const getDoubleStringValue = (rawData: DataView) => {
 	const stringData = getStringValue(rawData);
 	const data = [];
 
@@ -556,7 +451,7 @@ const getDoubleStringValue = (rawData) => {
 	return data;
 };
 
-const getIntegerStringValue = (rawData) => {
+const getIntegerStringValue = (rawData: DataView) => {
 	const stringData = getStringValue(rawData);
 	const data = [];
 
@@ -567,14 +462,13 @@ const getIntegerStringValue = (rawData) => {
 	return data;
 };
 
-const getSingleStringValue = (rawData, maxLength, charset, vr) => {
-	const len = Math.min(rawData.byteLength, maxLength || 0);
-	return [Utils.getStringAt(rawData, 0, len, charset, vr).trim()];
-};
-
-const getPersonNameStringValue = (rawData, charset, vr) => {
+const getPersonNameStringValue = (
+	rawData: DataView,
+	charset: Charset,
+	vr: string
+):string[] => {
 	const stringData = getStringValue(rawData, charset, vr);
-	const data = [];
+	const data = Array(stringData.length);
 
 	for (let ctr = 0; ctr < stringData.length; ctr += 1) {
 		data[ctr] = stringData[ctr].replace("^", " ");
@@ -583,7 +477,11 @@ const getPersonNameStringValue = (rawData, charset, vr) => {
 	return data;
 };
 
-const convertPrivateValue = (group, element, rawData) => {
+const convertPrivateValue = (
+	group: number,
+	element: number,
+	rawData: DataView
+): DataView | string => {
 	let privReader;
 
 	for (let ctr = 0; ctr < PRIVATE_DATA_READERS.length; ctr += 1) {
@@ -596,8 +494,13 @@ const convertPrivateValue = (group, element, rawData) => {
 	return rawData;
 };
 
-const convertValue = (vr, rawData, littleEndian, charset) => {
-	let data = null;
+const convertValue = (
+	vr: string,
+	rawData: DataView,
+	littleEndian: boolean,
+	charset: Charset
+): TagValue => {
+	let data: TagValue = null;
 	// http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
 	switch (vr) {
 		case "AE":
@@ -687,14 +590,183 @@ const convertValue = (vr, rawData, littleEndian, charset) => {
 	return data;
 };
 
-export const TagId = {
-	Charset: Tag.TAG_SPECIFIC_CHAR_SET,
-	PixelData: Tag.TAG_PIXEL_DATA,
-	SublistItem: Tag.TAG_SUBLIST_ITEM,
-	SublistItemDelim: Tag.TAG_SUBLIST_ITEM_DELIM,
-	SequenceDelim: Tag.TAG_SUBLIST_SEQ_DELIM,
-	MetaLength: Tag.TAG_META_LENGTH,
-	TransferSyntax: Tag.TAG_TRANSFER_SYNTAX,
-};
+class Tag implements ITagKey {
+	static isEqual({ group, element }: ITagKey, tagId: TagTupleID) {
+		return group === tagId[0] && element === tagId[1];
+	}
+
+	id: TagStringID
+
+	group: number
+
+	element: number
+
+	vr: string | null
+
+	value: TagValue
+
+	offsetStart: number | null
+
+	offsetValue: number | null
+
+	offsetEnd: number | null
+
+	sublist: boolean
+
+	preformatted: boolean
+
+	/**
+	 * The Tag constuctor.
+	 * @property {number} group
+	 * @property {number} element
+	 * @property {string} vr
+	 * @property {number} offsetStart
+	 * @property {number} offsetValue
+	 * @property {number} offsetEnd
+	 * @property {boolean} sublist - true if this tag is a sublist
+	 * @property {number|number[]|string|string[]|object} value
+	 * @type {Function}
+	 */
+	constructor({
+		group,
+		element,
+		vr = null,
+		value = null,
+		offsetStart = null,
+		offsetValue = null,
+		offsetEnd = null,
+		littleEndian = true,
+		charset = null
+	}: ITagContstuctor) {
+		this.group = group;
+		this.element = element;
+		this.vr = vr;
+		this.offsetStart = offsetStart;
+		this.offsetValue = offsetValue;
+		this.offsetEnd = offsetEnd;
+		this.sublist = false;
+		this.preformatted = false;
+		this.id = createTagId(group, element);
+
+		if (value instanceof Array) {
+			this.value = value;
+			this.sublist = true;
+		}
+		else if (value !== null) {
+			const dv = new DataView(value);
+			this.value = convertValue(vr!, dv, littleEndian, charset);
+
+			if ((this.value === dv) && this.isPrivateData()) {
+				this.value = convertPrivateValue(group, element, dv);
+				this.preformatted = (this.value !== dv);
+			}
+		}
+		else {
+			this.value = null;
+		}
+	}
+
+	/**
+	 * Returns true if this is the transform syntax tag.
+	 * @returns {boolean}
+	 */
+	is([group, element]: TagTupleID):boolean {
+		return ((this.group === group) && (this.element === element));
+	}
+
+	/**
+	 * Returns true if this tag contains private data.
+	 * @returns {boolean}
+	 */
+	isPrivateData():boolean {
+		/* eslint-disable no-bitwise */
+		return ((this.group & 1) === 1);
+	}
+
+	/**
+	 * Returns true if this tag contains private data that can be read.
+	 * @returns {boolean}
+	 */
+	hasInterpretedPrivateData(): boolean {
+		return this.isPrivateData() && Utils.isString(this.value);
+	}
+
+	/**
+	 * Returns a string representation of this tag.
+	 * @param {number} [level] - the indentation level
+	 * @param {boolean} [html]
+	 * @returns {string}
+	 */
+	toString(level: number, html: boolean): string {
+		let valueStr = "";
+		const groupStr = Utils.dec2hex(this.group);
+		const elemStr = Utils.dec2hex(this.element);
+		let tagStr = `(${groupStr},${elemStr})`;
+		let des = "";
+		let padding;
+
+		if (level === undefined) {
+			// eslint-disable-next-line no-param-reassign
+			level = 0;
+		}
+
+		padding = "";
+		for (let ctr = 0; ctr < level; ctr += 1) {
+			if (html) {
+				padding += "&nbsp;&nbsp;";
+			}
+			else {
+				padding += "  ";
+			}
+		}
+
+		if (this.sublist) {
+			const value = <Array<Tag>> this.value;
+			for (let ctr = 0; ctr < value!.length; ctr += 1) {
+				const tag = value[ctr];
+				valueStr += `\n${(tag.toString(level + 1, html))}`;
+			}
+		}
+		else if (this.vr === "SQ" || this.is(TagIds.PixelData) || !this.value) {
+			valueStr = "";
+		}
+		else if (html && this.preformatted) {
+			valueStr = `[<pre>${this.value}</pre>]`;
+		}
+		else {
+			valueStr = `[${this.value}]`;
+		}
+
+		if (this.is(TagIds.SublistItem)) {
+			tagStr = "Sequence Item";
+		}
+		else if (this.is(TagIds.SublistItemDelim)) {
+			tagStr = "Sequence Item Delimiter";
+		}
+		else if (this.is(TagIds.SequenceDelim)) {
+			tagStr = "Sequence Delimiter";
+		}
+		else if (this.is(TagIds.PixelData)) {
+			tagStr = "Pixel Data";
+		}
+		else {
+			des = Utils.convertCamcelCaseToTitleCase(Dictionary.getDescription(this.group, this.element));
+		}
+
+		if (html) {
+			return `${padding}<span style='color:#B5CBD3'>${tagStr}</span>&nbsp;&nbsp;&nbsp;${des}&nbsp;&nbsp;&nbsp;${valueStr}`;
+		}
+		return `${padding} ${tagStr} ${des} ${valueStr}`;
+	}
+
+	/**
+	 * Returns an HTML string representation of this tag.
+	 * @param {number} level - the indentation level
+	 * @returns {string}
+	 */
+	toHTMLString(level: number): string {
+		return this.toString(level, true);
+	}
+}
 
 export default Tag;

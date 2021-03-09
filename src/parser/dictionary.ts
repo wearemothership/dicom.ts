@@ -2,7 +2,9 @@ import * as Utils from "./utilities";
 
 const { dec2hex } = Utils;
 
-const dictPrivate = {
+type TDICOMDictionary = Record<string, Record<string, [string, string]>>
+
+const dictPrivate: TDICOMDictionary = {
 	"0207": {
 		"101F": ["FE", "ElscintDataScale"] // uses special Elscint double type (see Tag class)
 	}
@@ -10,7 +12,7 @@ const dictPrivate = {
 
 // strange bug in eslint, thinks the integer prop keys should not be in quotes!
 /* eslint-disable  quote-props */
-const dict = {
+const dict: TDICOMDictionary = {
 	"0002": {
 		"0001": ["OB", "FileMetaInformationVersion"],
 		"0002": ["UI", "MediaStoredSOPClassUID"],
@@ -3617,7 +3619,7 @@ const dict = {
  * @param {number} element
  * @returns {string}
  */
-const getVR = (group, element) => {
+const getVR = (group: number, element: number):string => {
 	let vr;
 	let elementData;
 	let groupData;
@@ -3656,7 +3658,7 @@ const getVR = (group, element) => {
  * @param {number} element
  * @returns {string}
  */
-const getDescription = (group, element) => {
+const getDescription = (group: number, element: number): string => {
 	let des;
 	let elementData;
 	let groupData;

@@ -1,5 +1,5 @@
 /* eslint no-use-before-define: ["error", { "classes": false }] */
-import Tag, { createTagId, createTagIdWithTag } from "./tag";
+import { TagIds, createTagId, createTagIdWithTag } from "./tag";
 import { TransferSyntax } from "./constants";
 
 const getSingleValueSafely = (tag, index) => (tag?.value?.[index] ?? null);
@@ -122,7 +122,7 @@ class DCMImage {
 	 * @returns {daikon.Tag}
 	 */
 	getPixelData() {
-		return this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)];
+		return this.tags[createTagIdWithTag(TagIds.PixelData)];
 	}
 
 	getPixelDataBytes() {
@@ -134,7 +134,7 @@ class DCMImage {
 			console.log("converting palette!");
 			this.convertPalette();
 		}
-		const tagId = createTagIdWithTag(Tag.TAG_PIXEL_DATA);
+		const tagId = createTagIdWithTag(TagIds.PixelData);
 		const tag = this.tags[tagId];
 
 		return tag?.value?.buffer;
@@ -153,7 +153,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getCols() {
-		return this.getTagValueIndexed(Tag.TAG_COLS);
+		return this.getTagValueIndexed(TagIds.Cols);
 	}
 
 	/**
@@ -161,7 +161,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getRows() {
-		return this.getTagValueIndexed(Tag.TAG_ROWS);
+		return this.getTagValueIndexed(TagIds.Rows);
 	}
 
 	/**
@@ -169,7 +169,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getSeriesDescription() {
-		return this.getTagValueIndexed(Tag.TAG_SERIES_DESCRIPTION);
+		return this.getTagValueIndexed(TagIds.SeriesDescription);
 	}
 
 	/**
@@ -177,7 +177,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getSeriesInstanceUID() {
-		return this.getTagValueIndexed(Tag.TAG_SERIES_INSTANCE_UID);
+		return this.getTagValueIndexed(TagIds.SeriesInstanceUid);
 	}
 
 	/**
@@ -185,7 +185,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getSeriesNumber() {
-		return this.getTagValueIndexed(Tag.TAG_SERIES_NUMBER);
+		return this.getTagValueIndexed(TagIds.SeriesNumber);
 	}
 
 	/**
@@ -193,7 +193,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getEchoNumber() {
-		return this.getTagValueIndexed(Tag.TAG_ECHO_NUMBER);
+		return this.getTagValueIndexed(TagIds.EchoNumber);
 	}
 
 	/**
@@ -201,7 +201,7 @@ class DCMImage {
 	 * @return {number[]}
 	 */
 	getImagePosition() {
-		return this.getTagValue(Tag.TAG_IMAGE_POSITION);
+		return this.getTagValue(TagIds.ImagePosition);
 	}
 
 	/**
@@ -209,7 +209,7 @@ class DCMImage {
 	 * @return {number[]}
 	 */
 	getImageDirections() {
-		return this.getTagValue(Tag.TAG_IMAGE_ORIENTATION);
+		return this.getTagValue(TagIds.ImageOrientation);
 	}
 
 	/**
@@ -218,7 +218,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getImagePositionSliceDir(sliceDir) {
-		const imagePos = this.getTagValue(Tag.TAG_IMAGE_POSITION);
+		const imagePos = this.getTagValue(TagIds.ImagePosition);
 		if (imagePos && sliceDir >= 0) {
 			return imagePos[sliceDir];
 		}
@@ -230,7 +230,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getModality() {
-		return this.getTagValueIndexed(Tag.TAG_MODALITY);
+		return this.getTagValueIndexed(TagIds.Modality);
 	}
 
 	/**
@@ -238,7 +238,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getSliceLocation() {
-		return this.getTagValueIndexed(Tag.TAG_SLICE_LOCATION);
+		return this.getTagValueIndexed(TagIds.SliceLocation);
 	}
 
 	/**
@@ -246,7 +246,7 @@ class DCMImage {
 	 * @returns {number[]}
 	 */
 	getSliceLocationVector() {
-		return this.getTagValue(Tag.TAG_SLICE_LOCATION_VECTOR);
+		return this.getTagValue(TagIds.SliceLocationVector);
 	}
 
 	/**
@@ -254,7 +254,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getImageNumber() {
-		return this.getTagValueIndexed(Tag.TAG_IMAGE_NUM);
+		return this.getTagValueIndexed(TagIds.ImageNum);
 	}
 
 	/**
@@ -262,7 +262,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getTemporalPosition() {
-		return this.getTagValueIndexed(Tag.TAG_TEMPORAL_POSITION);
+		return this.getTagValueIndexed(TagIds.TemporalPosition);
 	}
 
 	/**
@@ -270,7 +270,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getTemporalNumber() {
-		return this.getTagValueIndexed(Tag.TAG_NUMBER_TEMPORAL_POSITIONS);
+		return this.getTagValueIndexed(TagIds.NumberTemporalPositions);
 	}
 
 	/**
@@ -278,7 +278,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getSliceGap() {
-		return this.getTagValueIndexed(Tag.TAG_SLICE_GAP);
+		return this.getTagValueIndexed(TagIds.SliceGap);
 	}
 
 	/**
@@ -286,7 +286,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getSliceThickness() {
-		return this.getTagValueIndexed(Tag.TAG_SLICE_THICKNESS);
+		return this.getTagValueIndexed(TagIds.SliceThickness);
 	}
 
 	/**
@@ -294,7 +294,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getImageMax() {
-		return this.getTagValueIndexed(Tag.TAG_IMAGE_MAX);
+		return this.getTagValueIndexed(TagIds.ImageMax);
 	}
 
 	/**
@@ -302,7 +302,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getImageMin() {
-		return this.getTagValueIndexed(Tag.TAG_IMAGE_MIN);
+		return this.getTagValueIndexed(TagIds.ImageMin);
 	}
 
 	/**
@@ -310,7 +310,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getDataScaleSlope() {
-		return this.getTagValueIndexed(Tag.TAG_DATA_SCALE_SLOPE);
+		return this.getTagValueIndexed(TagIds.DataScaleSlope);
 	}
 
 	/**
@@ -318,11 +318,11 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getDataScaleIntercept() {
-		return this.getTagValueIndexed(Tag.TAG_DATA_SCALE_INTERCEPT);
+		return this.getTagValueIndexed(TagIds.DataScaleIntercept);
 	}
 
 	getDataScaleElscint() {
-		let scale = this.getTagValueIndexed(Tag.TAG_DATA_SCALE_ELSCINT) || 1;
+		let scale = this.getTagValueIndexed(TagIds.DataScaleElscint) || 1;
 
 		const bandwidth = this.getPixelBandwidth();
 		scale = Math.sqrt(bandwidth) / (10 * scale);
@@ -338,7 +338,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getWindowWidth() {
-		return this.getTagValueIndexed(Tag.TAG_WINDOW_WIDTH);
+		return this.getTagValueIndexed(TagIds.WindowWidth);
 	}
 
 	/**
@@ -346,11 +346,11 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getWindowCenter() {
-		return this.getTagValueIndexed(Tag.TAG_WINDOW_CENTER);
+		return this.getTagValueIndexed(TagIds.WindowCenter);
 	}
 
 	getPixelBandwidth() {
-		return this.getTagValueIndexed(Tag.TAG_PIXEL_BANDWIDTH);
+		return this.getTagValueIndexed(TagIds.PixelBandwidth);
 	}
 
 	getSeriesId() {
@@ -371,7 +371,7 @@ class DCMImage {
 	 * @returns {number[]}
 	 */
 	getPixelSpacing() {
-		return this.getTagValue(Tag.TAG_PIXEL_SPACING);
+		return this.getTagValue(TagIds.PixelSpacing);
 	}
 
 	/**
@@ -379,7 +379,7 @@ class DCMImage {
 	 * @returns {string[]}
 	 */
 	getImageType() {
-		return this.getTagValue(Tag.TAG_IMAGE_TYPE);
+		return this.getTagValue(TagIds.ImageType);
 	}
 
 	/**
@@ -387,7 +387,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getBitsStored() {
-		return this.getTagValueIndexed(Tag.TAG_BITS_STORED);
+		return this.getTagValueIndexed(TagIds.BitsStored);
 	}
 
 	/**
@@ -395,7 +395,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getBitsAllocated() {
-		return this.getTagValueIndexed(Tag.TAG_BITS_ALLOCATED);
+		return this.getTagValueIndexed(TagIds.BitsAllocated);
 	}
 
 	/**
@@ -403,7 +403,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getFrameTime() {
-		return this.getTagValueIndexed(Tag.TAG_FRAME_TIME);
+		return this.getTagValueIndexed(TagIds.FrameTime);
 	}
 
 	/**
@@ -412,7 +412,7 @@ class DCMImage {
 	 */
 	getAcquisitionMatrix() {
 		const mat = [0, 0];
-		mat[0] = this.getTagValueIndexed(Tag.TAG_ACQUISITION_MATRIX);
+		mat[0] = this.getTagValueIndexed(TagIds.AcquisitionMatrix);
 
 		if (this.privateDataAll === null) {
 			this.privateDataAll = this.getAllInterpretedPrivateData();
@@ -449,7 +449,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getTR() {
-		return this.getTagValueIndexed(Tag.TAG_TR);
+		return this.getTagValueIndexed(TagIds.Tr);
 	}
 
 	putTag(tag) {
@@ -473,9 +473,9 @@ class DCMImage {
 	convertPalette() {
 		const data = this.getPixelData();
 
-		const reds = this.getPalleteValues(Tag.TAG_PALETTE_RED);
-		const greens = this.getPalleteValues(Tag.TAG_PALETTE_GREEN);
-		const blues = this.getPalleteValues(Tag.TAG_PALETTE_BLUE);
+		const reds = this.getPalleteValues(TagIds.PaletteRed);
+		const greens = this.getPalleteValues(TagIds.PaletteGreen);
+		const blues = this.getPalleteValues(TagIds.PaletteBlue);
 
 		if ((reds?.length > 0)
 			&& (greens?.length > 0)
@@ -508,7 +508,7 @@ class DCMImage {
 					rgb.setUint8((ctr * 3) + 2, bVal);
 				}
 			}
-			this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)].value = rgb;
+			this.tags[createTagIdWithTag(TagIds.PixelData)].value = rgb;
 			this.convertedPalette = true;
 		}
 	}
@@ -518,11 +518,11 @@ class DCMImage {
 	 * @returns {boolean}
 	 */
 	hasPixelData() {
-		return (this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)] !== undefined);
+		return (this.tags[createTagIdWithTag(TagIds.PixelData)] !== undefined);
 	}
 
 	clearPixelData() {
-		this.tags[createTagIdWithTag(Tag.TAG_PIXEL_DATA)].value = null;
+		this.tags[createTagIdWithTag(TagIds.PixelData)].value = null;
 	}
 
 	/**
@@ -531,7 +531,7 @@ class DCMImage {
 	 */
 	getOrientation() {
 		let orientation = null;
-		const dirCos = this.getTagValue(Tag.TAG_IMAGE_ORIENTATION);
+		const dirCos = this.getTagValue(TagIds.ImageOrientation);
 		let bigRow = 0;
 		let bigCol = 0;
 
@@ -749,7 +749,7 @@ class DCMImage {
 	 * @returns {boolean}
 	 */
 	isPalette() {
-		const value = this.getTagValueIndexed(Tag.TAG_PHOTOMETRIC_INTERPRETATION);
+		const value = this.getTagValueIndexed(TagIds.PhotometricInterpretation);
 		return (value && value.toLowerCase().indexOf("palette") !== -1);
 	}
 
@@ -762,7 +762,7 @@ class DCMImage {
 	}
 
 	isElscint() {
-		const tag = this.getTag(Tag.TAG_DATA_SCALE_ELSCINT);
+		const tag = this.getTag(TagIds.DataScaleElscint);
 		return (tag !== undefined);
 	}
 
@@ -884,7 +884,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getNumberOfFrames() {
-		const value = this.getTagValueIndexed(Tag.TAG_NUMBER_OF_FRAMES);
+		const value = this.getTagValueIndexed(TagIds.NumberOfFrames);
 		return value ?? 1;
 	}
 
@@ -893,7 +893,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getNumberOfSamplesPerPixel() {
-		const value = this.getTagValueIndexed(Tag.TAG_SAMPLES_PER_PIXEL);
+		const value = this.getTagValueIndexed(TagIds.SamplesPerPixel);
 		return value ?? 1;
 	}
 
@@ -914,7 +914,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getPixelRepresentation() {
-		return this.getTagValueIndexed(Tag.TAG_PIXEL_REPRESENTATION);
+		return this.getTagValueIndexed(TagIds.PixelRepresentation);
 	}
 
 	/**
@@ -922,7 +922,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getPhotometricInterpretation() {
-		return this.getTagValueIndexed(Tag.TAG_PHOTOMETRIC_INTERPRETATION);
+		return this.getTagValueIndexed(TagIds.PhotometricInterpretation);
 	}
 
 	/**
@@ -930,7 +930,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getPatientName() {
-		return this.getTagValueIndexed(Tag.TAG_PATIENT_NAME);
+		return this.getTagValueIndexed(TagIds.PatientName);
 	}
 
 	/**
@@ -938,7 +938,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getPatientID() {
-		return this.getTagValueIndexed(Tag.TAG_PATIENT_ID);
+		return this.getTagValueIndexed(TagIds.PatientId);
 	}
 
 	/**
@@ -946,7 +946,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getStudyTime() {
-		return this.getTagValueIndexed(Tag.TAG_STUDY_TIME);
+		return this.getTagValueIndexed(TagIds.StudyTime);
 	}
 
 	/**
@@ -954,7 +954,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getTransferSyntax() {
-		return this.getTagValueIndexed(Tag.TAG_TRANSFER_SYNTAX);
+		return this.getTagValueIndexed(TagIds.TransferSyntax);
 	}
 
 	/**
@@ -962,7 +962,7 @@ class DCMImage {
 	 * @returns {string}
 	 */
 	getStudyDate() {
-		return this.getTagValueIndexed(Tag.TAG_STUDY_DATE);
+		return this.getTagValueIndexed(TagIds.StudyDate);
 	}
 
 	/**
@@ -970,7 +970,7 @@ class DCMImage {
 	 * @returns {number}
 	 */
 	getPlanarConfig() {
-		return this.getTagValueIndexed(Tag.TAG_PLANAR_CONFIG);
+		return this.getTagValueIndexed(TagIds.PlanarConfig);
 	}
 
 	/**
@@ -979,9 +979,9 @@ class DCMImage {
 	 */
 	getImageDescription() {
 		const values = [
-			this.getTagValueIndexed(Tag.TAG_STUDY_DES),
-			this.getTagValueIndexed(Tag.TAG_SERIES_DESCRIPTION),
-			this.getTagValueIndexed(Tag.TAG_IMAGE_COMMENTS)
+			this.getTagValueIndexed(TagIds.StudyDes),
+			this.getTagValueIndexed(TagIds.SeriesDescription),
+			this.getTagValueIndexed(TagIds.ImageComments)
 		].filter((el) => el !== null);
 
 		return values.join(" ").trim();
@@ -1018,7 +1018,7 @@ class DCMImage {
 
 	// originally from: http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
 	getAcquiredSliceDirection() {
-		const dirCos = this.getTagValue(Tag.TAG_IMAGE_ORIENTATION);
+		const dirCos = this.getTagValue(TagIds.ImageOrientation);
 
 		if (dirCos?.length !== 6) {
 			return DCMImage.sliceDirection.unknown;
@@ -1140,7 +1140,7 @@ class DCMImage {
 		this.photometricInterpretation = this.getPhotometricInterpretation();
 
 		// should we invert any output
-		let invert = this.getTagValueIndexed(Tag.TAG_LUT_SHAPE) === "INVERSE";
+		let invert = this.getTagValueIndexed(TagIds.LutShape) === "inverse";
 		invert = invert || this.photometricInterpretation === "MONOCHROME1";
 		this.invert = invert;
 
@@ -1151,7 +1151,7 @@ class DCMImage {
 		this.slope = this.getDataScaleSlope() || 1.0;
 		this.intercept = this.getDataScaleIntercept() || 0.0;
 
-		const lutDescriptor = this.getTagValue(Tag.TAG_VOI_LUT_DESCRIPTOR);
+		const lutDescriptor = this.getTagValue(TagIds.VoiLutDescriptor);
 		if (lutDescriptor?.length === 3) {
 			const [nEntries, firstValue, bitsStored] = lutDescriptor;
 			if (!nEntries < 2 ** bitsStored - 1) {
@@ -1159,7 +1159,7 @@ class DCMImage {
 				if (bitsStored > 8) {
 					ArrayType = Uint16Array;
 				}
-				const lutDataTagValue = this.getTagValue(Tag.TAG_VOI_LUT_DATA);
+				const lutDataTagValue = this.getTagValue(TagIds.VoiLutData);
 				if (lutDataTagValue) {
 					const data = new ArrayType(
 						lutDataTagValue,

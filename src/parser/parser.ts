@@ -4,13 +4,13 @@ import pako from "pako";
 // @ts-ignore
 import DCMImage from "./image";
 // @ts-ignore
-import Tag, { TagId } from "./tag";
+import Tag, { TagIds } from "./tag";
 
 import * as Utils from "./utilities";
 // @ts-ignore
 import Dictionary from "./dictionary";
 
-import { TransferSyntax } from "./constants";
+import { Charset, DefaultCharset, TransferSyntax } from "./constants";
 
 const MAGIC_COOKIE_OFFSET = 128;
 const MAGIC_COOKIE = [68, 73, 67, 77];
@@ -64,7 +64,7 @@ interface IParserPublic {
 	littleEndian:boolean;
 	explicit:boolean;
 	error?: Error | null;
-	charset?:string;
+	charset?:Charset;
 }
 
 /**
@@ -105,7 +105,7 @@ class Parser implements IParserPublic {
 
 	error: Error | null = null;
 
-	charset?:string = undefined;
+	charset?:Charset = null;
 
 	/**
 	 * Parses this data and returns an image object.
@@ -127,7 +127,7 @@ class Parser implements IParserPublic {
 
 				image.putTag(tag);
 
-				if (tag.is(TagId.PixelData)) {
+				if (tag.is(TagIds.PixelData)) {
 					break;
 				}
 
@@ -162,7 +162,7 @@ class Parser implements IParserPublic {
 		try {
 			let tag = this.getNextTag(data, 0);
 			while (tag !== null) {
-				if (tag.is(TagId.SublistItem)) {
+				if (tag.is(TagIds.SublistItem)) {
 					tags.push(tag);
 				}
 
@@ -263,13 +263,14 @@ class Parser implements IParserPublic {
 
 		const offsetValue = offset;
 
-		const isPixelData = Tag.isEqual({ group, element }, TagId.PixelData);
+		const isPixelData = Tag.isEqual({ group, element }, TagIds.PixelData);
 
 		if ((vr === "SQ") || (!isPixelData && !this.encapsulation && (Parser.DATA_VRS.indexOf(vr) !== -1))) {
 			value = this.parseSublist(data, offset, length, vr !== "SQ");
 
 			if (length === Parser.UNDEFINED_LENGTH) {
-				length = value[value.length - 1].offsetEnd - offset;
+				const tag = value[value.length - 1] as Tag;
+				length = tag.offsetEnd! - offset;
 			}
 		}
 		else if ((length > 0) && !testForTag) {
@@ -296,8 +297,8 @@ class Parser implements IParserPublic {
 		});
 
 		if (tag.value) {
-			if (tag.is(<[number, number]> TagId.TransferSyntax)) {
-				const [val] = tag.value;
+			if (tag.is(TagIds.TransferSyntax)) {
+				const [val] = tag.value as [string];
 				this.explicit = true;
 				this.littleEndian = true;
 				if (val === TransferSyntax.ImplicitLittle) {
@@ -310,16 +311,18 @@ class Parser implements IParserPublic {
 					this.needsDeflate = true;
 				}
 			}
-			else if (tag.is(<[number, number]>TagId.MetaLength)) {
-				this.metaFinishedOffset = tag.value[0] + offset;
+			else if (tag.is(TagIds.MetaLength)) {
+				const [val] = tag.value as [number];
+				this.metaFinishedOffset = val + offset;
 			}
-			else if (tag.is(<[number, number]>TagId.Charset)) {
-				let charset = tag.value;
-				if (charset.length === 2) {
-					charset = `${charset[0] || "ISO 2022 IR 6"}\\${charset[1]}`;
+			else if (tag.is(TagIds.Charset)) {
+				const charsetValue = tag.value as string[];
+				let charset:Charset = DefaultCharset;
+				if (charsetValue.length === 2) {
+					charset = `${charsetValue[0] || DefaultCharset}\\${charsetValue[1]}`;
 				}
-				else if (charset.length === 1) {
-					[charset] = charset;
+				else if (charsetValue.length === 1) {
+					[charset] = charsetValue;
 				}
 				this.charset = charset;
 			}
@@ -327,7 +330,7 @@ class Parser implements IParserPublic {
 		return tag;
 	}
 
-	parseSublist(data: DataView, offsetStart:number, length:number, raw:boolean) {
+	parseSublist(data: DataView, offsetStart:number, length:number, raw:boolean): Array<Tag> {
 		const tags = [];
 		let offset = offsetStart;
 		const offsetEnd = offsetStart + length;
@@ -336,9 +339,9 @@ class Parser implements IParserPublic {
 		if (length === Parser.UNDEFINED_LENGTH) {
 			let sublistItem = this.parseSublistItem(data, offset, raw);
 
-			while (!sublistItem.is(<[number, number]>TagId.SequenceDelim)) {
+			while (!sublistItem.is(<[number, number]>TagIds.SequenceDelim)) {
 				tags.push(sublistItem);
-				offset = sublistItem.offsetEnd;
+				offset = sublistItem.offsetEnd || 0;
 				sublistItem = this.parseSublistItem(data, offset, raw);
 			}
 
@@ -348,7 +351,7 @@ class Parser implements IParserPublic {
 			while (offset < offsetEnd) {
 				const sublistItem = this.parseSublistItem(data, offset, raw);
 				tags.push(sublistItem);
-				offset = sublistItem.offsetEnd;
+				offset = sublistItem.offsetEnd || 0;
 			}
 		}
 
@@ -357,7 +360,7 @@ class Parser implements IParserPublic {
 		return tags;
 	}
 
-	parseSublistItem(data:DataView, offsetStart:number, raw:boolean) {
+	parseSublistItem(data:DataView, offsetStart:number, raw:boolean): Tag {
 		let offset = offsetStart;
 		let value = null;
 		const tags = [];
@@ -376,7 +379,7 @@ class Parser implements IParserPublic {
 		if (length === Parser.UNDEFINED_LENGTH) {
 			let tag = this.getNextTag(data, offset);
 
-			while (!tag.is(TagId.SublistItemDelim)) {
+			while (!tag.is(TagIds.SublistItemDelim)) {
 				tags.push(tag);
 				offset = tag.offsetEnd;
 				tag = this.getNextTag(data, offset);

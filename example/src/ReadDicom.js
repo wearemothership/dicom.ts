@@ -67,7 +67,7 @@ export const CPUDecode = (buf, canvas) => new Promise((resolve, reject) => {
 		// greyscale...
 
 		// TODO: move this to Daikon - getInterpretedData
-		const lutDescriptor = image.getTag(dicomjs.Tag.TAG_VOI_LUT_DESCRIPTOR);
+		const lutDescriptor = image.getTag(dicomjs.TagIds.VoiLutDescriptor);
 
 		// calculate bit shift for colour depths > 8bit greyscale
 		const storedBits = image.bitsStored;
@@ -87,7 +87,7 @@ export const CPUDecode = (buf, canvas) => new Promise((resolve, reject) => {
 			if (lutDescriptor.value[2] > 8) {
 				ArrayType = Uint16Array;
 			}
-			const lutData = new ArrayType(image.getTag(dicomjs.Tag.TAG_VOI_LUT_DATA).value);
+			const lutData = new ArrayType(image.getTag(dicomjs.TagIds.VoiLutData).value);
 			console.log(lutDescriptor);
 			console.log(lutData);
 			// const outRange = lutDescriptor.value[1];
@@ -104,11 +104,11 @@ export const CPUDecode = (buf, canvas) => new Promise((resolve, reject) => {
 
 			// const pixData2 = new Uint16Array(image.getRawData());
 
-			// const minPixVal = image.getTagValue(dicomjs.Tag.TAG_IMAGE_MIN);
-			// const maxPixVal = image.getTagValue(dicomjs.Tag.TAG_IMAGE_MAX);
+			// const minPixVal = image.getTagValue(dicomjs.TagIds.ImageMin);
+			// const maxPixVal = image.getTagValue(dicomjs.TagIds.ImageMax);
 
-			// let windowCenter = image.getTagValue(dicomjs.Tag.TAG_WINDOW_CENTER)[0];
-			// let windowWidth = image.getTagValue(dicomjs.Tag.TAG_WINDOW_WIDTH)[0];
+			// let windowCenter = image.getTagValue(dicomjs.TagIds.WindowCenter)[0];
+			// let windowWidth = image.getTagValue(dicomjs.TagIds.WindowWidth)[0];
 
 			// if (windowWidth || maxPixVal) {
 			// 	if (maxPixVal && !windowWidth) {

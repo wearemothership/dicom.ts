@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 // @ts-ignore
 import { convertBytes } from "dicom-character-set";
+import { Charset, DefaultCharset } from "./constants";
 
 let crcTable: Array<number>;
 
@@ -13,11 +14,11 @@ export const getStringAt = (
 	dataview: DataView,
 	start: number,
 	length:number,
-	charset:string = "ISO 2022 IR 6",
+	charset?:Charset,
 	vr?:string
 ):string => {
 	const strBuff = new Uint8Array(dataview.buffer, dataview.byteOffset + start, length);
-	let str = convertBytes(charset, strBuff, { vr });
+	let str = convertBytes(charset || DefaultCharset, strBuff, { vr });
 
 	while (str && str.charCodeAt(str.length - 1) === 0) {
 		str = str.slice(0, -1);
