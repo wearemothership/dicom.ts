@@ -840,7 +840,7 @@ class DCMImage {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpeg2000) !== -1)
-				|| (transferSyntax.indexOf(TransferSyntax.CompressionJpeg2000lossless) !== -1)) {
+				|| (transferSyntax.indexOf(TransferSyntax.CompressionJpeg2000Lossless) !== -1)) {
 				return true;
 			}
 		}

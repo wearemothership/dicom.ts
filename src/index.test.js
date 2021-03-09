@@ -160,4 +160,19 @@ describe("dicom.js", () => {
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("943302fe91302fd9ede3bb5f31b466bb403ed403");
 	});
+
+	// issues
+
+	it("Renders with: jpeg2000 lossless", async () => {
+		const data = fs.readFileSync("./test/vpop-pro.com/jpeg-2000-lossless.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("dba60ea49c4f78556451be507ff08e1a25cfabd5");
+	});
 });
