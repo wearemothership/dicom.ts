@@ -1,53 +1,49 @@
 // Based on: http://stackoverflow.com/questions/3549894/javascript-data-structure-for-fast-lookup-and-ordered-looping
-import OrderedMapIterator from "./iterator";
+import OrderedMapIterator, { IOrderedMap } from "./iterator";
 
-class OrderedMap {
-	constructor() {
-		this.map = {};
-		this.orderedKeys = [];
-	}
+export interface TWithIndex {
+	index: number
+}
+class OrderedMap<K extends keyof any, T> implements IOrderedMap<K, T>, TWithIndex {
+	orderedKeys: K[] = []
 
-	put(key, value) {
-		if (key in this.map) {
-			// key already exists, replace value
-			this.map[key] = value;
-		}
-		else {
+	map: Map<K, T> = new Map<K, T>()
+
+	index = 0 // bit of a hack - necessary for Series
+
+	put(key: K, value: T) {
+		if (!this.map.get(key)) {
 			// insert new key and value
 			this.orderedKeys.push(key);
-			this.orderedKeys.sort((a, b) => (parseFloat(a) - parseFloat(b)));
-			this.map[key] = value;
+			this.orderedKeys.sort((a, b) => (parseFloat(a as string) - parseFloat(b as string)));
 		}
+		this.map.set(key, value);
 	}
 
-	remove(key) {
+	remove(key: K) {
 		const index = this.orderedKeys.indexOf(key);
 		if (index === -1) {
 			throw new Error("key does not exist");
 		}
 
 		this.orderedKeys.splice(index, 1);
-		delete this.map[key];
+		this.map.delete(key);
 	}
 
-	get(key) {
-		if (key in this.map) {
-			return this.map[key];
-		}
-
-		return null;
+	get(key: K): T | undefined {
+		return this.map.get(key);
 	}
 
-	iterator() {
+	iterator(): OrderedMapIterator<K, T> {
 		return new OrderedMapIterator(this);
 	}
 
-	getOrderedValues() {
-		const orderedValues = [];
+	getOrderedValues(): T[] {
 		const it = this.iterator();
+		const orderedValues: T[] = Array(it.length());
 
 		while (it.hasNext()) {
-			orderedValues.push(it.next());
+			orderedValues.push(it.next()!);
 		}
 
 		return orderedValues;

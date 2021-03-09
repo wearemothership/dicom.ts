@@ -2,50 +2,64 @@ import Image from "./image";
 import Parser from "./parser";
 import OrderedMap from "./orderedmap";
 
+type Images = any[];
+
+type ImagesMap = OrderedMap<number, Images>;
+
+interface IProgressMeter {
+	drawProgress: (progress: number, message: string) => void,
+}
+
 const getMosaicOffset = (
-	mosaicCols,
-	mosaicColWidth,
-	mosaicRowHeight,
-	mosaicWidth,
-	xLocVal,
-	yLocVal,
-	zLocVal
-) => {
+	mosaicCols: number,
+	mosaicColWidth: number,
+	mosaicRowHeight: number,
+	mosaicWidth: number,
+	xLocVal: number,
+	yLocVal:number,
+	zLocVal:number
+):number => {
 	let xLoc = xLocVal;
 	let yLoc = yLocVal;
 	const zLoc = zLocVal;
 
 	xLoc = ((zLoc % mosaicCols) * mosaicColWidth) + xLoc;
-	yLoc = (((parseInt(zLoc / mosaicCols, 10)) * mosaicRowHeight) + yLoc) * mosaicWidth;
+	yLoc = (((Math.floor(zLoc / mosaicCols)) * mosaicRowHeight) + yLoc) * mosaicWidth;
 
 	return (xLoc + yLoc);
 };
 
-const orderByImagePosition = (images, sliceDir) => {
-	const dicomMap = new OrderedMap();
+const orderByImagePosition = (images: Images, sliceDir: number): Images => {
+	const dicomMap = new OrderedMap<number, any>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
 		dicomMap.put(images[ctr].getImagePositionSliceDir(sliceDir), images[ctr]);
 	}
 	return dicomMap.getOrderedValues();
 };
 
-const orderBySliceLocation = (images) => {
-	const dicomMap = new OrderedMap();
+const orderBySliceLocation = (images: Images): Images => {
+	const dicomMap = new OrderedMap<number, any>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
 		dicomMap.put(images[ctr].getSliceLocation(), images[ctr]);
 	}
 	return dicomMap.getOrderedValues();
 };
 
-const orderByImageNumber = (images) => {
-	const dicomMap = new OrderedMap();
+const orderByImageNumber = (images: Images): Images => {
+	const dicomMap = new OrderedMap<number, any>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
 		dicomMap.put(images[ctr].getImageNumber(), images[ctr]);
 	}
 	return dicomMap.getOrderedValues();
 };
 
-const hasMatchingSlice = (dg, image, sliceDir, doImagePos, doSliceLoc) => {
+const hasMatchingSlice = (
+	dg: Images,
+	image: any,
+	sliceDir: number,
+	doImagePos: boolean,
+	doSliceLoc: boolean
+): boolean => {
 	let matchingNum = 0;
 
 	if (doImagePos) {
@@ -83,13 +97,19 @@ const hasMatchingSlice = (dg, image, sliceDir, doImagePos, doSliceLoc) => {
 
 	return false;
 };
-const orderByTime = (images, numFrames, sliceDir, hasImagePosition, hasSliceLocation) => {
-	const dicomMap = new OrderedMap();
+
+const orderByTime = (
+	images: Images,
+	numFrames:number,
+	sliceDir: number,
+	hasImagePosition: boolean,
+	hasSliceLocation: boolean
+): OrderedMap<number, Images> => {
+	const dicomMap = new OrderedMap<number, Images>();
 	const hasTemporalPosition = (numFrames > 1) && (images[0].getTemporalPosition() !== null);
 	const hasTemporalNumber = (numFrames > 1)
 	&& (images[0].getTemporalNumber() !== null)
 	&& (images[0].getTemporalNumber() === numFrames);
-
 	if (hasTemporalPosition && hasTemporalNumber) { // explicit series
 		for (let ctr = 0; ctr < images.length; ctr += 1) {
 			const image = images[ctr];
@@ -106,7 +126,7 @@ const orderByTime = (images, numFrames, sliceDir, hasImagePosition, hasSliceLoca
 	}
 	else { // implicit series
 		// order data by slice then time
-		const timeBySliceMap = new OrderedMap();
+		const timeBySliceMap = new OrderedMap<number, any>();
 		for (let ctr = 0; ctr < images.length; ctr += 1) {
 			if (images[ctr] !== null) {
 				let sliceMarker = ctr;
@@ -119,7 +139,7 @@ const orderByTime = (images, numFrames, sliceDir, hasImagePosition, hasSliceLoca
 
 				let slice = timeBySliceMap.get(sliceMarker);
 				if (slice === null) {
-					slice = new OrderedMap();
+					slice = new OrderedMap<number, number>();
 					timeBySliceMap.put(sliceMarker, slice);
 				}
 
@@ -143,12 +163,12 @@ const orderByTime = (images, numFrames, sliceDir, hasImagePosition, hasSliceLoca
 		// groups dicoms by timepoint
 		for (let ctr = 0; ctr < dicomsCopy.length; ctr += 1) {
 			if (dicomsCopy[ctr] !== null) {
-				let dgFound = null;
+				let dgFound: Images | undefined;
 				const it = dicomMap.iterator();
 				while (it.hasNext()) {
 					const dg = it.next();
 					if (!hasMatchingSlice(
-						dg,
+						dg!,
 						dicomsCopy[ctr],
 						sliceDir,
 						hasImagePosition,
@@ -164,7 +184,7 @@ const orderByTime = (images, numFrames, sliceDir, hasImagePosition, hasSliceLoca
 					dicomMap.put(dicomMap.orderedKeys.length, dgFound);
 				}
 
-				dgFound.push(dicomsCopy[ctr]);
+				dgFound!.push(dicomsCopy[ctr]);
 			}
 		}
 	}
@@ -172,7 +192,11 @@ const orderByTime = (images, numFrames, sliceDir, hasImagePosition, hasSliceLoca
 	return dicomMap;
 };
 
-const orderDicoms = (images, numFrames, sliceDir) => {
+const orderDicoms = (
+	images: Images,
+	numFrames: number,
+	sliceDir: number
+): OrderedMap<number, Images>[] => {
 	const hasImagePosition = (images[0].getImagePosition() !== null);
 	const hasSliceLocation = (images[0].getSliceLocation() !== null);
 	const hasImageNumber = (images[0].getImageNumber() !== null);
@@ -186,10 +210,10 @@ const orderDicoms = (images, numFrames, sliceDir) => {
 	);
 	const timeIt = timeMap.orderedKeys;
 
-	const imagesOrderedByTimeAndSpace = [];
+	const imagesOrderedByTimeAndSpace:Array<OrderedMap<number, Images>> = [];
 
 	for (let ctr = 0; ctr < timeIt.length; ctr += 1) {
-		const dg = timeMap.get(timeIt[ctr]);
+		const dg = timeMap.get(timeIt[ctr])!;
 		let ordered;
 		if (hasImagePosition) {
 			ordered = orderByImagePosition(dg, sliceDir);
@@ -216,7 +240,7 @@ const orderDicoms = (images, numFrames, sliceDir) => {
 	return imagesOrderedByTimeAndSpace;
 };
 
-const validatePixelDataLength = (image) => {
+const validatePixelDataLength = (image: any): number => {
 	const length = image.getPixelDataBytes().byteLength;
 	const sliceLength = image.columns * image.rows;
 	// pixel data length should be divisible by slice size,
@@ -236,7 +260,7 @@ const validatePixelDataLength = (image) => {
  * @type {Function}
  */
 class Series {
-	static parserError = null;
+	static parserError: Error | null = null;
 
 	/**
 	 * True to keep original order of images, ignoring metadata-based ordering.
@@ -251,27 +275,38 @@ class Series {
 	 */
 	static useExplicitSpacing = 0;
 
-	constructor() {
-		this.images = [];
-		this.imagesOriginalOrder = null;
-		this.isMosaic = false;
-		this.isElscint = false;
-		this.isCompressed = false;
-		this.numberOfFrames = 0;
-		this.numberOfFramesInFile = 0;
-		this.isMultiFrame = false;
-		this.isMultiFrameVolume = false;
-		this.isMultiFrameTimeseries = false;
-		this.isImplicitTimeseries = false;
-		this.sliceSense = false;
-		this.sliceDir = Image.sliceDirection.unknown;
-		this.error = null;
-	}
+	images:Images = []
 
-	getOrder() {
+	imagesOriginalOrder: ImagesMap[] | null = null;
+
+	isMosaic: boolean = false;
+
+	isElscint: boolean = false;
+
+	isCompressed: boolean = false;
+
+	numberOfFrames: number = 0;
+
+	numberOfFramesInFile: number = 0;
+
+	isMultiFrame: boolean = false;
+
+	isMultiFrameVolume: boolean = false;
+
+	isMultiFrameTimeseries: boolean = false;
+
+	isImplicitTimeseries: boolean = false;
+
+	sliceSense = false;
+
+	sliceDir = Image.sliceDirection.unknown;
+
+	error: Error | null = null;
+
+	getOrder():number[] {
 		const order = [];
-		for (let ctr = 0; ctr < this.imagesOriginalOrder.length; ctr += 1) {
-			order[ctr] = this.imagesOriginalOrder[ctr].index;
+		for (let ctr = 0; ctr < this.imagesOriginalOrder!.length; ctr += 1) {
+			order[ctr] = this.imagesOriginalOrder![ctr].index;
 		}
 		return order;
 	}
@@ -280,7 +315,7 @@ class Series {
 	 * Returns the series ID.
 	 * @returns {string}
 	 */
-	toString() {
+	toString():string {
 		return this.images[0].getSeriesId();
 	}
 
@@ -288,7 +323,7 @@ class Series {
 	 * Returns a nice name for the series.
 	 * @returns {string|null}
 	 */
-	getName() {
+	getName(): string | null {
 		const des = this.images[0].getSeriesDescription();
 		const uid = this.images[0].getSeriesInstanceUID();
 		if (des !== null) {
@@ -304,7 +339,7 @@ class Series {
 	 * Adds an image to the series.
 	 * @param {daikon.Image} image
 	 */
-	addImage(image) {
+	addImage(image: any) {
 		this.images.push(image);
 	}
 
@@ -314,7 +349,7 @@ class Series {
 	 * @param {daikon.Image} image
 	 * @returns {boolean}
 	 */
-	matchesSeries(image) {
+	matchesSeries(image:any): boolean {
 		if (this.images.length === 0) {
 			return true;
 		}
@@ -431,7 +466,10 @@ class Series {
 	 * 									function [e.g., drawProgress(.5, "Loading...")]
 	 * @param {Function} onFinishedImageRead -- callback
 	 */
-	concatenateImageData(progressMeter, onFinishedImageRead) {
+	concatenateImageData(
+		progressMeter: IProgressMeter,
+		onFinishedImageRead: (buffer: ArrayBuffer) => void
+	) {
 		let data;
 		if (this.isMosaic) {
 			data = this.getMosaicData(this.images[0], this.images[0].getPixelDataBytes());
@@ -443,12 +481,18 @@ class Series {
 		this.images[0].clearPixelData();
 		const buffer = new Uint8Array(new ArrayBuffer(length * this.images.length));
 		buffer.set(new Uint8Array(data, 0, length), 0);
-		setTimeout(this, () => (
+		setTimeout(() => (
 			this.concatenateNextImageData(buffer, length, progressMeter, 1, onFinishedImageRead)
 		), 0);
 	}
 
-	concatenateNextImageData(buffer, frameSize, progressMeter, index, onFinishedImageRead) {
+	concatenateNextImageData(
+		buffer:Uint8Array | Uint16Array,
+		frameSize: number,
+		progressMeter: IProgressMeter,
+		index: number,
+		onFinishedImageRead: (buffer: ArrayBuffer) => void
+	) {
 		if (index >= this.images.length) {
 			progressMeter?.drawProgress(1, "Reading DICOM Images");
 			onFinishedImageRead(buffer.buffer);
@@ -462,10 +506,10 @@ class Series {
 			else {
 				data = this.images[index].getPixelDataBytes();
 			}
-			const length = this.validatePixelDataLength(this.images[index]);
+			const length = validatePixelDataLength(this.images[index]);
 			this.images[index].clearPixelData();
 			buffer.set(new Uint8Array(data, 0, length), (frameSize * index));
-			setTimeout(this, () => (
+			setTimeout(() => (
 				this.concatenateNextImageData(
 					buffer,
 					frameSize,
@@ -476,7 +520,7 @@ class Series {
 		}
 	}
 
-	getMosaicData(image, data) {
+	getMosaicData(image: any, data:Uint16Array | Uint8Array): ArrayBuffer {
 		const [image0] = this.images;
 
 		const mosaicWidth = image0.columns;
@@ -486,11 +530,11 @@ class Series {
 
 		const numBytes = image0.bytesAllocated;
 		const numSlices = mosaicWidth * mosaicHeight;
-		const numRows = parseInt(mosaicHeight / mosaicRows, 10);
-		const numCols = parseInt(mosaicWidth / mosaicCols, 10);
+		const numRows = Math.floor(mosaicHeight / mosaicRows);
+		const numCols = Math.floor(mosaicWidth / mosaicCols);
 
-		const mosaicRowHeight = parseInt(mosaicHeight / mosaicRows, 10);
-		const mosaicColWidth = parseInt(mosaicWidth / mosaicCols, 10);
+		const mosaicRowHeight = Math.floor(mosaicHeight / mosaicRows);
+		const mosaicColWidth = Math.floor(mosaicWidth / mosaicCols);
 
 		const buffer = new Uint8Array(new ArrayBuffer(numSlices * numRows * numCols * numBytes));
 		const dataTyped = new Uint8Array(data);
@@ -523,12 +567,12 @@ class Series {
  * @param {DataView} data
  * @returns {daikon.Image|null}
  */
-export const parseImage = (data) => {
+export const parseImage = (data: DataView) => {
 	const parser = new Parser();
 	const image = parser.parse(data);
 
 	if (parser.hasError()) {
-		Series.parserError = parser.error;
+		Series.parserError = parser.error as Error;
 		return null;
 	}
 
