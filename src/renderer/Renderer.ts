@@ -14,7 +14,7 @@ class Renderer {
 
 	decoder: Decoder | null = null
 
-	image: any = null
+	image: DCMImage | null = null
 
 	program: IProgram | null = null;
 

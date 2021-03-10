@@ -339,7 +339,7 @@ class Parser implements IParserPublic {
 		if (length === Parser.UNDEFINED_LENGTH) {
 			let sublistItem = this.parseSublistItem(data, offset, raw);
 
-			while (!sublistItem.is(<[number, number]>TagIds.SequenceDelim)) {
+			while (!sublistItem.is(TagIds.SequenceDelim)) {
 				tags.push(sublistItem);
 				offset = sublistItem.offsetEnd || 0;
 				sublistItem = this.parseSublistItem(data, offset, raw);

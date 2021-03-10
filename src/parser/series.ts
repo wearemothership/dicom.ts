@@ -1,10 +1,9 @@
 import Parser from "./parser";
 import OrderedMap from "./orderedmap";
 import DCMImage from "./image";
+import { SliceDirection } from "./constants";
 
-type Images = any[];
-
-type ImagesMap = OrderedMap<number, Images>;
+type Images = DCMImage[];
 
 const getMosaicOffset = (
 	mosaicCols: number,
@@ -34,24 +33,24 @@ const orderByImagePosition = (images: Images, sliceDir: number): Images => {
 };
 
 const orderBySliceLocation = (images: Images): Images => {
-	const dicomMap = new OrderedMap<number, any>();
+	const dicomMap = new OrderedMap<number, DCMImage>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
-		dicomMap.put(images[ctr].getSliceLocation(), images[ctr]);
+		dicomMap.put(images[ctr].sliceLocation, images[ctr]);
 	}
 	return dicomMap.getOrderedValues();
 };
 
 const orderByImageNumber = (images: Images): Images => {
-	const dicomMap = new OrderedMap<number, any>();
+	const dicomMap = new OrderedMap<number, DCMImage>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
-		dicomMap.put(images[ctr].getImageNumber(), images[ctr]);
+		dicomMap.put(images[ctr].imageNumber, images[ctr]);
 	}
 	return dicomMap.getOrderedValues();
 };
 
 const hasMatchingSlice = (
 	dg: Images,
-	image: any,
+	image: DCMImage,
 	sliceDir: number,
 	doImagePos: boolean,
 	doSliceLoc: boolean
@@ -62,10 +61,10 @@ const hasMatchingSlice = (
 		matchingNum = image.getImagePositionSliceDir(sliceDir);
 	}
 	else if (doSliceLoc) {
-		matchingNum = image.getSliceLocation();
+		matchingNum = image.sliceLocation;
 	}
 	else {
-		matchingNum = image.getImageNumber();
+		matchingNum = image.imageNumber;
 	}
 
 	for (let ctr = 0; ctr < dg.length; ctr += 1) {
@@ -78,13 +77,13 @@ const hasMatchingSlice = (
 			}
 		}
 		else if (doSliceLoc) {
-			const sliceLoc = current.getSliceLocation();
+			const sliceLoc = current.sliceLocation;
 			if (sliceLoc === matchingNum) {
 				return true;
 			}
 		}
 		else {
-			const imageNum = current.getImageNumber();
+			const imageNum = current.imageNumber;
 			if (imageNum === matchingNum) {
 				return true;
 			}
@@ -102,15 +101,15 @@ const orderByTime = (
 	hasSliceLocation: boolean
 ): OrderedMap<number, Images> => {
 	const dicomMap = new OrderedMap<number, Images>();
-	const hasTemporalPosition = (numFrames > 1) && (images[0].getTemporalPosition() !== null);
+	const hasTemporalPosition = (numFrames > 1) && (images[0].temporalPosition !== null);
 	const hasTemporalNumber = (numFrames > 1)
-	&& (images[0].getTemporalNumber() !== null)
-	&& (images[0].getTemporalNumber() === numFrames);
+	&& (images[0].temporalNumber !== null)
+	&& (images[0].temporalNumber === numFrames);
 	if (hasTemporalPosition && hasTemporalNumber) { // explicit series
 		for (let ctr = 0; ctr < images.length; ctr += 1) {
 			const image = images[ctr];
 
-			const tempPos = image.getTemporalPosition();
+			const tempPos = image.temporalPosition;
 			let dg = dicomMap.get(tempPos);
 			if (!dg) {
 				dg = [];
@@ -122,7 +121,7 @@ const orderByTime = (
 	}
 	else { // implicit series
 		// order data by slice then time
-		const timeBySliceMap = new OrderedMap<number, any>();
+		const timeBySliceMap = new OrderedMap<number, OrderedMap<number, DCMImage>>();
 		for (let ctr = 0; ctr < images.length; ctr += 1) {
 			if (images[ctr] !== null) {
 				let sliceMarker = ctr;
@@ -130,28 +129,28 @@ const orderByTime = (
 					sliceMarker = images[ctr].getImagePositionSliceDir(sliceDir);
 				}
 				else if (hasSliceLocation) {
-					sliceMarker = images[ctr].getSliceLocation();
+					sliceMarker = images[ctr].sliceLocation;
 				}
 
 				let slice = timeBySliceMap.get(sliceMarker);
 				if (slice === null) {
-					slice = new OrderedMap<number, number>();
+					slice = new OrderedMap<number, DCMImage>();
 					timeBySliceMap.put(sliceMarker, slice);
 				}
 
-				slice.put(ctr, images[ctr]);
+				(slice as OrderedMap<number, DCMImage>).put(ctr, images[ctr]);
 			}
 		}
 
 		// copy into DICOM array (ordered by slice by time)
-		const dicomsCopy = [];
+		const dicomsCopy: DCMImage[] = [];
 		let dicomsCopyIndex = 0;
 		const sliceIt = timeBySliceMap.iterator();
 		while (sliceIt.hasNext()) {
 			const slice = sliceIt.next();
-			const timeIt = slice.iterator();
+			const timeIt = slice!.iterator();
 			while (timeIt.hasNext()) {
-				dicomsCopy[dicomsCopyIndex] = timeIt.next();
+				dicomsCopy[dicomsCopyIndex] = timeIt.next()!;
 				dicomsCopyIndex += 1;
 			}
 		}
@@ -192,10 +191,10 @@ const orderDicoms = (
 	images: Images,
 	numFrames: number,
 	sliceDir: number
-): OrderedMap<number, Images>[] => {
-	const hasImagePosition = (images[0].getImagePosition() !== null);
-	const hasSliceLocation = (images[0].getSliceLocation() !== null);
-	const hasImageNumber = (images[0].getImageNumber() !== null);
+): Images => {
+	const hasImagePosition = (images[0].imagePosition !== null);
+	const hasSliceLocation = (images[0].sliceLocation !== null);
+	const hasImageNumber = (images[0].imageNumber !== null);
 
 	const timeMap = orderByTime(
 		images,
@@ -206,7 +205,7 @@ const orderDicoms = (
 	);
 	const timeIt = timeMap.orderedKeys;
 
-	const imagesOrderedByTimeAndSpace:Array<OrderedMap<number, Images>> = [];
+	const imagesOrderedByTimeAndSpace:Images = [];
 
 	for (let ctr = 0; ctr < timeIt.length; ctr += 1) {
 		const dg = timeMap.get(timeIt[ctr])!;
@@ -255,11 +254,11 @@ class Series {
 	 * slices (see Series.useExplicitOrdering)
 	 * @type {number}
 	 */
-	static useExplicitSpacing = 0;
+	static useExplicitSpacing: number = 0;
 
 	images:Images = []
 
-	imagesOriginalOrder: ImagesMap[] | null = null;
+	imagesOriginalOrder: Images | null = null;
 
 	isMosaic: boolean = false;
 
@@ -281,7 +280,7 @@ class Series {
 
 	sliceSense = false;
 
-	sliceDir = DCMImage.sliceDirection.unknown;
+	sliceDir = SliceDirection.Unknown;
 
 	error: Error | null = null;
 
@@ -298,7 +297,7 @@ class Series {
 	 * @returns {string}
 	 */
 	toString():string {
-		return this.images[0].getSeriesId();
+		return this.images[0].seriesId;
 	}
 
 	/**
@@ -306,8 +305,8 @@ class Series {
 	 * @returns {string|null}
 	 */
 	getName(): string | null {
-		const des = this.images[0].getSeriesDescription();
-		const uid = this.images[0].getSeriesInstanceUID();
+		const des = this.images[0].seriesDescription;
+		const uid = this.images[0].seriesInstanceUID;
 		if (des !== null) {
 			return des;
 		}
@@ -321,7 +320,7 @@ class Series {
 	 * Adds an image to the series.
 	 * @param {daikon.Image} image
 	 */
-	addImage(image: any) {
+	addImage(image: DCMImage) {
 		this.images.push(image);
 	}
 
@@ -335,25 +334,27 @@ class Series {
 		if (this.images.length === 0) {
 			return true;
 		}
-		return (this.images[0].getSeriesId() === image.getSeriesId());
+		return (this.images[0].seriesId === image.seriesId);
 	}
 
 	/**
 	 * Orders and organizes the images in this series.
 	 */
 	buildSeries() {
-		this.isMosaic = this.images[0].isMosaic();
-		this.isElscint = this.images[0].isElscint();
-		this.isCompressed = this.images[0].isCompressed();
+		const [image0] = this.images;
+		this.isMosaic = image0.isMosaic();
+		this.isElscint = image0.isElscint();
+		this.isCompressed = image0.isCompressed();
 		// check for multi-frame
-		this.numberOfFrames = this.images[0].getNumberOfFrames();
-		this.numberOfFramesInFile = this.images[0].getNumberOfImplicitFrames();
-		this.isMultiFrame = (this.numberOfFrames > 1) || (this.isMosaic && (this.images[0].length > 1));
+		this.numberOfFrames = image0.numberOfFrames;
+		this.numberOfFramesInFile = image0.getNumberOfImplicitFrames();
+		this.isMultiFrame = (this.numberOfFrames > 1)
+			|| (this.isMosaic && (image0.mosaicCols * image0.mosaicRows > 1));
 		this.isMultiFrameVolume = false;
 		this.isMultiFrameTimeseries = false;
 		this.isImplicitTimeseries = false;
 		if (this.isMultiFrame) {
-			const hasFrameTime = (this.images[0].getFrameTime() > 0);
+			const hasFrameTime = (image0.getFrameTime() > 0);
 			if (this.isMosaic) {
 				this.isMultiFrameTimeseries = true;
 			}
@@ -370,11 +371,11 @@ class Series {
 		}
 
 		if (!this.isMosaic && (this.numberOfFrames <= 1)) { // check for implicit frame count
-			let imagePos = (this.images[0].getImagePosition() || []);
+			let imagePos = (image0.imagePosition || []);
 			const sliceLoc = imagePos.toString();
 			this.numberOfFrames = 0;
 			for (let ctr = 0; ctr < this.images.length; ctr += 1) {
-				imagePos = (this.images[ctr].getImagePosition() || []);
+				imagePos = (this.images[ctr].imagePosition || []);
 				if (imagePos.toString() === sliceLoc) {
 					this.numberOfFrames += 1;
 				}
@@ -383,8 +384,8 @@ class Series {
 				this.isImplicitTimeseries = true;
 			}
 		}
-		this.sliceDir = this.images[0].getAcquiredSliceDirection();
-		let orderedImages;
+		this.sliceDir = image0.acquiredSliceDirection;
+		let orderedImages: DCMImage[];
 		if (Series.useExplicitOrdering) {
 			orderedImages = this.images.slice();
 		}
@@ -403,10 +404,10 @@ class Series {
 			this.sliceSense = true;
 		}
 		else if (this.isMultiFrame) {
-			const sliceLocations = orderedImages[0].getSliceLocationVector();
+			const sliceLocations = orderedImages[0].sliceLocationVector;
 			if (sliceLocations !== null) {
-				const orientation = orderedImages[0].getOrientation();
-				if (orientation.charAt(2) === "Z") {
+				const { orientation } = orderedImages[0];
+				if (orientation?.charAt(2) === "Z") {
 					this.sliceSense = (sliceLocations[0] - sliceLocations[sliceLocations.length - 1]) < 0;
 				}
 				else {
@@ -423,8 +424,8 @@ class Series {
 		* y-axis is increasing to the posterior side of the patient.
 		* The z-axis is increasing toward the head of the patient."
 		*/
-		else if ((this.sliceDir === DCMImage.sliceDirection.sagittal)
-			|| (this.sliceDir === DCMImage.sliceDirection.coronal)) {
+		else if ((this.sliceDir === SliceDirection.Sagittal)
+			|| (this.sliceDir === SliceDirection.Coronal)) {
 			if (sliceLocDiff > 0) {
 				this.sliceSense = false;
 			}
@@ -442,15 +443,14 @@ class Series {
 		this.images = orderedImages;
 	}
 
-	getMosaicData(image: any, data:Uint16Array | Uint8Array): ArrayBuffer {
+	getMosaicData(image: DCMImage, data:Uint16Array | Uint8Array): ArrayBuffer {
 		const [image0] = this.images;
 
 		const mosaicWidth = image0.columns;
 		const mosaicHeight = image0.rows;
-		const mosaicRows = image0.getMosaicRows();
-		const mosaicCols = image0.getMosaicCols();
+		const { mosaicRows, mosaicCols } = image0;
 
-		const numBytes = image0.bytesAllocated;
+		const numBytes = image0.bytesAllocated || 1;
 		const numSlices = mosaicWidth * mosaicHeight;
 		const numRows = Math.floor(mosaicHeight / mosaicRows);
 		const numCols = Math.floor(mosaicWidth / mosaicCols);

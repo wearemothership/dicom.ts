@@ -11,7 +11,7 @@ export interface ISize {
 
 interface IDecoder {
 	outputSize: ISize
-	image: any
+	image: IDisplayInfo
 	getFrame(gl:WebGL2RenderingContext, frameNo:number):Promise<FrameInfo>
 	// createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture>
 }

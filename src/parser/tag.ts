@@ -117,7 +117,7 @@ interface ITagKey {
 	element: number;
 }
 
-export type TagTupleID = [group: number, element: number];
+export type TagTupleID = [number, number];
 
 export type TagStringID = string;
 
@@ -129,13 +129,16 @@ export type TagValue =
 	| DataView
 	| string
 	| string[]
-	| Array<number>
+	| number[]
+	| number
 	| Date[]
 	| null;
 
+export type TagSingleValue = string | number | Date | null;
+
 interface ITagContstuctor extends ITagKey {
 	vr?: string | null
-	value?: any
+	value?: TagValue
 	offsetStart?: number | null
 	offsetValue?: number | null
 	offsetEnd?: number | null
@@ -655,7 +658,7 @@ class Tag implements ITagKey {
 			this.sublist = true;
 		}
 		else if (value !== null) {
-			const dv = new DataView(value);
+			const dv = new DataView(value as Uint8Array);
 			this.value = convertValue(vr!, dv, littleEndian, charset);
 
 			if ((this.value === dv) && this.isPrivateData()) {

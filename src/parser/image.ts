@@ -158,7 +158,7 @@ class DCMImage implements IImageInfo {
 	 * Returns the series description.
 	 * @returns {string}
 	 */
-	get seriesDescription(): number {
+	get seriesDescription(): string {
 		return this.getTagValueIndexed(TagIds.SeriesDescription);
 	}
 
@@ -744,11 +744,11 @@ class DCMImage implements IImageInfo {
 		return (value && value.toLowerCase().indexOf("palette") !== -1);
 	}
 
-	getMosaicCols() {
+	get mosaicCols() {
 		return this.columns / this.getAcquisitionMatrix()[1];
 	}
 
-	getMosaicRows() {
+	get mosaicRows() {
 		return this.rows / this.getAcquisitionMatrix()[0];
 	}
 
