@@ -15,6 +15,29 @@ export enum TransferSyntax {
 	CompressionDeflate = "1.2.840.10008.1.2.1.99"
 }
 
+export enum PixelRepresentation {
+	UInt = 0x0,
+	Int = 0x1
+}
+
+export enum SliceDirection {
+	Unknown = -1,
+	Axial = 2,
+	Coronal = 1,
+	Sagittal = 0,
+	Oblique = 3
+}
+
+export enum ByteType {
+	Unkown = 0,
+	Binary = 1,
+	Integer = 2,
+	IntegerUnsigned = 3,
+	Float = 4,
+	Complex = 5,
+	Rgb = 6
+}
+
 export type Charset = string | null;
 
 export const DefaultCharset:Charset = "ISO 2022 IR 6";

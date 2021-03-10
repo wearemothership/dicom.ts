@@ -3,7 +3,7 @@ import "./App.css";
 import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "dicom.js";
 import React, { useEffect, useState, useRef } from "react";
-import { CPUDecode, GPUJSDecode } from "./ReadDicom";
+import { GPUJSDecode } from "./ReadDicom";
 import CornerstoneDecode from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
 
@@ -100,12 +100,6 @@ const Renderer = ({
 		</>
 	);
 };
-
-const CPURenderer = ({ fileBuffer, children }) => (
-	<Renderer renderMethod={CPUDecode} fileBuffer={fileBuffer}>
-		{children}
-	</Renderer>
-);
 
 const GPURenderer = ({ fileBuffer, children }) => (
 	<Renderer renderMethod={GPUJSDecode} fileBuffer={fileBuffer}>

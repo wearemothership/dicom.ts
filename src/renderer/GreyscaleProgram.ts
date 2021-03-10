@@ -5,25 +5,24 @@ import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString } from "./Program";
 import { ISize } from "../decoder/Decoder";
+import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const greyscaleShader = raw("./greyscale.glsl");
 
 class GreyscaleProgram implements IProgram {
-	// eslint-disable-next-line camelcase
-
 	programInfo: ProgramInfo;
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	frame: FrameInfo;
+	info: IDisplayInfo;
 
 	gl:WebGLRenderingContext;
 
 	outputSize: ISize;
 
-	constructor(gl:WebGLRenderingContext, frame: FrameInfo) {
-		const getWordString = glslUnpackWordString(frame);
+	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+		const getWordString = glslUnpackWordString(info);
 
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShader.replace("$(word)", getWordString)]);
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
@@ -37,9 +36,9 @@ class GreyscaleProgram implements IProgram {
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 		this.programInfo = programInfo;
 
-		this.frame = frame;
+		this.info = info;
 		this.gl = gl;
-		this.outputSize = { width: frame.width, height: frame.height };
+		this.outputSize = info.size;
 		return this;
 	}
 
@@ -48,16 +47,21 @@ class GreyscaleProgram implements IProgram {
 			gl,
 			unitQuadBufferInfo,
 			programInfo,
-			outputSize
+			outputSize,
+			info
 		} = this;
 		const {
-			texture,
+			texture
+		} = frame;
+
+		const {
 			windowWidth,
 			windowCenter,
 			invert,
 			slope,
 			intercept
-		} = frame;
+		} = info;
+
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,

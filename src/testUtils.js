@@ -2,8 +2,12 @@ import crypto from "crypto";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { createObjectURL, revokeObjectURL } from "blob-util";
 
+const classReplacer = (key, value) => (value?.toObject?.() ?? value);
+
+export const toJSONString = (object) => JSON.stringify(object, classReplacer);
+
 export const shaFromJSON = (input) => crypto.createHash("sha1")
-	.update(JSON.stringify(input))
+	.update(JSON.stringify(input, classReplacer))
 	.digest("hex");
 
 export const shaFromBuffer = (input) => crypto.createHash("sha1")

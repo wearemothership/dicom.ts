@@ -1,6 +1,8 @@
 import * as twgl from "twgl.js";
-import Image from "../parser/image";
+import { IDecoderInfo } from "../image/DecoderInfo";
+import { displayInfoFromDecoderInfo, IDisplayInfo } from "../image/DisplayInfo";
 import FrameInfo from "../image/FrameInfo";
+import { ImageSize } from "../image/Types";
 
 export interface ISize {
 	width: number,
@@ -15,20 +17,14 @@ interface IDecoder {
 }
 
 class Decoder implements IDecoder {
-	image:any;
+	image: IDisplayInfo;
 
-	outputSize = {
-		width: 1,
-		height: 1
-	}
+	outputSize: ImageSize;
 
-	constructor(image:any) {
-		this.image = image;
+	constructor(image:IDecoderInfo) {
+		this.image = displayInfoFromDecoderInfo(image);
 
-		this.outputSize = {
-			width: image.width,
-			height: image.height
-		};
+		this.outputSize = image.size;
 	}
 
 	async getFrame(gl:WebGLRenderingContext, frameNo:number):Promise<FrameInfo> {
@@ -41,8 +37,8 @@ class Decoder implements IDecoder {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected decode(frameNo:number):Promise<Uint8Array | Uint16Array> {
-		return Promise.resolve(this.image.getPixelData().value);
+	protected decode(frameNo:number):Promise<DataView> {
+		return Promise.resolve(this.image.data);
 	}
 
 	protected async createTexture(gl:WebGLRenderingContext, frameNo:number):Promise<WebGLTexture> {
@@ -50,7 +46,7 @@ class Decoder implements IDecoder {
 		const greyBuffer = new Uint8Array(pixelData.buffer);
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (this.image.dataType === Image.byteType.rgb) {
+		if (this.image.rgb) {
 			format = gl.RGB;
 			internalFormat = gl.RGB;
 		}

@@ -8,15 +8,15 @@ class JPEGLosslessDecoder extends Decoder {
 	decode(frameNo: number) {
 		const { image } = this;
 		if (!this.jpegs) {
-			this.jpegs = getJpegData(image);
+			this.jpegs = getJpegData(image.data);
 		}
 		const decompressed = JpegLSDecoder({
-			rows: image.rows,
-			columns: image.columns,
-			samplesPerPixel: image.samplesPerPixel,
+			rows: image.size.rows,
+			columns: image.size.columns,
+			samplesPerPixel: image.samples,
 			bitsAllocated: image.bitsAllocated,
-			planarConfiguration: image.getPlanarConfig(),
-			pixelRepresentation: image.pixelRepresentation
+			planarConfiguration: image.planar ? 1 : 0,
+			pixelRepresentation: image.signed ? 1 : 0,
 		}, new Uint8Array(this.jpegs[frameNo])).pixelData;
 
 		return Promise.resolve(decompressed);

@@ -5,6 +5,7 @@ import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram from "./Program";
 import { ISize } from "../decoder/Decoder";
+import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const colorShader = raw("./color.glsl");
@@ -14,13 +15,13 @@ class ContrastifyProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	frame: FrameInfo;
+	info: IDisplayInfo;
 
 	gl:WebGLRenderingContext;
 
 	outputSize: ISize;
 
-	constructor(gl:WebGLRenderingContext, frame: FrameInfo) {
+	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, colorShader]);
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
@@ -33,9 +34,9 @@ class ContrastifyProgram implements IProgram {
 		this.unitQuadBufferInfo = unitQuadBufferInfo;
 
 		this.programInfo = programInfo;
-		this.frame = frame;
+		this.info = info;
 		this.gl = gl;
-		this.outputSize = { width: frame.width, height: frame.height };
+		this.outputSize = info.size;
 	}
 
 	run(frame: FrameInfo) {
@@ -43,9 +44,11 @@ class ContrastifyProgram implements IProgram {
 			gl,
 			programInfo,
 			unitQuadBufferInfo,
-			outputSize
+			outputSize,
+			info,
 		} = this;
-		const { invert, texture } = frame;
+		const { invert } = info;
+		const { texture } = frame;
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,

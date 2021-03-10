@@ -8,24 +8,23 @@ class RLEDecoder extends Decoder {
 	protected decode(frameNo: number) {
 		const { image } = this;
 		if (!this.rleData) {
-			const encapTags = getEncapsulatedData(image);
+			const encapTags = getEncapsulatedData(image.data);
 			const numTags = encapTags?.length || 0;
 			const data = new Array(numTags);
 			// the first sublist item contains offsets - ignore
 			for (let ctr = 1; ctr < numTags; ctr += 1) {
-				if (encapTags[ctr].value) {
-					data[ctr - 1] = encapTags[ctr].value.buffer;
-				}
+				const dataView = encapTags[ctr].value as DataView;
+				data[ctr - 1] = dataView?.buffer || null;
 			}
 			this.rleData = data;
 		}
 		const decompressed = RLE({
-			rows: image.rows,
-			columns: image.columns,
-			samplesPerPixel: image.samplesPerPixel,
+			rows: image.size.rows,
+			columns: image.size.columns,
+			samplesPerPixel: image.samples,
 			bitsAllocated: image.bitsAllocated,
-			planarConfiguration: image.getPlanarConfig(),
-			pixelRepresentation: image.pixelRepresentation
+			planarConfiguration: image.planar ? 1.0 : 0.0,
+			pixelRepresentation: image.signed ? 0x1 : 0x0
 		},
 		this.rleData[frameNo]).pixelData;
 		return Promise.resolve(decompressed);

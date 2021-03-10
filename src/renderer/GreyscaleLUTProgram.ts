@@ -2,9 +2,10 @@ import * as twgl from "twgl.js";
 import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
-import FrameInfo, { IImageLutInfo } from "../image/FrameInfo";
+import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString } from "./Program";
 import { ISize } from "../decoder/Decoder";
+import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const greyscaleLUTShader = raw("./greyscaleLUT.glsl");
@@ -14,18 +15,17 @@ class GreyscaleLUTProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	frame: FrameInfo;
+	info: IDisplayInfo;
 
 	gl:WebGLRenderingContext;
 
 	outputSize: ISize;
 
-	lut: IImageLutInfo;
-
 	lutTexture: WebGLTexture;
 
-	constructor(gl:WebGLRenderingContext, frame: FrameInfo, lut: IImageLutInfo) {
-		const getWordString = glslUnpackWordString(frame);
+	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+		const { lut } = info;
+		const getWordString = glslUnpackWordString(info);
 
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleLUTShader.replace("$(word)", getWordString)]);
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
@@ -37,15 +37,15 @@ class GreyscaleLUTProgram implements IProgram {
 
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (frame.bitsAllocated <= 8) {
+		if (info.bitsAllocated <= 8) {
 			format = gl.LUMINANCE;
 			internalFormat = gl.LUMINANCE;
 		}
 
 		// 1D tex
 		this.lutTexture = twgl.createTexture(gl, {
-			src: new Uint8Array(lut.data.buffer),
-			width: lut.data.length,
+			src: new Uint8Array(lut!.data.buffer),
+			width: lut!.data.length,
 			height: 1,
 			format,
 			internalFormat,
@@ -58,10 +58,9 @@ class GreyscaleLUTProgram implements IProgram {
 		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 		this.programInfo = programInfo;
-		this.lut = lut;
-		this.frame = frame;
 		this.gl = gl;
-		this.outputSize = { width: frame.width, height: frame.height };
+		this.outputSize = info.size;
+		this.info = info;
 		return this;
 	}
 
@@ -70,23 +69,24 @@ class GreyscaleLUTProgram implements IProgram {
 			gl,
 			unitQuadBufferInfo,
 			programInfo,
-			lut,
 			outputSize,
-			lutTexture
+			lutTexture,
+			info
 		} = this;
 		const {
 			texture,
-			invert,
 		} = frame;
+
+		const { lut, invert } = info;
 
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,
 			u_lutTexture: lutTexture,
-			u_lutWidth: lut.data.length,
-			u_firstInputValue: lut.firstValue,
+			u_lutWidth: lut!.data.length,
+			u_firstInputValue: lut!.firstValue,
 			u_invert: invert,
-			u_maxValue: 2 ** frame.bitsStored
+			u_maxValue: 2 ** info.bitsStored
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 		// cleanup on next runloop

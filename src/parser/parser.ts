@@ -150,15 +150,15 @@ class Parser implements IParserPublic {
 
 		if (image !== null) {
 			// set cached tags
-			image.parseComplete(this.littleEndian);
+			image.littleEndian = this.littleEndian;
 		}
 
 		return image;
 	}
 
-	parseEncapsulated(data: DataView): Array<any> {
+	parseEncapsulated(data: DataView): Tag[] {
 		this.encapsulation = true;
-		const tags = [];
+		const tags: Tag[] = [];
 		try {
 			let tag = this.getNextTag(data, 0);
 			while (tag !== null) {

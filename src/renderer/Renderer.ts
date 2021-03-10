@@ -4,11 +4,10 @@ import ColorProgram from "./ColorProgram";
 import IProgram from "./Program";
 import GreyscaleProgram from "./GreyscaleProgram";
 import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
-import { IImageLutInfo } from "../image/FrameInfo";
+import { ImageSize } from "../image/Types";
+import { DCMImage } from "../parser";
 
 class Renderer {
-	lut: IImageLutInfo | null = null;
-
 	canvas: HTMLCanvasElement
 
 	gl: WebGLRenderingContext
@@ -28,34 +27,33 @@ class Renderer {
 		this.gl = gl!;
 	}
 
-	async render(image: any, frameNo:number = 0) {
+	async render(image: DCMImage, frameNo:number = 0) {
 		if (this.image !== image) {
 			this.image = image;
-			this.decoder = decoderForImage(image);
-			const width = image.columns;
-			const height = image.rows;
-			this.decoder!.outputSize = { width, height };
+			const decoder = decoderForImage(image);
+			const size = new ImageSize(image);
+			decoder!.outputSize = size;
+			this.canvas.width = size.width;
+			this.canvas.height = size.height;
 
-			const { canvas } = this;
-			canvas.width = width;
-			canvas.height = height;
-			this.lut = image.lut;
+			const imageInfo = decoder!.image;
+			if (imageInfo.rgb) {
+				this.program = new ColorProgram(this.gl, imageInfo);
+			}
+			else if (imageInfo.windowCenter || imageInfo.minPixVal || imageInfo.maxPixVal) {
+				this.program = new GreyscaleProgram(this.gl, imageInfo);
+			}
+			else if (imageInfo.lut) {
+				this.program = new GreyscaleLUTProgram(this.gl, imageInfo);
+			}
+			else {
+				this.program = new ContrastifyProgram(this.gl, imageInfo);
+			}
+			this.decoder = decoder;
 		}
 		const frame = await this.decoder!.getFrame(this.gl, frameNo);
 
-		if (frame.isRGB) {
-			this.program = new ColorProgram(this.gl, frame);
-		}
-		else if (frame.windowCenter || image.minPixValue || image.maxPixValue) {
-			this.program = new GreyscaleProgram(this.gl, frame);
-		}
-		else if (this.lut) {
-			this.program = new GreyscaleLUTProgram(this.gl, frame, this.lut!);
-		}
-		else {
-			this.program = new ContrastifyProgram(this.gl, frame);
-		}
-		this.program.run(frame);
+		this.program!.run(frame);
 	}
 }
 

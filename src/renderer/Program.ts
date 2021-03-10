@@ -1,4 +1,5 @@
 import { ISize } from "../decoder/Decoder";
+import { IDisplayInfo } from "../image/DisplayInfo";
 import FrameInfo from "../image/FrameInfo";
 
 // let vertexShader = raw("./vertex.glsl");
@@ -25,14 +26,14 @@ interface IProgram {
  * @param {Boolean} integerVal should return greyscale psuedo int (0 - 65535)
  * 							   else return a 0.0-1.0 float color ratio
  */
-export const glslUnpackWordString = (frame: FrameInfo, integerVal:boolean = true):string => {
+export const glslUnpackWordString = (image: IDisplayInfo, integerVal:boolean = true):string => {
 	let val;
 	let divisor = "";
 	if (!integerVal) {
-		divisor = ` / ${2 ** frame.bitsStored}.0`;
+		divisor = ` / ${2 ** image.bitsStored}.0`;
 	}
-	const { signed } = frame;
-	if (frame.bitsAllocated 	<= 8) {
+	const { signed } = image;
+	if (image.bitsAllocated <= 8) {
 		// one byte
 		val = "(color.r * 255.0)";
 		if (signed) {
@@ -40,11 +41,11 @@ export const glslUnpackWordString = (frame: FrameInfo, integerVal:boolean = true
 		}
 	}
 	else {
-		const { isRGB } = frame;
+		const { rgb } = image;
 		// 2nd byte for greyscale images is packed in alpha chan,
 		// or green channel for RGB based 16bit greyscale
-		const byte2Chan = isRGB ? "g" : "a";
-		if (frame.littleEndian) {
+		const byte2Chan = rgb ? "g" : "a";
+		if (image.littleEndian) {
 			val = `(color.${byte2Chan} * 65535.0 + color.r * 255.0)`;
 		}
 		else {

@@ -1,13 +1,39 @@
-/* eslint no-use-before-define: ["error", { "classes": false }] */
-import { TagIds, createTagId, createTagIdWithTag } from "./tag";
-import { TransferSyntax } from "./constants";
+import Tag, {
+	TagIds,
+	TagValue,
+	createTagId,
+	createTagIdWithTag,
+	TagStringID,
+	TagTupleID
+} from "./tag";
+import {
+	TransferSyntax,
+	SliceDirection,
+	ByteType,
+	PixelRepresentation
+} from "./constants";
 
-const getSingleValueSafely = (tag, index) => (tag?.value?.[index] ?? null);
+const getSingleValueSafely = (tag: Tag | null, index: number): any => (
+	(<Array<any> | undefined> tag?.value)?.[index] || null);
 
-const getValueSafely = (tag) => (tag?.value ?? null);
+const getValueSafely = (tag:Tag):TagValue => (tag?.value ?? null);
+
+enum Axis {
+	R = "R",
+	L = "L",
+	A = "A",
+	P = "P",
+	F = "F",
+	H = "H",
+}
 
 // originally from: http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
-const getMajorAxisFromPatientRelativeDirectionCosine = (x, y, z) => {
+const ObliquityThresholdCosineValue = 0.8;
+const getMajorAxisFromPatientRelativeDirectionCosine = (
+	x: number,
+	y: number,
+	z: number
+): Axis | null => {
 	const absX = Math.abs(x);
 	const absY = Math.abs(y);
 	const absZ = Math.abs(z);
@@ -15,24 +41,23 @@ const getMajorAxisFromPatientRelativeDirectionCosine = (x, y, z) => {
 	// The tests here really don't need to check the other dimensions,
 	// just the threshold, since the sum of the squares should be == 1.0
 	// but just in case ...
-	const { obliquityThresholdCosineValue } = Image;
 	let axis = null;
-	if ((absX > obliquityThresholdCosineValue) && (absX > absY) && (absX > absZ)) {
-		const orientationX = (x < 0) ? "R" : "L";
+	if ((absX > ObliquityThresholdCosineValue) && (absX > absY) && (absX > absZ)) {
+		const orientationX = (x < 0) ? Axis.R : Axis.L;
 		axis = orientationX;
 	}
-	else if ((absY > obliquityThresholdCosineValue) && (absY > absX) && (absY > absZ)) {
-		const orientationY = (y < 0) ? "A" : "P";
+	else if ((absY > ObliquityThresholdCosineValue) && (absY > absX) && (absY > absZ)) {
+		const orientationY = (y < 0) ? Axis.A : Axis.P;
 		axis = orientationY;
 	}
-	else if ((absZ > obliquityThresholdCosineValue) && (absZ > absX) && (absZ > absY)) {
-		const orientationZ = (z < 0) ? "F" : "H";
+	else if ((absZ > ObliquityThresholdCosineValue) && (absZ > absX) && (absZ > absY)) {
+		const orientationZ = (z < 0) ? Axis.F : Axis.H;
 		axis = orientationZ;
 	}
 	return axis;
 };
 
-const scalePalette = (pal) => {
+const scalePalette = (pal: number[]):number[] => {
 	const max = Math.max(...pal);
 	const min = Math.min(...pal);
 
@@ -42,78 +67,66 @@ const scalePalette = (pal) => {
 
 		for (let ctr = 0; ctr < pal.length; ctr += 1) {
 			// eslint-disable-next-line no-param-reassign
-			pal[ctr] = parseInt(Math.round((pal[ctr] - intercept) * slope), 10);
+			pal[ctr] = Math.round((pal[ctr] - intercept) * slope);
 		}
 	}
 
 	return pal;
 };
 
-class DCMImage {
-	// enums
-	static sliceDirection = {
-		unknown: -1,
-		axial: 2,
-		coronal: 1,
-		sagittal: 0,
-		oblique: 3
-	};
+interface IImageInfo {
+	tags: Record<TagStringID, Tag>
+	tagsFlat: Record<TagStringID, Tag>
+	littleEndian: boolean
+	index: number
+}
 
-	static byteType = {
-		unkown: 0,
-		binary: 1,
-		integer: 2,
-		integerUnsigned: 3,
-		float: 4,
-		complex: 5,
-		rgb: 6
-	};
-
-	static Parser;
-
-	static obliquityThresholdCosineValue = 0.8;
-
+class DCMImage implements IImageInfo {
 	static skipPaletteConversion = false;
 
-	constructor() {
-		this.tags = {};
-		this.tagsFlat = {};
-		this.littleEndian = false;
-		this.index = -1;
-		this.decompressed = false;
-		this.privateDataAll = null;
-		this.convertedPalette = false;
-	}
+	tags: Record<TagStringID, Tag> = {};
+
+	tagsFlat: Record<TagStringID, Tag> = {};
+
+	littleEndian = false;
+
+	index = -1;
+
+	decompressed = false;
+
+	privateDataAll: string | null = null;
+
+	convertedPalette = false;
+
+	bytesAllocated: number | null = null;
 
 	/**
- 	* Returns a tag matching the specified group and element.
-	* @param { Array } tupple of
- 	* 	@param {number} group
- 	* 	@param {number} element
- 	* @returns {daikon.Tag}
- 	*/
-	getTag(tag) {
-		const [group = null, element = null] = tag;
+	 * Returns a tag matching the specified group and element tuple
+	 * @param {TagTupleID} tag - Tuple of group & elem like TagIds values
+	 * @returns
+	 */
+	getTag(tag: TagTupleID):Tag {
+		const [group, element] = tag;
 		const tagId = createTagId(group, element);
 		return this.tags[tagId] ?? this.tagsFlat[tagId];
 	}
 
 	/**
 	 * get the value of the tag if exists
-	 * @param {Array} tag tupple of group and element ids
+	 * @param {TagTupleID} tag tuple of group and element ids
 	 * @returns the value of the tag or null if not exist
 	 */
-	getTagValue(tag) {
+	getTagValue(tag:TagTupleID):TagValue {
 		return getValueSafely(this.getTag(tag));
 	}
 
 	/**
 	 * get the value of the tag if exists
-	 * @param {Array} tag tupple of group and element ids
+	 * @param {TagTupleID} tag tuple of group and element ids
 	 * @param {Number} index the position in the value
 	 * @returns the value at index or null if not exist
 	 */
-	getTagValueIndexed(tag, index = 0) {
+	getTagValueIndexed(tag: TagTupleID, index:number = 0): any {
 		return getSingleValueSafely(this.getTag(tag), index);
 	}
 
@@ -121,38 +134,15 @@ class DCMImage {
 	 * Returns the pixel data tag.
 	 * @returns {daikon.Tag}
 	 */
-	getPixelData() {
+	get pixelData(): Tag {
 		return this.tags[createTagIdWithTag(TagIds.PixelData)];
-	}
-
-	getPixelDataBytes() {
-		if (this.isCompressed()) {
-			this.decompress();
-		}
-
-		if (this.isPalette() && !DCMImage.skipPaletteConversion) {
-			console.log("converting palette!");
-			this.convertPalette();
-		}
-		const tagId = createTagIdWithTag(TagIds.PixelData);
-		const tag = this.tags[tagId];
-
-		return tag?.value?.buffer;
-	}
-
-	/**
-	 * Returns the raw pixel data.
-	 * @returns {ArrayBuffer}
-	 */
-	getRawData() {
-		return this.getPixelDataBytes();
 	}
 
 	/**
 	 * Returns the number of columns.
 	 * @returns {number}
 	 */
-	getCols() {
+	get columns(): number {
 		return this.getTagValueIndexed(TagIds.Cols);
 	}
 
@@ -160,7 +150,7 @@ class DCMImage {
 	 * Returns the number of rows.
 	 * @returns {number}
 	 */
-	getRows() {
+	get rows(): number {
 		return this.getTagValueIndexed(TagIds.Rows);
 	}
 
@@ -168,7 +158,7 @@ class DCMImage {
 	 * Returns the series description.
 	 * @returns {string}
 	 */
-	getSeriesDescription() {
+	get seriesDescription(): number {
 		return this.getTagValueIndexed(TagIds.SeriesDescription);
 	}
 
@@ -176,7 +166,7 @@ class DCMImage {
 	 * Returns the series instance UID.
 	 * @returns {string}
 	 */
-	getSeriesInstanceUID() {
+	get seriesInstanceUID(): string {
 		return this.getTagValueIndexed(TagIds.SeriesInstanceUid);
 	}
 
@@ -184,7 +174,7 @@ class DCMImage {
 	 * Returns the series number.
 	 * @returns {number}
 	 */
-	getSeriesNumber() {
+	get seriesNumber(): number {
 		return this.getTagValueIndexed(TagIds.SeriesNumber);
 	}
 
@@ -192,7 +182,7 @@ class DCMImage {
 	 * Returns the echo number.
 	 * @returns {number}
 	 */
-	getEchoNumber() {
+	get echoNumber(): number {
 		return this.getTagValueIndexed(TagIds.EchoNumber);
 	}
 
@@ -200,16 +190,16 @@ class DCMImage {
 	 * Returns the image position.
 	 * @return {number[]}
 	 */
-	getImagePosition() {
-		return this.getTagValue(TagIds.ImagePosition);
+	get imagePosition(): number[] {
+		return this.getTagValue(TagIds.ImagePosition) as number[];
 	}
 
 	/**
 	 * Returns the image axis directions
 	 * @return {number[]}
 	 */
-	getImageDirections() {
-		return this.getTagValue(TagIds.ImageOrientation);
+	get imageDirections(): number[] {
+		return this.getTagValue(TagIds.ImageOrientation) as number[];
 	}
 
 	/**
@@ -217,8 +207,8 @@ class DCMImage {
 	 * @param {number} sliceDir - the index
 	 * @returns {number}
 	 */
-	getImagePositionSliceDir(sliceDir) {
-		const imagePos = this.getTagValue(TagIds.ImagePosition);
+	getImagePositionSliceDir(sliceDir: number): number {
+		const imagePos = this.imagePosition;
 		if (imagePos && sliceDir >= 0) {
 			return imagePos[sliceDir];
 		}
@@ -229,7 +219,7 @@ class DCMImage {
 	 * Returns the modality
 	 * @returns {string}
 	 */
-	getModality() {
+	get modality(): string {
 		return this.getTagValueIndexed(TagIds.Modality);
 	}
 
@@ -237,7 +227,7 @@ class DCMImage {
 	 * Returns the slice location.
 	 * @returns {number}
 	 */
-	getSliceLocation() {
+	get sliceLocation(): number {
 		return this.getTagValueIndexed(TagIds.SliceLocation);
 	}
 
@@ -245,15 +235,15 @@ class DCMImage {
 	 * Returns the slice location vector.
 	 * @returns {number[]}
 	 */
-	getSliceLocationVector() {
-		return this.getTagValue(TagIds.SliceLocationVector);
+	get sliceLocationVector(): number[] {
+		return this.getTagValue(TagIds.SliceLocationVector) as number[];
 	}
 
 	/**
 	 * Returns the image number.
 	 * @returns {number}
 	 */
-	getImageNumber() {
+	get imageNumber(): number {
 		return this.getTagValueIndexed(TagIds.ImageNum);
 	}
 
@@ -261,7 +251,7 @@ class DCMImage {
 	 * Returns the temporal position.
 	 * @returns {number}
 	 */
-	getTemporalPosition() {
+	get temporalPosition(): number {
 		return this.getTagValueIndexed(TagIds.TemporalPosition);
 	}
 
@@ -269,7 +259,7 @@ class DCMImage {
 	 * Returns the temporal number.
 	 * @returns {number}
 	 */
-	getTemporalNumber() {
+	get temporalNumber(): number {
 		return this.getTagValueIndexed(TagIds.NumberTemporalPositions);
 	}
 
@@ -277,7 +267,7 @@ class DCMImage {
 	 * Returns the slice gap.
 	 * @returns {number}
 	 */
-	getSliceGap() {
+	get sliceGap(): number {
 		return this.getTagValueIndexed(TagIds.SliceGap);
 	}
 
@@ -285,7 +275,7 @@ class DCMImage {
 	 * Returns the slice thickness.
 	 * @returns {number}
 	 */
-	getSliceThickness() {
+	get sliceThickness(): number {
 		return this.getTagValueIndexed(TagIds.SliceThickness);
 	}
 
@@ -293,7 +283,7 @@ class DCMImage {
 	 * Returns the image maximum.
 	 * @returns {number}
 	 */
-	getImageMax() {
+	get imageMax(): number {
 		return this.getTagValueIndexed(TagIds.ImageMax);
 	}
 
@@ -301,7 +291,7 @@ class DCMImage {
 	 * Returns the image minimum.
 	 * @returns {number}
 	 */
-	getImageMin() {
+	get imageMin(): number {
 		return this.getTagValueIndexed(TagIds.ImageMin);
 	}
 
@@ -309,7 +299,7 @@ class DCMImage {
 	 * Returns the rescale slope.
 	 * @returns {number}
 	 */
-	getDataScaleSlope() {
+	get dataScaleSlope(): number {
 		return this.getTagValueIndexed(TagIds.DataScaleSlope);
 	}
 
@@ -317,14 +307,14 @@ class DCMImage {
 	 * Returns the rescale intercept.
 	 * @returns {number}
 	 */
-	getDataScaleIntercept() {
+	get dataScaleIntercept(): number {
 		return this.getTagValueIndexed(TagIds.DataScaleIntercept);
 	}
 
-	getDataScaleElscint() {
+	get dataScaleElscint() {
 		let scale = this.getTagValueIndexed(TagIds.DataScaleElscint) || 1;
 
-		const bandwidth = this.getPixelBandwidth();
+		const bandwidth = this.pixelBandwidth;
 		scale = Math.sqrt(bandwidth) / (10 * scale);
 
 		if (scale <= 0) {
@@ -337,7 +327,7 @@ class DCMImage {
 	 * Returns the window width.
 	 * @returns {number}
 	 */
-	getWindowWidth() {
+	get windowWidth(): number {
 		return this.getTagValueIndexed(TagIds.WindowWidth);
 	}
 
@@ -345,21 +335,21 @@ class DCMImage {
 	 * Returns the window center.
 	 * @returns {number}
 	 */
-	getWindowCenter() {
+	get windowCenter(): number {
 		return this.getTagValueIndexed(TagIds.WindowCenter);
 	}
 
-	getPixelBandwidth() {
+	get pixelBandwidth() {
 		return this.getTagValueIndexed(TagIds.PixelBandwidth);
 	}
 
-	getSeriesId() {
+	get seriesId() {
 		const ids = [
-			this.getSeriesDescription(),
-			this.getSeriesInstanceUID(),
-			this.getSeriesNumber(),
-			this.getEchoNumber(),
-			this.getOrientation(),
+			this.seriesDescription,
+			this.seriesInstanceUID,
+			this.seriesNumber,
+			this.echoNumber,
+			this.orientation,
 		].filter((id) => id != null); // remove nulls
 
 		const { columns, rows } = this;
@@ -370,23 +360,23 @@ class DCMImage {
 	 * Returns the pixel spacing.
 	 * @returns {number[]}
 	 */
-	getPixelSpacing() {
-		return this.getTagValue(TagIds.PixelSpacing);
+	get pixelSpacing(): number[] {
+		return this.getTagValue(TagIds.PixelSpacing) as number[];
 	}
 
 	/**
 	 * Returns the image type.
 	 * @returns {string[]}
 	 */
-	getImageType() {
-		return this.getTagValue(TagIds.ImageType);
+	get imageType(): string[] {
+		return this.getTagValue(TagIds.ImageType) as string[];
 	}
 
 	/**
 	 * Returns the number of bits stored.
 	 * @returns {number}
 	 */
-	getBitsStored() {
+	get bitsStored(): number {
 		return this.getTagValueIndexed(TagIds.BitsStored);
 	}
 
@@ -394,7 +384,7 @@ class DCMImage {
 	 * Returns the number of bits allocated.
 	 * @returns {number}
 	 */
-	getBitsAllocated() {
+	get bitsAllocated(): number {
 		return this.getTagValueIndexed(TagIds.BitsAllocated);
 	}
 
@@ -402,7 +392,7 @@ class DCMImage {
 	 * Returns the frame time.
 	 * @returns {number}
 	 */
-	getFrameTime() {
+	getFrameTime(): number {
 		return this.getTagValueIndexed(TagIds.FrameTime);
 	}
 
@@ -410,12 +400,12 @@ class DCMImage {
 	 * Returns the acquisition matrix (e.g., "mosaic" data).
 	 * @returns {number[]}
 	 */
-	getAcquisitionMatrix() {
-		const mat = [0, 0];
+	getAcquisitionMatrix(): number[] {
+		const mat:[number, number] = [0, 0];
 		mat[0] = this.getTagValueIndexed(TagIds.AcquisitionMatrix);
 
 		if (this.privateDataAll === null) {
-			this.privateDataAll = this.getAllInterpretedPrivateData();
+			this.privateDataAll = this.allInterpretedPrivateData;
 		}
 
 		if (this.privateDataAll?.length > 0) {
@@ -427,11 +417,11 @@ class DCMImage {
 					const str = this.privateDataAll.substring(start, end);
 					const matPrivate = str.match(/\d+/g);
 
-					if (matPrivate?.length === 2) {
-						[mat[0], mat[1]] = matPrivate;
-					}
-					else if (matPrivate?.length === 1) {
-						[mat[0]] = matPrivate;
+					if (matPrivate?.length ?? 0 >= 1) {
+						mat[0] = parseFloat(matPrivate![0]);
+						if (matPrivate?.length === 2) {
+							mat[1] = parseFloat(matPrivate![1]);
+						}
 					}
 				}
 			}
@@ -448,19 +438,20 @@ class DCMImage {
 	 * Returns the TR.
 	 * @returns {number}
 	 */
-	getTR() {
+	getTR(): number {
 		return this.getTagValueIndexed(TagIds.Tr);
 	}
 
-	putTag(tag) {
+	putTag(tag: Tag) {
 		this.tags[tag.id] = tag;
 		this.putFlattenedTag(this.tagsFlat, tag);
 	}
 
-	putFlattenedTag(tags, tag) {
+	putFlattenedTag(tags: Record<TagStringID, Tag>, tag:Tag) {
 		if (tag.sublist) {
-			for (let ctr = 0; ctr < tag.value.length; ctr += 1) {
-				this.putFlattenedTag(tags, tag.value[ctr]);
+			const value = tag.value! as Tag[];
+			for (let ctr = 0; ctr < value.length; ctr += 1) {
+				this.putFlattenedTag(tags, value[ctr]);
 			}
 		}
 		else if (!tags[tag.id]) {
@@ -471,19 +462,19 @@ class DCMImage {
 
 	// TODO: remove this - upload palette to GPU!
 	convertPalette() {
-		const data = this.getPixelData();
+		const data = this.pixelData.value as DataView;
 
-		const reds = this.getPalleteValues(TagIds.PaletteRed);
-		const greens = this.getPalleteValues(TagIds.PaletteGreen);
-		const blues = this.getPalleteValues(TagIds.PaletteBlue);
+		const reds = this.getPalleteValues(TagIds.PaletteRed) ?? [];
+		const greens = this.getPalleteValues(TagIds.PaletteGreen) ?? [];
+		const blues = this.getPalleteValues(TagIds.PaletteBlue) ?? [];
 
-		if ((reds?.length > 0)
-			&& (greens?.length > 0)
-			&& (blues?.length > 0)
+		if ((reds.length > 0)
+			&& (greens.length > 0)
+			&& (blues.length > 0)
 			&& !this.convertedPalette) {
-			const nFrames = this.getNumberOfFrames();
-			const rgb = new DataView(new ArrayBuffer(this.getRows() * this.getCols() * nFrames * 3));
-			const numBytes = this.bytesAllocated;
+			const nFrames = this.numberOfFrames;
+			const rgb = new DataView(new ArrayBuffer(this.rows * this.columns * nFrames * 3));
+			const numBytes = this.bitsAllocated / 8;
 			const numElements = data.byteLength / numBytes;
 
 			if (numBytes === 1) {
@@ -517,7 +508,7 @@ class DCMImage {
 	 * Returns true if pixel data is found.
 	 * @returns {boolean}
 	 */
-	hasPixelData() {
+	hasPixelData(): boolean {
 		return (this.tags[createTagIdWithTag(TagIds.PixelData)] !== undefined);
 	}
 
@@ -529,9 +520,9 @@ class DCMImage {
 	 * Returns an orientation string (e.g., XYZ+--).
 	 * @returns {string}
 	 */
-	getOrientation() {
+	get orientation(): string | null {
 		let orientation = null;
-		const dirCos = this.getTagValue(TagIds.ImageOrientation);
+		const dirCos = this.getTagValue(TagIds.ImageOrientation) as number[];
 		let bigRow = 0;
 		let bigCol = 0;
 
@@ -539,7 +530,7 @@ class DCMImage {
 			return null;
 		}
 
-		const spacing = this.getPixelSpacing();
+		const spacing = this.pixelSpacing;
 
 		if (!spacing) {
 			return null;
@@ -723,8 +714,8 @@ class DCMImage {
 	 * Returns true if this image is "mosaic".
 	 * @returns {boolean}
 	 */
-	isMosaic() {
-		const imageType = this.getImageType();
+	isMosaic(): boolean {
+		const { imageType } = this;
 		let labeledAsMosaic = false;
 		if (imageType !== null) {
 			for (let ctr = 0; ctr < imageType.length; ctr += 1) {
@@ -748,7 +739,7 @@ class DCMImage {
 	 * Returns true if this image uses palette colors.
 	 * @returns {boolean}
 	 */
-	isPalette() {
+	isPalette(): boolean {
 		const value = this.getTagValueIndexed(TagIds.PhotometricInterpretation);
 		return (value && value.toLowerCase().indexOf("palette") !== -1);
 	}
@@ -770,7 +761,7 @@ class DCMImage {
 	 * Returns true if this image stores compressed data.
 	 * @returns {boolean}
 	 */
-	isCompressed() {
+	isCompressed(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if (transferSyntax.indexOf(TransferSyntax.CompressionJpeg) !== -1) {
@@ -788,7 +779,7 @@ class DCMImage {
 	 * Returns true if this image stores JPEG data.
 	 * @returns {boolean}
 	 */
-	isCompressedJPEG() {
+	isCompressedJPEG(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if (transferSyntax.indexOf(TransferSyntax.CompressionJpeg) !== -1) {
@@ -803,7 +794,7 @@ class DCMImage {
 	 * Returns true of this image stores lossless JPEG data.
 	 * @returns {boolean}
 	 */
-	isCompressedJPEGLossless() {
+	isCompressedJPEGLossless(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpegLossless) !== -1)
@@ -819,7 +810,7 @@ class DCMImage {
 	 * Returns true if this image stores baseline JPEG data.
 	 * @returns {boolean}
 	 */
-	isCompressedJPEGBaseline() {
+	isCompressedJPEGBaseline(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpegBaseline8bit) !== -1)
@@ -836,7 +827,7 @@ class DCMImage {
 	 * Returns true if this image stores JPEG2000 data.
 	 * @returns {boolean}
 	 */
-	isCompressedJPEG2000() {
+	isCompressedJPEG2000(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpeg2000) !== -1)
@@ -852,7 +843,7 @@ class DCMImage {
 	 * Returns true if this image stores JPEG-LS data.
 	 * @returns {boolean}
 	 */
-	isCompressedJPEGLS() {
+	isCompressedJPEGLS(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if ((transferSyntax.indexOf(TransferSyntax.CompressionJpegLs) !== -1)
@@ -868,7 +859,7 @@ class DCMImage {
 	 * Returns true if this image stores RLE data.
 	 * @returns {boolean}
 	 */
-	isCompressedRLE() {
+	isCompressedRLE(): boolean {
 		const { transferSyntax } = this;
 		if (transferSyntax) {
 			if (transferSyntax.indexOf(TransferSyntax.CompressionRLE) !== -1) {
@@ -883,7 +874,7 @@ class DCMImage {
 	 * Returns the number of frames.
 	 * @returns {number}
 	 */
-	getNumberOfFrames() {
+	get numberOfFrames(): number {
 		const value = this.getTagValueIndexed(TagIds.NumberOfFrames);
 		return value ?? 1;
 	}
@@ -892,28 +883,28 @@ class DCMImage {
 	 * Returns the number of samples per pixel.
 	 * @returns {number}
 	 */
-	getNumberOfSamplesPerPixel() {
+	get samplesPerPixel(): number {
 		const value = this.getTagValueIndexed(TagIds.SamplesPerPixel);
 		return value ?? 1;
 	}
 
-	getNumberOfImplicitFrames() {
+	getNumberOfImplicitFrames():number {
 		if (this.isCompressed()) {
 			return 1;
 		}
 
-		const pixelData = this.getPixelData();
-		const length = pixelData.offsetEnd - pixelData.offsetValue;
-		const size = this.columns * this.rows * this.bytesAllocated;
+		const { pixelData } = this;
+		const length = pixelData.offsetEnd! - pixelData.offsetValue!;
+		const size = this.columns * this.rows * Math.round(this.bitsAllocated / 8);
 
-		return parseInt(length / size, 10);
+		return Math.floor(length / size);
 	}
 
 	/**
 	 * Returns the pixel representation.
-	 * @returns {number}
+	 * @returns {PixelRepresentation}
 	 */
-	getPixelRepresentation() {
+	get pixelRepresentation(): PixelRepresentation {
 		return this.getTagValueIndexed(TagIds.PixelRepresentation);
 	}
 
@@ -921,7 +912,7 @@ class DCMImage {
 	 * Returns the photometric interpretation.
 	 * @returns {string}
 	 */
-	getPhotometricInterpretation() {
+	get photometricInterpretation(): string {
 		return this.getTagValueIndexed(TagIds.PhotometricInterpretation);
 	}
 
@@ -929,7 +920,7 @@ class DCMImage {
 	 * Returns the patient name.
 	 * @returns {string}
 	 */
-	getPatientName() {
+	get patientName(): string {
 		return this.getTagValueIndexed(TagIds.PatientName);
 	}
 
@@ -937,7 +928,7 @@ class DCMImage {
 	 * Returns the patient ID.
 	 * @returns {string}
 	 */
-	getPatientID() {
+	get patientID(): string {
 		return this.getTagValueIndexed(TagIds.PatientId);
 	}
 
@@ -945,7 +936,7 @@ class DCMImage {
 	 * Returns the study time.
 	 * @returns {string}
 	 */
-	getStudyTime() {
+	get studyTime(): string {
 		return this.getTagValueIndexed(TagIds.StudyTime);
 	}
 
@@ -953,7 +944,7 @@ class DCMImage {
 	 * Returns the transfer syntax.
 	 * @returns {string}
 	 */
-	getTransferSyntax() {
+	get transferSyntax(): TransferSyntax {
 		return this.getTagValueIndexed(TagIds.TransferSyntax);
 	}
 
@@ -961,7 +952,7 @@ class DCMImage {
 	 * Returns the study date.
 	 * @returns {string}
 	 */
-	getStudyDate() {
+	get studyDate(): string {
 		return this.getTagValueIndexed(TagIds.StudyDate);
 	}
 
@@ -969,7 +960,7 @@ class DCMImage {
 	 * Returns the planar configuration.
 	 * @returns {number}
 	 */
-	getPlanarConfig() {
+	get planarConfig(): number {
 		return this.getTagValueIndexed(TagIds.PlanarConfig);
 	}
 
@@ -977,7 +968,7 @@ class DCMImage {
 	 * Returns all descriptive info for this image.
 	 * @returns {string}
 	 */
-	getImageDescription() {
+	get imageDescription(): string {
 		const values = [
 			this.getTagValueIndexed(TagIds.StudyDes),
 			this.getTagValueIndexed(TagIds.SeriesDescription),
@@ -988,14 +979,14 @@ class DCMImage {
 	}
 
 	/**
-	 * Returns the datatype (e.g., DCMImage.byteType.integerUnsigned).
+	 * Returns the datatype (e.g., ByteType.integerUnsigned).
 	 * @returns {number}
 	 */
-	getDataType() {
+	get dataType(): ByteType {
 		const dataType = this.pixelRepresentation;
 
 		if (dataType === null) {
-			return DCMImage.byteType.unkown;
+			return ByteType.Unkown;
 		}
 
 		const interp = this.photometricInterpretation?.trim() || null;
@@ -1004,56 +995,56 @@ class DCMImage {
 				|| (interp.indexOf("YBR") !== -1)
 				|| (interp.toLowerCase().indexOf("palette") !== -1)
 			)) {
-			return DCMImage.byteType.rgb;
+			return ByteType.Rgb;
 		}
 
 		if (dataType === 0) {
-			return DCMImage.byteType.integerUnsigned;
+			return ByteType.IntegerUnsigned;
 		}
 		if (dataType === 1) {
-			return DCMImage.byteType.integer;
+			return ByteType.Integer;
 		}
-		return DCMImage.byteType.unkown;
+		return ByteType.Unkown;
 	}
 
 	// originally from: http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
-	getAcquiredSliceDirection() {
-		const dirCos = this.getTagValue(TagIds.ImageOrientation);
+	get acquiredSliceDirection() {
+		const dirCos = this.getTagValue(TagIds.ImageOrientation) as number[];
 
 		if (dirCos?.length !== 6) {
-			return DCMImage.sliceDirection.unknown;
+			return SliceDirection.Unknown;
 		}
 
 		const rowAxis = getMajorAxisFromPatientRelativeDirectionCosine(dirCos[0], dirCos[1], dirCos[2]);
 		const colAxis = getMajorAxisFromPatientRelativeDirectionCosine(dirCos[3], dirCos[4], dirCos[5]);
 		if ((rowAxis !== null) && (colAxis !== null)) {
 			if (((rowAxis === "R") || (rowAxis === "L")) && ((colAxis === "A") || (colAxis === "P"))) {
-				return DCMImage.sliceDirection.axial;
+				return SliceDirection.Axial;
 			}
 			if (((colAxis === "R") || (colAxis === "L")) && ((rowAxis === "A") || (rowAxis === "P"))) {
-				return DCMImage.sliceDirection.axial;
+				return SliceDirection.Axial;
 			}
 			if (((rowAxis === "R") || (rowAxis === "L")) && ((colAxis === "H") || (colAxis === "F"))) {
-				return DCMImage.sliceDirection.coronal;
+				return SliceDirection.Coronal;
 			}
 			if (((colAxis === "R") || (colAxis === "L")) && ((rowAxis === "H") || (rowAxis === "F"))) {
-				return DCMImage.sliceDirection.coronal;
+				return SliceDirection.Coronal;
 			}
 			if (((rowAxis === "A") || (rowAxis === "P")) && ((colAxis === "H") || (colAxis === "F"))) {
-				return DCMImage.sliceDirection.sagittal;
+				return SliceDirection.Sagittal;
 			}
 			if (((colAxis === "A") || (colAxis === "P")) && ((rowAxis === "H") || (rowAxis === "F"))) {
-				return DCMImage.sliceDirection.sagittal;
+				return SliceDirection.Sagittal;
 			}
 		}
-		return DCMImage.sliceDirection.oblique;
+		return SliceDirection.Oblique;
 	}
 
 	/**
 	 * Returns a string of interpreted private data.
 	 * @returns {string}
 	 */
-	getAllInterpretedPrivateData() {
+	get allInterpretedPrivateData(): string {
 		let str = "";
 
 		const sortedKeys = Object.keys(this.tags).sort();
@@ -1076,16 +1067,15 @@ class DCMImage {
 	 * Returns a string representation of this image.
 	 * @returns {string}
 	 */
-	toString() {
+	toString(): string {
 		let str = "";
 
 		const sortedKeys = Object.keys(this.tags).sort();
 
 		for (let ctr = 0; ctr < sortedKeys.length; ctr += 1) {
 			const key = sortedKeys[ctr];
-			// eslint-disable-next-line no-prototype-builtins
-			if (this.tags.hasOwnProperty(key)) {
-				const tag = this.tags[key];
+			const tag = this.tags[key];
+			if (tag) {
 				str += `${tag.toHTMLString()}<br />`;
 			}
 		}
@@ -1096,8 +1086,8 @@ class DCMImage {
 		return str;
 	}
 
-	getPalleteValues(tagID) {
-		const value = getValueSafely(this.getTag(tagID));
+	getPalleteValues(tagID: TagTupleID) {
+		const value = getValueSafely(this.getTag(tagID)) as DataView;
 
 		if (value?.buffer) {
 			const numVals = value.buffer.byteLength / 2;
@@ -1125,65 +1115,7 @@ class DCMImage {
 		}
 		return null;
 	}
-
-	parseComplete(littleEndian) {
-		this.littleEndian = littleEndian;
-		this.transferSyntax = this.getTransferSyntax();
-		this.pixelRepresentation = this.getPixelRepresentation();
-		this.bitsAllocated = this.getBitsAllocated();
-		this.bytesAllocated = parseInt(Math.ceil(this.bitsAllocated / 8), 10);
-		this.bitsStored = this.getBitsStored();
-		this.rows = this.getRows();
-		this.columns = this.getCols();
-		this.samplesPerPixel = this.getNumberOfSamplesPerPixel();
-		// this needs to happen before this.getDataType
-		this.photometricInterpretation = this.getPhotometricInterpretation();
-
-		// should we invert any output
-		let invert = this.getTagValueIndexed(TagIds.LutShape) === "inverse";
-		invert = invert || this.photometricInterpretation === "MONOCHROME1";
-		this.invert = invert;
-
-		this.isRGB = !(this.photometricInterpretation || "").startsWith("MONO");
-
-		this.dataType = this.getDataType();
-
-		this.slope = this.getDataScaleSlope() || 1.0;
-		this.intercept = this.getDataScaleIntercept() || 0.0;
-
-		const lutDescriptor = this.getTagValue(TagIds.VoiLutDescriptor);
-		if (lutDescriptor?.length === 3) {
-			const [nEntries, firstValue, bitsStored] = lutDescriptor;
-			if (!nEntries < 2 ** bitsStored - 1) {
-				let ArrayType = Uint8Array;
-				if (bitsStored > 8) {
-					ArrayType = Uint16Array;
-				}
-				const lutDataTagValue = this.getTagValue(TagIds.VoiLutData);
-				if (lutDataTagValue) {
-					const data = new ArrayType(
-						lutDataTagValue,
-						0,
-						Math.min(lutDescriptor[0] || 2 ** 16, lutDataTagValue.length)
-					);
-
-					this.lut = {
-						nEntries,
-						firstValue,
-						bitsStored,
-						data
-					};
-				}
-			}
-		}
-		if (!this.lutData) {
-			this.minPixVal = this.getImageMin();
-			this.maxPixVal = this.getImageMax();
-
-			this.windowCenter = this.getWindowCenter();
-			this.windowWidth = this.getWindowWidth();
-		}
-	}
 }
 
 export default DCMImage;
+export { ByteType };

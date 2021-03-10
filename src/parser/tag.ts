@@ -117,17 +117,19 @@ interface ITagKey {
 	element: number;
 }
 
-type TagTupleID = [number, number];
+export type TagTupleID = [group: number, element: number];
 
-type TagStringID = string;
+export type TagStringID = string;
 
-type TagValue =
+export type TagValue =
 	Tag[]
 	| ArrayBuffer
+	| Uint8Array
+	| Uint16Array
 	| DataView
 	| string
 	| string[]
-	| number[]
+	| Array<number>
 	| Date[]
 	| null;
 
@@ -697,18 +699,13 @@ class Tag implements ITagKey {
 	 * @param {boolean} [html]
 	 * @returns {string}
 	 */
-	toString(level: number, html: boolean): string {
+	toString(level: number = 0, html: boolean = false): string {
 		let valueStr = "";
 		const groupStr = Utils.dec2hex(this.group);
 		const elemStr = Utils.dec2hex(this.element);
 		let tagStr = `(${groupStr},${elemStr})`;
 		let des = "";
 		let padding;
-
-		if (level === undefined) {
-			// eslint-disable-next-line no-param-reassign
-			level = 0;
-		}
 
 		padding = "";
 		for (let ctr = 0; ctr < level; ctr += 1) {
@@ -764,8 +761,37 @@ class Tag implements ITagKey {
 	 * @param {number} level - the indentation level
 	 * @returns {string}
 	 */
-	toHTMLString(level: number): string {
+	toHTMLString(level: number = 0): string {
 		return this.toString(level, true);
+	}
+
+	// for test, ignore any ptotocol changes etc
+	toObject(): any {
+		const {
+			id,
+			group,
+			element,
+			vr,
+			value,
+			offsetStart,
+			offsetValue,
+			offsetEnd,
+			sublist,
+			preformatted
+		} = this;
+
+		return {
+			id,
+			group,
+			element,
+			vr,
+			value,
+			offsetStart,
+			offsetValue,
+			offsetEnd,
+			sublist,
+			preformatted
+		};
 	}
 }
 

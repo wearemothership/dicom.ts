@@ -14,14 +14,13 @@ interface IJpxImage {
 class JPEG2000Decoder extends Decoder {
 	private jpegs:Array<ArrayBuffer> | null = null
 
-	protected decode(frameNo:number):Promise<Uint8Array | Uint16Array> {
+	protected decode(frameNo:number):Promise<DataView> {
 		const { image } = this;
-		const frameSize = image.rows
-			* image.columns
+		const frameSize = image.size.numberOfPixels
 			* image.bytesAllocated;
 
 		if (!this.jpegs) {
-			this.jpegs = getJpegData(image);
+			this.jpegs = getJpegData(image.data);
 		}
 		const decoder = <IJpxImage> (<unknown> new JpxImage());
 		decoder.parse(new Uint8Array(this.jpegs[frameNo]));
@@ -38,7 +37,7 @@ class JPEG2000Decoder extends Decoder {
 			image.bytesAllocated
 		);
 
-		return Promise.resolve(new Uint8Array(decompressed.buffer));
+		return Promise.resolve(decompressed);
 	}
 }
 

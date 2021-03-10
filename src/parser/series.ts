@@ -1,14 +1,10 @@
-import Image from "./image";
 import Parser from "./parser";
 import OrderedMap from "./orderedmap";
+import DCMImage from "./image";
 
 type Images = any[];
 
 type ImagesMap = OrderedMap<number, Images>;
-
-interface IProgressMeter {
-	drawProgress: (progress: number, message: string) => void,
-}
 
 const getMosaicOffset = (
 	mosaicCols: number,
@@ -240,20 +236,6 @@ const orderDicoms = (
 	return imagesOrderedByTimeAndSpace;
 };
 
-const validatePixelDataLength = (image: any): number => {
-	const length = image.getPixelDataBytes().byteLength;
-	const sliceLength = image.columns * image.rows;
-	// pixel data length should be divisible by slice size,
-	// if not, try to figure out correct pixel data length
-	if ((length % sliceLength) === 0) {
-		return length;
-	}
-	return sliceLength
-		* image.getNumberOfFrames()
-		* image.samplesPerPixel
-		* image.bytesAllocated;
-};
-
 /**
  * The Series constructor.
  * @property {daikon.Image[]} images
@@ -299,7 +281,7 @@ class Series {
 
 	sliceSense = false;
 
-	sliceDir = Image.sliceDirection.unknown;
+	sliceDir = DCMImage.sliceDirection.unknown;
 
 	error: Error | null = null;
 
@@ -441,8 +423,8 @@ class Series {
 		* y-axis is increasing to the posterior side of the patient.
 		* The z-axis is increasing toward the head of the patient."
 		*/
-		else if ((this.sliceDir === Image.sliceDirection.sagittal)
-			|| (this.sliceDir === Image.sliceDirection.coronal)) {
+		else if ((this.sliceDir === DCMImage.sliceDirection.sagittal)
+			|| (this.sliceDir === DCMImage.sliceDirection.coronal)) {
 			if (sliceLocDiff > 0) {
 				this.sliceSense = false;
 			}
@@ -458,66 +440,6 @@ class Series {
 		}
 		this.imagesOriginalOrder = this.images;
 		this.images = orderedImages;
-	}
-
-	/**
-	 * Concatenates image data (asynchronously).
-	 * @param {object} progressMeter -- the object must have a drawProgress(percent, label)
-	 * 									function [e.g., drawProgress(.5, "Loading...")]
-	 * @param {Function} onFinishedImageRead -- callback
-	 */
-	concatenateImageData(
-		progressMeter: IProgressMeter,
-		onFinishedImageRead: (buffer: ArrayBuffer) => void
-	) {
-		let data;
-		if (this.isMosaic) {
-			data = this.getMosaicData(this.images[0], this.images[0].getPixelDataBytes());
-		}
-		else {
-			data = this.images[0].getPixelDataBytes();
-		}
-		const length = validatePixelDataLength(this.images[0]);
-		this.images[0].clearPixelData();
-		const buffer = new Uint8Array(new ArrayBuffer(length * this.images.length));
-		buffer.set(new Uint8Array(data, 0, length), 0);
-		setTimeout(() => (
-			this.concatenateNextImageData(buffer, length, progressMeter, 1, onFinishedImageRead)
-		), 0);
-	}
-
-	concatenateNextImageData(
-		buffer:Uint8Array | Uint16Array,
-		frameSize: number,
-		progressMeter: IProgressMeter,
-		index: number,
-		onFinishedImageRead: (buffer: ArrayBuffer) => void
-	) {
-		if (index >= this.images.length) {
-			progressMeter?.drawProgress(1, "Reading DICOM Images");
-			onFinishedImageRead(buffer.buffer);
-		}
-		else {
-			let data;
-			progressMeter?.drawProgress(index / this.images.length, "Reading DICOM Images");
-			if (this.isMosaic) {
-				data = this.getMosaicData(this.images[index], this.images[index].getPixelDataBytes());
-			}
-			else {
-				data = this.images[index].getPixelDataBytes();
-			}
-			const length = validatePixelDataLength(this.images[index]);
-			this.images[index].clearPixelData();
-			buffer.set(new Uint8Array(data, 0, length), (frameSize * index));
-			setTimeout(() => (
-				this.concatenateNextImageData(
-					buffer,
-					frameSize,
-					progressMeter,
-					index + 1,
-					onFinishedImageRead
-				)), 0);
-		}
 	}
 
 	getMosaicData(image: any, data:Uint16Array | Uint8Array): ArrayBuffer {
@@ -567,7 +489,7 @@ class Series {
  * @param {DataView} data
  * @returns {daikon.Image|null}
  */
-export const parseImage = (data: DataView) => {
+export const parseImage = (data: DataView): DCMImage | null => {
 	const parser = new Parser();
 	const image = parser.parse(data);
 

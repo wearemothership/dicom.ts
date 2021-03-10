@@ -5,6 +5,7 @@ import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString } from "./Program";
 import { ISize } from "../decoder/Decoder";
+import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const minMaxShader = raw("./minMax.glsl");
@@ -29,20 +30,20 @@ class ContrastifyProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	frame: FrameInfo;
+	info: IDisplayInfo;
 
 	gl:WebGLRenderingContext;
 
 	outputSize: ISize;
 
-	constructor(gl:WebGLRenderingContext, frame: FrameInfo) {
+	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
 		const ext = gl.getExtension("WEBGL_draw_buffers");
 		if (!ext) {
 			throw new Error("Image requires WEBGL_draw_buffers");
 		}
 		this.ext = ext!;
 
-		const getWordString = glslUnpackWordString(frame, false);
+		const getWordString = glslUnpackWordString(info, false);
 
 		const minMaxFragString = minMaxShader
 			.replace("$(cellSize)", cellSize.toString())
@@ -61,32 +62,34 @@ class ContrastifyProgram implements IProgram {
 		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
-		this.frame = frame;
+		this.info = info;
 		this.gl = gl;
-		this.outputSize = { width: frame.width, height: frame.height };
+		this.outputSize = info.size;
 		return this;
 	}
 
 	run(frame: FrameInfo) {
 		const framebuffers:Array<FramebufferInfo> = [];
-		const {
-			width,
-			height,
-			invert,
-			slope,
-			intercept
-		} = frame;
-		let w = width;
-		let h = height;
 
 		const {
 			gl,
 			ext,
+			info,
 			minMaxProgramInfo,
 			contrastProgramInfo,
 			unitQuadBufferInfo,
 			outputSize
 		} = this;
+
+		const {
+			size,
+			invert,
+			slope,
+			intercept
+		} = this.info;
+		const { width, height } = size;
+		let w = width;
+		let h = height;
 
 		const srcTex = frame.texture;
 
@@ -169,13 +172,13 @@ class ContrastifyProgram implements IProgram {
 		gl.useProgram(contrastProgramInfo.program);
 
 		// twgl.setBuffersAndAttributes(gl, contrastProgramInfo, unitQuadBufferInfo);
-		const { signed } = frame;
+		const { signed } = info;
 		let interceptRatio = intercept;
 		if (signed && intercept < 0) {
-			interceptRatio /= (2 ** (frame.bitsStored - 1));
+			interceptRatio /= (2 ** (info.bitsStored - 1));
 		}
 		else {
-			interceptRatio /= (2 ** (frame.bitsStored));
+			interceptRatio /= (2 ** (info.bitsStored));
 		}
 
 		twgl.setUniforms(contrastProgramInfo, {
