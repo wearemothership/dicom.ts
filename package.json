@@ -1,6 +1,6 @@
 {
   "name": "dicom.js",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "A small, fast, javascript DICOM renderer",
   "author": "mothershipsoft",
   "license": "MIT",

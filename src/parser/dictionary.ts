@@ -1040,7 +1040,7 @@ const dict: TDICOMDictionary = {
 		"9507": ["SQ", "XRay3DAcquisitionSequence"],
 		"9508": ["FL", "PrimaryPositionerScanArc"],
 		"9509": ["FL", "SecondaryPositionerScanArc"],
-		"9510": ["FL ", "PrimaryPositionerScanStartAngle"],
+		"9510": ["FL", "PrimaryPositionerScanStartAngle"],
 		"9511": ["FL", "SecondaryPositionerScanStartAngle"],
 		"9514": ["FL", "PrimaryPositionerIncrement"],
 		"9515": ["FL", "SecondaryPositionerIncrement"],

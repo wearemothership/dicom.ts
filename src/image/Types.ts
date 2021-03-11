@@ -13,9 +13,9 @@ export interface IImageSize {
 }
 
 export class ImageSize implements IImageSize {
-	width: number
+	readonly width: number
 
-	height: number
+	readonly height: number
 
 	constructor({
 		width,
@@ -38,5 +38,12 @@ export class ImageSize implements IImageSize {
 	get numberOfPixels(): number {
 		const { width, height } = this;
 		return width * height;
+	}
+
+	scale(scale: number):ImageSize {
+		let { width, height } = this;
+		width *= scale;
+		height *= scale;
+		return new ImageSize({ width, height });
 	}
 }

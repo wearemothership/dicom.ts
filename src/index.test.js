@@ -15,7 +15,7 @@ import {
 } from "node-canvas-webgl";
 import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
-import { DICOMCanvas, FileInput, dicomjs } from ".";
+import dicomjs, { DICOMCanvas, FileInput } from ".";
 
 // need to be global (as they would be in browser) for twgl to get them!
 window.WebGLRenderingContext = WebGLRenderingContext;
@@ -80,7 +80,7 @@ describe("dicom.js", () => {
 		// await dicomjs.render(image, canvas, 1);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		// fs.writeFileSync("./image.png", buffer);
+		fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("60388cc0984e94d685f985ee0e343224056afb26");
 	});
 
@@ -193,5 +193,18 @@ describe("dicom.js", () => {
 			sha = shaFromJSON(sha + buffer);
 		}
 		expect(sha).toEqual("bb5df5c6d918959e35702f112bd5353609332bdf");
+	});
+
+	it("Resizes ok", async () => {
+		const data = fs.readFileSync("./test/medical.nema.org/compsamples_rle_20040210/IMAGES/RLE/CT1_RLE");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas, 0.5);
+
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("447cba5c0bc8cc659978f94ab69e591833fa47cc");
 	});
 });

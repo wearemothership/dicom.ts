@@ -6,17 +6,20 @@ import GreyscaleProgram from "./GreyscaleProgram";
 import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
 import { ImageSize } from "../image/Types";
 import { DCMImage } from "../parser";
+import { ISize } from "../decoder/Decoder";
 
 class Renderer {
 	canvas: HTMLCanvasElement
 
-	gl: WebGLRenderingContext
-
-	decoder: Decoder | null = null
-
 	image: DCMImage | null = null
 
-	program: IProgram | null = null;
+	private gl: WebGLRenderingContext
+
+	private decoder: Decoder | null = null
+
+	private program: IProgram | null = null;
+
+	private outSize: ImageSize | null = null;
 
 	constructor(canvas: HTMLCanvasElement) {
 		const gl = canvas.getContext("webgl");
@@ -29,6 +32,13 @@ class Renderer {
 
 	async render(image: DCMImage, frameNo:number = 0) {
 		const { gl } = this;
+		if (!this.outSize) {
+			this.outSize = new ImageSize(image);
+		}
+		const size = this.outSize!;
+		this.canvas.width = size!.width;
+		this.canvas.height = size!.height;
+
 		if (this.image !== image) {
 			if (this.program) {
 				// TODO: lets create a program signature, only recreate if not cached?
@@ -36,10 +46,7 @@ class Renderer {
 			}
 			this.image = image;
 			const decoder = decoderForImage(image);
-			const size = new ImageSize(image);
-			decoder!.outputSize = size;
-			this.canvas.width = size.width;
-			this.canvas.height = size.height;
+			decoder!.outputSize = new ImageSize(image);
 
 			const imageInfo = decoder!.image;
 			if (imageInfo.rgb) {
@@ -56,11 +63,29 @@ class Renderer {
 			}
 			this.decoder = decoder;
 		}
+
+		this.program!.outputSize = size;
+
 		const frame = await this.decoder!.getFrame(gl, frameNo);
 
 		this.program!.run(frame);
 
 		frame.destroy();
+	}
+
+	set outputSize(size:ISize) {
+		this.outSize = new ImageSize(size);
+	}
+
+	get outputSize():ISize {
+		if (this.outSize) {
+			return this.outSize;
+		}
+		return new ImageSize({ width: 0, height: 0 });
+	}
+
+	destroy(): void {
+		this.program?.destroy();
 	}
 }
 
