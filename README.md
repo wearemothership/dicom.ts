@@ -6,13 +6,15 @@
 
 
 # background
-Was in the need of displaying greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task, it also seemed slow even using the webgl renderer.  By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 1.1 to 10 times faster, depending on the image and wether it was the first decode of the library.
+Was in the need of displaying greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task, it also seemed slow even using the webgl renderer.
 
 This is the result!
 
+By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 1.1 to 12 times faster, depending on the image and wether it was the first decode of the library.
+
 ## Todo
 - ~~add typescript support~~
-- complete ts impl
+- ~~complete ts impl~~
 - make sure adhere to licenses...
 - fix microbundle warnings
 - ~~fix cornerstone comparison example~~
@@ -23,7 +25,7 @@ This is the result!
 - LL decoder can be slower than cornerstones
 - ~~seperate out decoders from parser~~
 - ~~seperate programs~~
-- currently only supports rendering frame 0! - done, but test it!
+- ~~currently only supports rendering frame 0! - done, but test it!~~
 - accelerate palette conversion
 - load series
 - scale / maxsize

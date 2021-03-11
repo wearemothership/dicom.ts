@@ -11,6 +11,8 @@ export interface IImageLutInfo {
 
 export interface IDisplayInfo extends IDecoderInfo {
 
+	nFrames: number
+
 	lut: IImageLutInfo | null
 
 	invert: boolean
@@ -63,6 +65,9 @@ export const displayInfoFromDecoderInfo = (info:IDecoderInfo): IDisplayInfo => {
 
 	const displayInfo: IDisplayInfo = {
 		...info,
+
+		nFrames: image.numberOfFrames || 1,
+
 		lut: lutInfoFromImage(info.image),
 
 		minPixVal: image.imageMin,

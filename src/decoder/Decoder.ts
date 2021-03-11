@@ -38,12 +38,18 @@ class Decoder implements IDecoder {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected decode(frameNo:number):Promise<DataView> {
-		return Promise.resolve(this.image.data);
+		const { data, nFrames } = this.image;
+		const bytesPerFrame = data.byteLength / nFrames;
+		const dv = new DataView(
+			data.buffer,
+			bytesPerFrame * frameNo, bytesPerFrame
+		);
+		return Promise.resolve(dv);
 	}
 
 	protected async createTexture(gl:WebGLRenderingContext, frameNo:number):Promise<WebGLTexture> {
 		const pixelData = await this.decode(frameNo);
-		const greyBuffer = new Uint8Array(pixelData.buffer);
+		const greyBuffer = new Uint8Array(pixelData.buffer, pixelData.byteOffset, pixelData.byteLength);
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
 		if (this.image.rgb) {

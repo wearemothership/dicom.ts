@@ -13,7 +13,7 @@ import {
 	WebGLTexture,
 	WebGLUniformLocation
 } from "node-canvas-webgl";
-import { shaFromBuffer } from "./testUtils";
+import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
 import { DICOMCanvas, FileInput, dicomjs } from ".";
 
@@ -174,5 +174,24 @@ describe("dicom.js", () => {
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("dba60ea49c4f78556451be507ff08e1a25cfabd5");
+	});
+
+	it("Renders all frames ok, reuses program", async () => {
+		const data = fs.readFileSync("./test/medical.nema.org/multiframe/DISCIMG/IMAGES/BRMULTI");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		expect(image).toBeTruthy();
+		const canvas = createCanvas(512, 512);
+		const renderer = new dicomjs.Renderer(canvas);
+		let sha = "";
+		for (let i = 0; i < image.numberOfFrames; i += 1) {
+			// eslint-disable-next-line no-await-in-loop
+			await renderer.render(image, i);
+
+			const buffer = canvas.toBuffer("image/png");
+			// fs.writeFileSync(`./image${i}.png`, buffer);
+			sha = shaFromJSON(sha + buffer);
+		}
+		expect(sha).toEqual("bb5df5c6d918959e35702f112bd5353609332bdf");
 	});
 });
