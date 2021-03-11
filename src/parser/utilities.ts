@@ -3,7 +3,7 @@
 import { convertBytes } from "dicom-character-set";
 import { Charset, DefaultCharset } from "./constants";
 
-let crcTable: Array<number>;
+let crcTable: number[];
 
 export const MAX_VALUE = 9007199254740991;
 export const MIN_VALUE = -9007199254740991;
@@ -52,7 +52,7 @@ export const safeParseFloat = (str:string):number => {
 	return 0;
 };
 // http://stackoverflow.com/questions/8361086/convert-byte-array-to-numbers-in-javascript
-export const bytesToDouble = (data:Array<number>):number => {
+export const bytesToDouble = (data:number[]):number => {
 	const [b0, b1, b2, b3, b4, b5, b6, b7] = data;
 
 	const sign = (b0 & (1 << 7)) >> 7;
@@ -86,7 +86,7 @@ export const concatArrayBuffers = (buffer1: ArrayBuffer, buffer2:ArrayBuffer):Ar
 	return tmp.buffer;
 };
 
-export const fillBufferRGB = (array: Array<number>, buffer:DataView, offset:number) => {
+export const fillBufferRGB = (array: number[], buffer:DataView, offset:number) => {
 	const numElements = array.length || 0;
 
 	for (let ctr = 0; ctr < numElements; ctr += 3) {
@@ -98,7 +98,7 @@ export const fillBufferRGB = (array: Array<number>, buffer:DataView, offset:numb
 	}
 };
 
-export const toArrayBuffer = (buffer: Array<number>) => {
+export const toArrayBuffer = (buffer: number[]) => {
 	const ab = new ArrayBuffer(buffer.length);
 	const view = new Uint8Array(ab);
 	for (let i = 0; i < buffer.length; i += 1) {
@@ -135,7 +135,7 @@ export const swap16 = (val:number) => (
 );
 
 // http://stackoverflow.com/questions/18638900/javascript-crc32
-export const makeCRCTable = ():Array<number> => {
+export const makeCRCTable = ():number[] => {
 	crcTable = crcTable || Array(256);
 	for (let n = 0; n < 256; n += 1) {
 		let c = n;

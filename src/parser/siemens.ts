@@ -6,13 +6,26 @@ const ELEMENT_CSA1 = 0x1010;
 const ELEMENT_CSA2 = 0x1020;
 const GROUP_CSA = 0x029;
 
+export interface IPrivateDataReader {
+	readHeader(): string
+	readHeaderAtOffset(offset:number):string
+	readTag(offset:number):number
+	readString(offset:number, length:number):string
+	readItem(offset:number):number
+	canRead(group: number, element: number): boolean
+}
+
 /**
  * The Siemens constructor.
  * @params {ArrayBuffer} buffer
  * @type {Function}
  */
-class Siemens {
-	constructor(buffer) {
+class Siemens implements IPrivateDataReader {
+	output: string
+
+	data: DataView
+
+	constructor(buffer: ArrayBuffer) {
 		this.output = "";
 		this.data = new DataView(buffer, 0);
 	}
@@ -21,16 +34,15 @@ class Siemens {
  * Reads the Siemens header.  (See http://nipy.org/nibabel/dicom/siemens_csa.html)
  * @returns {string}
  */
-	readHeader() {
+	readHeader(): string {
 		let match;
 
 		try {
 			if (this.data.byteLength > CSA2_MAGIC_NUMBER.length) {
 				match = true;
-
+				const { data } = this;
 				for (let ctr = 0; ctr < CSA2_MAGIC_NUMBER.length; ctr += 1) {
-					// eslint-disable-next-line no-bitwise
-					match &= (this.data.getUint8(ctr) === CSA2_MAGIC_NUMBER[ctr]);
+					match = match && (data.getUint8(ctr) === CSA2_MAGIC_NUMBER[ctr]);
 				}
 
 				if (match) {
@@ -48,7 +60,7 @@ class Siemens {
 		return this.output;
 	}
 
-	readHeaderAtOffset(offset) {
+	readHeaderAtOffset(offset:number):string {
 		this.output += "\n";
 
 		const numTags = Utils.swap32(this.data.getUint32(offset));
@@ -72,7 +84,7 @@ class Siemens {
 		return this.output;
 	}
 
-	readTag(offset) {
+	readTag(offset:number):number {
 		const name = this.readString(offset, NAME_LENGTH);
 
 		let newOffset = offset + NAME_LENGTH;
@@ -99,7 +111,7 @@ class Siemens {
 		return offset;
 	}
 
-	readString(offset, length) {
+	readString(offset:number, length:number):string {
 		let str = "";
 
 		for (let ctr = 0; ctr < length; ctr += 1) {
@@ -114,10 +126,10 @@ class Siemens {
 		return str;
 	}
 
-	readItem(offset) {
+	readItem(offset:number):number {
 		const itemLength = Utils.swap32(this.data.getUint32(offset));
 
-		if ((offset + itemLength) > this.data.buffer.length) {
+		if ((offset + itemLength) > this.data.byteLength) {
 			return -1;
 		}
 
@@ -136,7 +148,7 @@ class Siemens {
 	 * @param {number} element
 	 * @returns {boolean}
 	 */
-	canRead = (group, element) => (
+	canRead = (group: number, element: number): boolean => (
 		(group === GROUP_CSA)
 		&& ((element === ELEMENT_CSA1)
 		|| (element === ELEMENT_CSA2))
