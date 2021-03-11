@@ -203,10 +203,12 @@ class ContrastifyProgram implements IProgram {
 					gl.deleteTexture(attachments[0]);
 				}
 			});
-			gl.deleteTexture(srcTex);
-			gl.deleteProgram(contrastProgramInfo.program);
-			gl.deleteProgram(minMaxProgramInfo.program);
 		}, 0);
+	}
+
+	destroy() {
+		this.gl.deleteProgram(this.contrastProgramInfo.program);
+		this.gl.deleteProgram(this.minMaxProgramInfo.program);
 	}
 }
 

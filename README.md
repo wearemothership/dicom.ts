@@ -25,11 +25,11 @@ By tightly integrating the parser, decoders and renderer, some decent perfomance
 - LL decoder can be slower than cornerstones
 - ~~seperate out decoders from parser~~
 - ~~seperate programs~~
-- ~~currently only supports rendering frame 0! - done, but test it!~~
+- ~~currently only supports rendering frame 0!~~
 - accelerate palette conversion
 - load series
 - scale / maxsize
-
+- code coverage
 
 ## Install
 

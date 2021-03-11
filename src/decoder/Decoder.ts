@@ -32,6 +32,7 @@ class Decoder implements IDecoder {
 		return new FrameInfo({
 			imageInfo: this.image,
 			frameNo,
+			gl,
 			texture
 		});
 	}

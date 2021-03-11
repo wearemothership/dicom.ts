@@ -28,7 +28,12 @@ class Renderer {
 	}
 
 	async render(image: DCMImage, frameNo:number = 0) {
+		const { gl } = this;
 		if (this.image !== image) {
+			if (this.program) {
+				// TODO: lets create a program signature, only recreate if not cached?
+				this.program.destroy();
+			}
 			this.image = image;
 			const decoder = decoderForImage(image);
 			const size = new ImageSize(image);
@@ -38,22 +43,24 @@ class Renderer {
 
 			const imageInfo = decoder!.image;
 			if (imageInfo.rgb) {
-				this.program = new ColorProgram(this.gl, imageInfo);
+				this.program = new ColorProgram(gl, imageInfo);
 			}
 			else if (imageInfo.windowCenter || imageInfo.minPixVal || imageInfo.maxPixVal) {
-				this.program = new GreyscaleProgram(this.gl, imageInfo);
+				this.program = new GreyscaleProgram(gl, imageInfo);
 			}
 			else if (imageInfo.lut) {
-				this.program = new GreyscaleLUTProgram(this.gl, imageInfo);
+				this.program = new GreyscaleLUTProgram(gl, imageInfo);
 			}
 			else {
-				this.program = new ContrastifyProgram(this.gl, imageInfo);
+				this.program = new ContrastifyProgram(gl, imageInfo);
 			}
 			this.decoder = decoder;
 		}
-		const frame = await this.decoder!.getFrame(this.gl, frameNo);
+		const frame = await this.decoder!.getFrame(gl, frameNo);
 
 		this.program!.run(frame);
+
+		frame.destroy();
 	}
 }
 

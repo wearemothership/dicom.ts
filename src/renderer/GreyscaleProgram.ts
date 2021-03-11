@@ -72,11 +72,10 @@ class GreyscaleProgram implements IProgram {
 			u_intercept: intercept
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
-		// cleanup on next runloop
-		setTimeout(() => {
-			gl.deleteTexture(texture);
-			gl.deleteProgram(programInfo.program);
-		}, 0);
+	}
+
+	destroy() {
+		this.gl.deleteProgram(this.programInfo.program);
 	}
 }
 

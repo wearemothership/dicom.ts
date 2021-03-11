@@ -17,6 +17,7 @@ interface IProgram {
 	// new (gl:WebGLRenderingContext, frame: FrameInfo): IProgram;
 
 	run(frame: FrameInfo):void
+	destroy(): void
 }
 
 /**

@@ -91,10 +91,15 @@ class GreyscaleLUTProgram implements IProgram {
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 		// cleanup on next runloop
 		setTimeout(() => {
-			gl.deleteTexture(texture);
 			gl.deleteTexture(lutTexture);
 			gl.deleteProgram(programInfo.program);
 		}, 0);
+	}
+
+	destroy() {
+		const { gl } = this;
+		gl.deleteProgram(this.programInfo.program);
+		gl.deleteTexture(this.lutTexture);
 	}
 }
 
