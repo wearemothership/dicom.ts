@@ -29,12 +29,12 @@ const render = async (
 	return Promise.resolve();
 };
 
-export default {
+export {
 	parseImage,
 	render,
 	Renderer,
 	Parser,
-	parserError: Series.parserError,
+	// parserError: Series.parserError,
 	DICOMCanvas,
 	FileInput
 };

@@ -7,7 +7,7 @@ import React, {
 	ReactChildren,
 } from "react";
 import { Parser, parseImage } from "../parser";
-import render from "../renderer/render";
+import { render } from "../renderer";
 
 const parseDecodeAndRender = (buf: ArrayBuffer, canvas: HTMLCanvasElement): Promise<void> => {
 	const data = new DataView(buf);

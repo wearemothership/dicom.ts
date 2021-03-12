@@ -1,5 +1,5 @@
 // /* eslint-disable */
-import { dicomjs } from "dicom.js"
+import * as dicomjs from "dicom.js"
 
 export const GPUJSDecode = (buf, canvas) => {
 	const data = new DataView(buf);
