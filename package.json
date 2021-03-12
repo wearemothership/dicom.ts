@@ -1,11 +1,11 @@
 {
   "name": "dicom.js",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "description": "A small, fast, javascript DICOM renderer",
   "author": "mothershipsoft",
   "license": "MIT",
   "repository": "mothershipsoft/dicom.js",
-  "main": "dist/index.modern.js",
+  "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.ts",
   "engines": {
