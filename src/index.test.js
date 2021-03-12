@@ -15,7 +15,9 @@ import {
 } from "node-canvas-webgl";
 import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
-import dicomjs, { DICOMCanvas, FileInput } from ".";
+import * as dicomjs from ".";
+
+const { DICOMCanvas, FileInput } = dicomjs;
 
 // need to be global (as they would be in browser) for twgl to get them!
 window.WebGLRenderingContext = WebGLRenderingContext;
