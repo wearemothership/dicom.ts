@@ -13,23 +13,24 @@ This is the result!
 By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 1.1 to 12 times faster, depending on the image and wether it was the first decode of the library.
 
 ## Todo
-- ~~add typescript support~~
-- ~~complete ts impl~~
 - make sure adhere to licenses...
-- fix microbundle warnings
-- ~~fix cornerstone comparison example~~
 - add standalone React canvas example
-- ~~add test framework~~
 - palette conversion does not work see ./test/issues
 - some images are not perfect with cornerstone, what is correct?
-- LL decoder can be slower than cornerstones
+- accelerate palette conversion
+- load series
+- code coverage
+- ~~J2KI files slower than cornerstone~~
+- ~~scale / maxsize~~
+- ~~LL decoder can be slower than cornerstones~~
+- ~~add typescript support~~
+- ~~complete ts impl~~
+- ~~fix microbundle warnings~~
+- ~~fix cornerstone comparison example~~
+- ~~add test framework~~
 - ~~seperate out decoders from parser~~
 - ~~seperate programs~~
 - ~~currently only supports rendering frame 0!~~
-- accelerate palette conversion
-- load series
-- scale / maxsize
-- code coverage
 
 ## Install
 

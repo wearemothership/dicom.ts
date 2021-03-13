@@ -1,43 +1,34 @@
-import JpxImage from "./codecs/jpx";
+import OpenJpeg from "./codecs/openjpeg";
 import Decoder from "./Decoder";
-import { getJpegData, fillBuffer } from "./util";
-
-interface IJxTile {
-	items: ArrayLike<number>
-}
-interface IJpxImage {
-	tiles: Array<IJxTile>,
-	componentsCount:number,
-	parse(buffer:Uint8Array):void
-}
+import { getJpegData } from "./util";
 
 class JPEG2000Decoder extends Decoder {
 	private jpegs:Array<ArrayBuffer> | null = null
 
 	protected decode(frameNo:number):Promise<DataView> {
 		const { image } = this;
-		const frameSize = image.size.numberOfPixels
-			* image.bytesAllocated;
+		// const frameSize = image.size.numberOfPixels
+		// 	* image.bytesAllocated;
 
 		if (!this.jpegs) {
 			this.jpegs = getJpegData(image.data);
 		}
-		const decoder = <IJpxImage> (<unknown> new JpxImage());
-		decoder.parse(new Uint8Array(this.jpegs[frameNo]));
-		// const { width, height } = decoder;
-		const decoded = decoder.tiles[frameNo].items;
-		const numComponents = decoder.componentsCount;
-
-		// TODO: why is this necessary?
-		const decompressed = new DataView(new ArrayBuffer(frameSize * numComponents));
-		fillBuffer(
-			decoded,
-			decompressed,
-			0,
-			image.bytesAllocated
-		);
-
-		return Promise.resolve(decompressed);
+		return new Promise((resolve) => {
+			OpenJpeg().then((OJ: { J2KDecoder: new () => any; }) => {
+				const decoder = new OJ.J2KDecoder();
+				const buffer = new Uint8Array(this.jpegs![frameNo]);
+				const encodedBuffer = decoder.getEncodedBuffer(buffer.length);
+				encodedBuffer.set(buffer);
+				const decodeLevel = 0;
+				const decodeLayer = 0;
+				for (let i = 0; i < 1; i += 1) {
+					decoder.decodeSubResolution(decodeLevel, decodeLayer);
+				}
+				decoder.getFrameInfo();
+				const decodedBuffer = decoder.getDecodedBuffer();
+				return resolve(decodedBuffer);
+			});
+		});
 	}
 }
 

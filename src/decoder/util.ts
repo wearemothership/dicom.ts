@@ -24,24 +24,6 @@ const concatArrayOfBuffers = (buffers:Array<ArrayBuffer>):ArrayBuffer => {
 	return tmp.buffer;
 };
 
-export const fillBuffer = (
-	array: ArrayLike<number>,
-	buffer: DataView,
-	offset:number,
-	numBytes:number
-) => {
-	if (numBytes === 1) {
-		for (let ctr = 0; ctr < array.length; ctr += 1) {
-			buffer.setUint8(offset + ctr, array[ctr]);
-		}
-	}
-	else if (numBytes === 2) {
-		for (let ctr = 0; ctr < array.length; ctr += 1) {
-			buffer.setUint16(offset + (ctr * 2), array[ctr], true);
-		}
-	}
-};
-
 const JPEG_MAGIC_NUMBER = [0xFF, 0xD8];
 const JPEG2000_MAGIC_NUMBER = [0xFF, 0x4F, 0xFF, 0x51];
 

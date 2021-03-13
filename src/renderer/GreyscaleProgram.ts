@@ -54,13 +54,23 @@ class GreyscaleProgram implements IProgram {
 			texture
 		} = frame;
 
-		const {
+		let {
 			windowWidth,
-			windowCenter,
+			windowCenter
+		} = info;
+
+		const {
+			maxPixVal,
+			minPixVal,
 			invert,
 			slope,
 			intercept
 		} = info;
+
+		if (!windowWidth && (maxPixVal !== null || minPixVal !== null)) {
+			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));
+			windowCenter = windowWidth / 2;
+		}
 
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],

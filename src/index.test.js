@@ -82,7 +82,7 @@ describe("dicom.js", () => {
 		// await dicomjs.render(image, canvas, 1);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("60388cc0984e94d685f985ee0e343224056afb26");
 	});
 
@@ -95,7 +95,7 @@ describe("dicom.js", () => {
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("7ebf07de7d6db444188249c3e592be8250b20098");
 	});
 
@@ -146,11 +146,11 @@ describe("dicom.js", () => {
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("83f8d3c0d12794591f23fa859b1121ee18e2fdc6");
 	});
 
-	it("Renders with: jpeg2000", async () => {
+	it("Renders with: jpeg2000 lossy", async () => {
 		const data = fs.readFileSync("./test/medical.nema.org/compsamples_j2k/IMAGES/J2KI/US1_J2KI");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
@@ -160,7 +160,7 @@ describe("dicom.js", () => {
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
-		expect(shaFromBuffer(buffer)).toEqual("943302fe91302fd9ede3bb5f31b466bb403ed403");
+		expect(shaFromBuffer(buffer)).toEqual("c03ac6dfd8cb9811d20ad0f80dd14546bfad7b86");
 	});
 
 	// issues
