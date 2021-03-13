@@ -2471,7 +2471,13 @@ var ArithmeticDecoder = (function ArithmeticDecoderClosure() {
 
 'use strict';
 
-var globalScope = (typeof window === 'undefined') ? this : window;
+var globalScope = null;
+
+function setGlobalScope() {
+	globalScope = (typeof window === 'undefined') ? this : window;
+}
+
+setGlobalScope();
 
 var isWorker = (typeof window === 'undefined');
 
