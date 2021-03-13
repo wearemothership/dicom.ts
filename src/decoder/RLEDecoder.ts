@@ -5,7 +5,7 @@ import { getEncapsulatedData } from "./util";
 class RLEDecoder extends Decoder {
 	private rleData: Array<ArrayBuffer> | null = null
 
-	protected decode(frameNo: number) {
+	protected decode(frameNo: number): Promise<DataView> {
 		const { image } = this;
 		if (!this.rleData) {
 			const encapTags = getEncapsulatedData(image.data);
@@ -18,15 +18,7 @@ class RLEDecoder extends Decoder {
 			}
 			this.rleData = data;
 		}
-		const decompressed = RLE({
-			rows: image.size.rows,
-			columns: image.size.columns,
-			samplesPerPixel: image.samples,
-			bitsAllocated: image.bitsAllocated,
-			planarConfiguration: image.planar ? 1.0 : 0.0,
-			pixelRepresentation: image.signed ? 0x1 : 0x0
-		},
-		this.rleData[frameNo]).pixelData;
+		const decompressed = RLE(image, this.rleData[frameNo]);
 		return Promise.resolve(decompressed);
 	}
 }
