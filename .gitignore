@@ -9,6 +9,9 @@ build
 dist
 .rpt2_cache
 
+# coverage
+coverage
+
 # misc
 .DS_Store
 .env
