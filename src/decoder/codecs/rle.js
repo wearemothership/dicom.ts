@@ -1,8 +1,12 @@
+/* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
 
 // MIT License
 
 // Copyright (c) 2020 Chris Hafey
+
+// Optimisations
+// Copyright (c) 2021 Mothership Software ltd
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -132,8 +136,8 @@ function decode16(imageFrame, pixelData) {
 	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples * 2);
 
 	const header = new DataView(frameData.buffer, frameData.byteOffset);
-	const data = new Int8Array(frameData.buffer, frameData.byteOffset);
-	const out = new Int8Array(outFrame);
+	const data = new Uint8Array(frameData.buffer, frameData.byteOffset);
+	const out = new Uint8Array(outFrame);
 
 	const numSegments = header.getInt32(0, true);
 
@@ -150,28 +154,30 @@ function decode16(imageFrame, pixelData) {
 		if (maxIndex === 0) {
 			maxIndex = (frameData.length - frameData.byteOffset) * 2;
 		}
-
+		let diff;
+		let maxI;
+		let value;
+		let i;
+		let n;
 		while (inIndex < maxIndex) {
-			const n = data[inIndex++];
-
-			if (n >= 0 && n <= 127) {
-				let outi = outIndex * 2 + highByte;
-				const maxI = Math.min(n + 1, frameSize - outIndex);
-				for (let i = 0; i < maxI; ++i) {
-					out[outi] = data[inIndex++];
-					outi += 2;
+			n = data[inIndex++];
+			i = outIndex * 2 + highByte;
+			if (n < 0x80) {
+				diff = Math.min(n + 1, frameSize - outIndex);
+				maxI = diff * 2 + i;
+				for (; i < maxI; i += 2) {
+					out[i] = data[inIndex++];
 				}
-				outIndex += maxI;
+				outIndex += diff;
 			}
-			else if (n <= -1 && n >= -127) {
-				const value = data[inIndex++];
-				let outi = outIndex * 2 + highByte;
-				const maxJ = Math.min(-n + 1, frameSize - outIndex);
-				for (let j = 0; j < maxJ; ++j) {
-					out[outi] = value;
-					outi += 2;
+			else if (n > 0x80) {
+				value = data[inIndex++];
+				diff = Math.min(129 - (n ^ 0x80), frameSize - outIndex);
+				maxI = diff * 2 + i;
+				for (; i < maxI; i += 2) {
+					out[i] = value;
 				}
-				outIndex += maxJ;
+				outIndex += diff;
 			} /* else if (n === -128) {
 		} // do nothing */
 		}

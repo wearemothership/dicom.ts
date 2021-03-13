@@ -55,7 +55,7 @@ describe("dicom.js", () => {
 
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("4687e84e04162daeb5f68843d1879d42b0fa6e0b");
 	});
 
