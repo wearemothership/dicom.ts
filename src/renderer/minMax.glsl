@@ -6,7 +6,7 @@ precision mediump float;
 
 uniform sampler2D u_minTexture;
 uniform sampler2D u_maxTexture;
-uniform vec2 u_srcResolution;  
+uniform vec2 u_srcResolution;
 
 float greyscale(vec4 color) {
   $(word)
@@ -15,13 +15,13 @@ float greyscale(vec4 color) {
 void main() {
     // compute the first pixel the source cell
     vec2 srcPixel = floor(gl_FragCoord.xy) * float(CELL_SIZE);
-    
+
     // one pixel in source
     vec2 onePixel = vec2(1) / u_srcResolution;
-    
+
     // uv for first pixel in cell. +0.5 for center of pixel
     vec2 uv = (srcPixel + 0.5) / u_srcResolution;
-    
+
     float minVal = 1.0;
     float maxVal = 0.0;
     vec4 minColor = vec4(1.0, 1.0, 1.0, 1.0);
@@ -43,7 +43,7 @@ void main() {
             }
         }
     }
-    
+
     gl_FragData[0] = minColor;
     gl_FragData[1] = maxColor;
 }

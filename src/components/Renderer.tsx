@@ -7,7 +7,7 @@ import React, {
 	ReactChildren,
 } from "react";
 import { Parser, parseImage } from "../parser";
-import { render } from "../renderer";
+import { render } from "..";
 
 const parseDecodeAndRender = (buf: ArrayBuffer, canvas: HTMLCanvasElement): Promise<void> => {
 	const data = new DataView(buf);
@@ -17,7 +17,7 @@ const parseDecodeAndRender = (buf: ArrayBuffer, canvas: HTMLCanvasElement): Prom
 	// const h = image.getRows();
 	// const scale = Math.min(1, Math.min(4096 / w, 4096 / h));
 	const scale = 1.0;
-	return render(image, canvas, scale);
+	return render(image!, canvas, scale);
 };
 
 type RenderProps = {

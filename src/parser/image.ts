@@ -96,8 +96,6 @@ class DCMImage implements IImageInfo {
 
 	privateDataAll: string | null = null;
 
-	convertedPalette = false;
-
 	bytesAllocated: number | null = null;
 
 	/**
@@ -457,50 +455,6 @@ class DCMImage implements IImageInfo {
 		else if (!tags[tag.id]) {
 			// eslint-disable-next-line no-param-reassign
 			tags[tag.id] = tag;
-		}
-	}
-
-	// TODO: remove this - upload palette to GPU!
-	convertPalette() {
-		const data = this.pixelData.value as DataView;
-
-		const reds = this.getPalleteValues(TagIds.PaletteRed) ?? [];
-		const greens = this.getPalleteValues(TagIds.PaletteGreen) ?? [];
-		const blues = this.getPalleteValues(TagIds.PaletteBlue) ?? [];
-
-		if ((reds.length > 0)
-			&& (greens.length > 0)
-			&& (blues.length > 0)
-			&& !this.convertedPalette) {
-			const nFrames = this.numberOfFrames;
-			const rgb = new DataView(new ArrayBuffer(this.rows * this.columns * nFrames * 3));
-			const numBytes = this.bitsAllocated / 8;
-			const numElements = data.byteLength / numBytes;
-
-			if (numBytes === 1) {
-				for (let ctr = 0; ctr < numElements; ctr += 1) {
-					const index = data.getUint8(ctr);
-					const rVal = reds[index];
-					const gVal = greens[index];
-					const bVal = blues[index];
-					rgb.setUint8((ctr * 3), rVal);
-					rgb.setUint8((ctr * 3) + 1, gVal);
-					rgb.setUint8((ctr * 3) + 2, bVal);
-				}
-			}
-			else if (numBytes === 2) {
-				for (let ctr = 0; ctr < numElements; ctr += 1) {
-					const index = data.getUint16(ctr * 2);
-					const rVal = reds[index];
-					const gVal = greens[index];
-					const bVal = blues[index];
-					rgb.setUint8((ctr * 3), rVal);
-					rgb.setUint8((ctr * 3) + 1, gVal);
-					rgb.setUint8((ctr * 3) + 2, bVal);
-				}
-			}
-			this.tags[createTagIdWithTag(TagIds.PixelData)].value = rgb;
-			this.convertedPalette = true;
 		}
 	}
 

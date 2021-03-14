@@ -265,7 +265,7 @@ class Parser implements IParserPublic {
 
 		const isPixelData = Tag.isEqual({ group, element }, TagIds.PixelData);
 
-		if ((vr === "SQ") || (!isPixelData && !this.encapsulation && (Parser.DATA_VRS.indexOf(vr) !== -1))) {
+		if ((vr === "SQ") || ((this.level > 0) && (Parser.DATA_VRS.indexOf(vr) !== -1))) {
 			value = this.parseSublist(data, offset, length, vr !== "SQ");
 
 			if (length === Parser.UNDEFINED_LENGTH) {

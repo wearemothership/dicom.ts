@@ -209,4 +209,17 @@ describe("dicom.js", () => {
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("447cba5c0bc8cc659978f94ab69e591833fa47cc");
 	});
+
+	it("Renders with palette conversion", async () => {
+		const data = fs.readFileSync("./test/current-issues/US-PAL-8-10x-echo.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas);
+
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("c688ed677deb5d13b55314f3e22cd4e85354d2c2");
+	});
 });
