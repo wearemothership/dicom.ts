@@ -18,6 +18,7 @@ By tightly integrating the parser, decoders and renderer, some decent perfomance
 - some images are not perfect with cornerstone, what is correct?
 - accelerate palette conversion
 - load series
+- ~~planar config~~
 - ~~palette conversion does not work see ./test/issues~~
 - ~~code coverage~~
 - ~~make sure adhere to licenses...~~

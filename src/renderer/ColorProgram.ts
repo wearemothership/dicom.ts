@@ -9,7 +9,6 @@ import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const colorShader = raw("./color.glsl");
-
 class ContrastifyProgram implements IProgram {
 	programInfo: ProgramInfo;
 
@@ -47,17 +46,22 @@ class ContrastifyProgram implements IProgram {
 			outputSize,
 			info,
 		} = this;
-		const { invert } = info;
+		const {
+			invert,
+			planar,
+			slope,
+			intercept
+		} = info;
 		const { texture } = frame;
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,
 			u_invert: invert,
-			// u_slope: slope,
-			// u_intercept: intercept
+			u_planar: planar,
+			u_slope: slope,
+			u_intercept: intercept
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
-		// cleanup on next runloop
 	}
 
 	destroy() {

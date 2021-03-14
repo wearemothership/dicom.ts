@@ -222,4 +222,17 @@ describe("dicom.js", () => {
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("c688ed677deb5d13b55314f3e22cd4e85354d2c2");
 	});
+
+	it("Renders RGB with planar configuration", async () => {
+		const data = fs.readFileSync("./test/current-issues/US-RGB-8-epicard.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas);
+
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("f8bce5cca7c5c3f5258c524f43a037480763e167");
+	});
 });

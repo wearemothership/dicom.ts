@@ -94,18 +94,23 @@ class Decoder implements IDecoder {
 		const decodedData = await this.decode(frameNo);
 		const pixelData = this.convertPalette(decodedData);
 		const buffer = new Uint8Array(pixelData.buffer, pixelData.byteOffset, pixelData.byteLength);
-
+		let { height } = this.outputSize;
+		const { width } = this.outputSize;
+		const { image } = this;
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (this.image.rgb) {
+		if (image.rgb && !image.planar) {
 			format = gl.RGB;
 			internalFormat = gl.RGB;
 		}
-		else if (this.image.bytesAllocated === 1) {
+		else if (image.bytesAllocated === 1) {
 			format = gl.LUMINANCE;
 			internalFormat = gl.LUMINANCE;
 		}
-		const { width, height } = this.outputSize;
+		if (image.planar) {
+			height *= 3;
+		}
+
 		return Promise.resolve(twgl.createTexture(gl, {
 			src: buffer,
 			width,
