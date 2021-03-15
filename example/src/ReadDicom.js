@@ -3,7 +3,7 @@ import * as dicomjs from "dicom.js"
 
 export const GPUJSDecode = (buf, canvas) => {
 	const data = new DataView(buf);
-	dicomjs.Parser.verbose = true;
+	// dicomjs.Parser.verbose = true;
 	const image = dicomjs.parseImage(data);
 	// const w = image.getCols();
 	// const h = image.getRows();

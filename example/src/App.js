@@ -77,6 +77,9 @@ const Renderer = ({
 					if (renderQ.length) {
 						renderQ[0]();
 					}
+				})
+				.catch((e) => {
+					console.error(e);
 				});
 			});
 			if (renderQ.length === 1) {

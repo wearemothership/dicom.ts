@@ -235,4 +235,22 @@ describe("dicom.js", () => {
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("f8bce5cca7c5c3f5258c524f43a037480763e167");
 	});
+
+	it("Fails gracefully when no pixel data", async () => {
+		// this image fails on horos and cornerstone too, no data after parse...
+		const data = fs.readFileSync("./test/medical.nema.org/multiframe/DISCIMG/IMAGES/BRFSSPC1");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		let error = null;
+		try {
+			await dicomjs.render(image, canvas);
+		}
+		catch (e) {
+			error = e;
+		}
+
+		expect(image).toBeTruthy();
+		expect(error.message).toEqual("Image has no data");
+	});
 });
