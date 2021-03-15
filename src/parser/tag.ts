@@ -37,6 +37,7 @@ export const TagIds: Record<string, TagTupleID> = {
 	PhotometricInterpretation: [0x0028, 0x0004],
 	SamplesPerPixel: [0x0028, 0x0002],
 	PlanarConfig: [0x0028, 0x0006],
+	PaletteRedDescriptor: [0x0028, 0x1101],
 	PaletteRed: [0x0028, 0x1201],
 	PaletteGreen: [0x0028, 0x1202],
 	PaletteBlue: [0x0028, 0x1203],

@@ -9,11 +9,21 @@ export interface IImageLutInfo {
 	data: Uint8Array | Uint16Array
 }
 
+export interface IImagePaletteInfo {
+	nEntries: number;
+	firstValue: number;
+	bitsAllocated: number;
+	r: DataView;
+	g: DataView;
+	b: DataView;
+}
+
 export interface IDisplayInfo extends IDecoderInfo {
 
 	nFrames: number
 
 	lut: IImageLutInfo | null
+	palette: IImagePaletteInfo | null
 
 	invert: boolean
 
@@ -27,7 +37,7 @@ export interface IDisplayInfo extends IDecoderInfo {
 	intercept: number
 }
 
-export const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
+const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 	const lutDescriptor = image.getTagValue(TagIds.VoiLutDescriptor) as number[];
 	if (lutDescriptor?.length !== 3) {
 		return null;
@@ -58,6 +68,27 @@ export const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 	};
 };
 
+const paletteInfoFromImage = (info: IDecoderInfo): IImagePaletteInfo | null => {
+	const { image } = info;
+	const reds = image.getTagValue(TagIds.PaletteRed) as DataView;
+	const greens = image.getTagValue(TagIds.PaletteGreen) as DataView;
+	const blues = image.getTagValue(TagIds.PaletteBlue) as DataView;
+	if ((reds?.byteLength > 0)
+		&& (greens?.byteLength > 0)
+		&& (blues?.byteLength > 0)) {
+		const paletteInfo = image.getTagValue(TagIds.PaletteRedDescriptor) as [number, number, number];
+		const [nEntries,, bitsAllocated] = paletteInfo;
+		return {
+			nEntries,
+			bitsAllocated,
+			r: reds,
+			g: greens,
+			b: blues
+		} as IImagePaletteInfo;
+	}
+	return null;
+};
+
 export const displayInfoFromDecoderInfo = (info:IDecoderInfo): IDisplayInfo => {
 	const { image } = info;
 	let invert = image.getTagValueIndexed(TagIds.LutShape) === "inverse";
@@ -69,6 +100,7 @@ export const displayInfoFromDecoderInfo = (info:IDecoderInfo): IDisplayInfo => {
 		nFrames: image.numberOfFrames || 1,
 
 		lut: lutInfoFromImage(info.image),
+		palette: paletteInfoFromImage(info),
 
 		minPixVal: image.imageMin,
 		maxPixVal: image.imageMax,

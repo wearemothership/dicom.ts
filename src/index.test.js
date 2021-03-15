@@ -232,7 +232,7 @@ describe("dicom.js", () => {
 
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("f8bce5cca7c5c3f5258c524f43a037480763e167");
 	});
 });

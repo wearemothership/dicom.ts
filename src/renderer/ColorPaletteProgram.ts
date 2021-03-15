@@ -8,9 +8,9 @@ import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
-const greyscaleLUTShader = raw("./greyscaleLUT.glsl");
+const colorPaletteShader = raw("./colorPalette.glsl");
 
-class GreyscaleLUTProgram implements IProgram {
+class ColorPaletteProgram implements IProgram {
 	programInfo: ProgramInfo;
 
 	unitQuadBufferInfo: BufferInfo | null = null;
@@ -21,13 +21,22 @@ class GreyscaleLUTProgram implements IProgram {
 
 	outputSize: ISize;
 
-	lutTexture: WebGLTexture;
+	rgbTextures: [WebGLTexture, WebGLTexture, WebGLTexture];
 
 	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const { lut } = info;
-		const getWordString = glslUnpackWordString(info);
+		const { palette } = info;
+		const getWordString = glslUnpackWordString(info, false);
+		const getPaletteWordString = glslUnpackWordString({
+			...info,
+			rgb: false,
+			bitsAllocated: palette!.bitsAllocated,
+			bitsStored: palette!.bitsAllocated
+		}, false);
 
-		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleLUTShader.replace("$(word)", getWordString)]);
+		const programInfo = twgl.createProgramInfo(gl, [vertexShader,
+			colorPaletteShader
+				.replace("$(word)", getWordString)
+				.replace("$(paletteWord)", getPaletteWordString)]);
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		twgl.bindFramebufferInfo(gl, null);
@@ -37,15 +46,15 @@ class GreyscaleLUTProgram implements IProgram {
 
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (info.bitsAllocated <= 8) {
+		if (palette!.bitsAllocated === 8) {
 			format = gl.LUMINANCE;
 			internalFormat = gl.LUMINANCE;
 		}
 
 		// 1D tex
-		this.lutTexture = twgl.createTexture(gl, {
-			src: new Uint8Array(lut!.data.buffer),
-			width: lut!.data.length,
+		const r = twgl.createTexture(gl, {
+			src: new Uint8Array(palette!.r.buffer),
+			width: palette!.nEntries,
 			height: 1,
 			format,
 			internalFormat,
@@ -55,6 +64,30 @@ class GreyscaleLUTProgram implements IProgram {
 			wrap: gl.CLAMP_TO_EDGE,
 		});
 
+		const g = twgl.createTexture(gl, {
+			src: new Uint8Array(palette!.g.buffer),
+			width: palette!.nEntries,
+			height: 1,
+			format,
+			internalFormat,
+			type: gl.UNSIGNED_BYTE,
+			min: gl.NEAREST,
+			mag: gl.NEAREST,
+			wrap: gl.CLAMP_TO_EDGE,
+		});
+
+		const b = twgl.createTexture(gl, {
+			src: new Uint8Array(palette!.b.buffer),
+			width: palette!.nEntries,
+			height: 1,
+			format,
+			internalFormat,
+			type: gl.UNSIGNED_BYTE,
+			min: gl.NEAREST,
+			mag: gl.NEAREST,
+			wrap: gl.CLAMP_TO_EDGE,
+		});
+		this.rgbTextures = [r, g, b];
 		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 		this.programInfo = programInfo;
@@ -70,32 +103,33 @@ class GreyscaleLUTProgram implements IProgram {
 			unitQuadBufferInfo,
 			programInfo,
 			outputSize,
-			lutTexture,
+			rgbTextures,
 			info
 		} = this;
 		const {
 			texture,
 		} = frame;
 
-		const { lut, invert } = info;
-
+		const { palette, invert } = info;
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,
-			u_lutTexture: lutTexture,
-			u_lutWidth: lut!.data.length,
-			u_firstInputValue: lut!.firstValue,
-			u_invert: invert,
-			u_maxValue: 2 ** info.bitsStored
+			u_redTexture: rgbTextures[0],
+			u_greenTexture: rgbTextures[1],
+			u_blueTexture: rgbTextures[2],
+			u_paletteWidth: palette!.nEntries,
+			u_invert: invert
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 	}
 
 	destroy() {
-		const { gl } = this;
+		const { gl, rgbTextures } = this;
 		gl.deleteProgram(this.programInfo.program);
-		gl.deleteTexture(this.lutTexture);
+		gl.deleteTexture(rgbTextures[0]);
+		gl.deleteTexture(rgbTextures[1]);
+		gl.deleteTexture(rgbTextures[2]);
 	}
 }
 
-export default GreyscaleLUTProgram;
+export default ColorPaletteProgram;

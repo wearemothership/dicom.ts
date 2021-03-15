@@ -100,6 +100,10 @@ class DecoderInfo implements IDecoderInfo {
 				// TODO: thow error?
 		}
 
+		if (!image.pixelData) {
+			throw Error("Image has no data");
+		}
+
 		this.rgb = !(image.photometricInterpretation || "").startsWith("MONO");
 		this.planar = !!image.planarConfig;
 		this.samples = image.samplesPerPixel;

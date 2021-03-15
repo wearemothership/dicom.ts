@@ -7,6 +7,7 @@ import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
 import { ImageSize } from "../image/Types";
 import { DCMImage } from "../parser";
 import { ISize } from "../decoder/Decoder";
+import ColorPaletteProgram from "./ColorPaletteProgram";
 
 class Renderer {
 	canvas: HTMLCanvasElement
@@ -49,7 +50,10 @@ class Renderer {
 			decoder!.outputSize = new ImageSize(image);
 
 			const imageInfo = decoder!.image;
-			if (imageInfo.rgb) {
+			if (imageInfo.palette) {
+				this.program = new ColorPaletteProgram(gl, imageInfo);
+			}
+			else if (imageInfo.rgb) {
 				this.program = new ColorProgram(gl, imageInfo);
 			}
 			else if (imageInfo.windowCenter || imageInfo.minPixVal || imageInfo.maxPixVal) {

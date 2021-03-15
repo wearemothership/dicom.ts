@@ -13,11 +13,12 @@ This is the result!
 By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 1.1 to 12 times faster, depending on the image and wether it was the first decode of the library.
 
 ## Todo
-
+- consistent error handling
+- improve memory management.  Can we share wasm heap?
 - add standalone React canvas example
 - some images are not perfect with cornerstone, what is correct?
-- accelerate palette conversion
 - load series
+- ~~accelerate palette conversion~~
 - ~~planar config~~
 - ~~palette conversion does not work see ./test/issues~~
 - ~~code coverage~~

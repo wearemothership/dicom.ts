@@ -18,6 +18,7 @@ export const decoderForImage = (image:DCMImage):Decoder | null => {
 	switch (info.codec) {
 		case Codec.JPEG:
 			if (hasCreateObjectURL) {
+				/* istanbul ignore next */
 				return new NativeDecoder(info);
 			}
 			return new JPEGBaselineDecoder(info);
@@ -30,6 +31,7 @@ export const decoderForImage = (image:DCMImage):Decoder | null => {
 		case Codec.JPEG2000:
 			// safari support native JPEG2000 decode
 			if (hasCreateObjectURL && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+				/* istanbul ignore next */
 				return new NativeDecoder(info);
 			}
 			return new JPEG2000Decoder(info);
@@ -39,5 +41,6 @@ export const decoderForImage = (image:DCMImage):Decoder | null => {
 			return new Decoder(info);
 		default:
 	}
+	/* istanbul ignore next */
 	return null;
 };

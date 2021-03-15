@@ -3,7 +3,6 @@ import { IDecoderInfo } from "../image/DecoderInfo";
 import { displayInfoFromDecoderInfo, IDisplayInfo } from "../image/DisplayInfo";
 import FrameInfo from "../image/FrameInfo";
 import { ImageSize } from "../image/Types";
-import { TagIds } from "../parser/tag";
 
 export interface ISize {
 	width: number,
@@ -49,57 +48,15 @@ class Decoder implements IDecoder {
 		return Promise.resolve(dv);
 	}
 
-	// TODO: remove this - upload palette to GPU!
-	protected convertPalette(pixelData: DataView) {
-		const { image } = this;
-		const { size, bytesAllocated } = image;
-		const reds = image.image.getPalleteValues(TagIds.PaletteRed) ?? [];
-		const greens = image.image.getPalleteValues(TagIds.PaletteGreen) ?? [];
-		const blues = image.image.getPalleteValues(TagIds.PaletteBlue) ?? [];
-
-		if ((reds.length > 0)
-			&& (greens.length > 0)
-			&& (blues.length > 0)) {
-			const rgb = new DataView(new ArrayBuffer(size.rows * size.columns * 3));
-			const numElements = pixelData.byteLength / bytesAllocated;
-
-			if (bytesAllocated === 1) {
-				for (let ctr = 0; ctr < numElements; ctr += 1) {
-					const index = pixelData.getUint8(ctr);
-					const rVal = reds[index];
-					const gVal = greens[index];
-					const bVal = blues[index];
-					rgb.setUint8((ctr * 3), rVal);
-					rgb.setUint8((ctr * 3) + 1, gVal);
-					rgb.setUint8((ctr * 3) + 2, bVal);
-				}
-			}
-			else if (bytesAllocated === 2) {
-				for (let ctr = 0; ctr < numElements; ctr += 1) {
-					const index = pixelData.getUint16(ctr * 2);
-					const rVal = reds[index];
-					const gVal = greens[index];
-					const bVal = blues[index];
-					rgb.setUint8((ctr * 3), rVal);
-					rgb.setUint8((ctr * 3) + 1, gVal);
-					rgb.setUint8((ctr * 3) + 2, bVal);
-				}
-			}
-			return rgb;
-		}
-		return pixelData;
-	}
-
 	protected async createTexture(gl:WebGLRenderingContext, frameNo:number):Promise<WebGLTexture> {
-		const decodedData = await this.decode(frameNo);
-		const pixelData = this.convertPalette(decodedData);
+		const pixelData = await this.decode(frameNo);
 		const buffer = new Uint8Array(pixelData.buffer, pixelData.byteOffset, pixelData.byteLength);
 		let { height } = this.outputSize;
 		const { width } = this.outputSize;
 		const { image } = this;
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (image.rgb && !image.planar) {
+		if (image.rgb && !image.planar && !image.palette) {
 			format = gl.RGB;
 			internalFormat = gl.RGB;
 		}

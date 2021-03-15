@@ -57,23 +57,6 @@ const getMajorAxisFromPatientRelativeDirectionCosine = (
 	return axis;
 };
 
-const scalePalette = (pal: number[]):number[] => {
-	const max = Math.max(...pal);
-	const min = Math.min(...pal);
-
-	if ((max > 255) || (min < 0)) {
-		const slope = 255.0 / (max - min);
-		const intercept = min;
-
-		for (let ctr = 0; ctr < pal.length; ctr += 1) {
-			// eslint-disable-next-line no-param-reassign
-			pal[ctr] = Math.round((pal[ctr] - intercept) * slope);
-		}
-	}
-
-	return pal;
-};
-
 interface IImageInfo {
 	tags: Record<TagStringID, Tag>
 	tagsFlat: Record<TagStringID, Tag>
@@ -1038,36 +1021,6 @@ class DCMImage implements IImageInfo {
 		str = str.replace(/(?:\r\n|\r|\n)/g, "<br />"); // replace newlines with <br>
 
 		return str;
-	}
-
-	getPalleteValues(tagID: TagTupleID) {
-		const value = getValueSafely(this.getTag(tagID)) as DataView;
-
-		if (value?.buffer) {
-			const numVals = value.buffer.byteLength / 2;
-			const valsBig = [];
-			const valsLittle = [];
-
-			for (let ctr = 0; ctr < numVals; ctr += 1) {
-				// eslint-disable-next-line no-bitwise
-				valsBig[ctr] = (value.getUint16(ctr * 2, false) & 0xFFFF);
-				// eslint-disable-next-line no-bitwise
-				valsLittle[ctr] = (value.getUint16(ctr * 2, true) & 0xFFFF);
-			}
-
-			const valsBigMax = Math.max(...valsBig);
-			const valsBigMin = Math.min(...valsBig);
-			const valsLittleMax = Math.max(...valsLittle);
-			const valsLittleMin = Math.min(...valsLittle);
-			const valsBigDiff = Math.abs(valsBigMax - valsBigMin);
-			const valsLittleDiff = Math.abs(valsLittleMax - valsLittleMin);
-
-			if (valsBigDiff < valsLittleDiff) {
-				return scalePalette(valsBig);
-			}
-			return scalePalette(valsLittle);
-		}
-		return null;
 	}
 }
 

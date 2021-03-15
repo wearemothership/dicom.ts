@@ -1,6 +1,6 @@
 {
   "name": "dicom.js",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A small, fast, javascript DICOM renderer",
   "author": "wearemothership",
   "email": "nick@wearemotehrship.com",

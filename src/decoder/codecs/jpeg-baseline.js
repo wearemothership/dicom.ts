@@ -21,6 +21,9 @@
 // - The Adobe Application-Specific JPEG markers in the Supporting the DCT Filters
 //   in PostScript Level 2, Technical Note #5116
 //   (partners.adobe.com/public/developer/en/ps/sdk/5116.DCT_Filter.pdf)
+
+/* istanbul ignore file */
+
 /* eslint-disable */
 const ColorSpace = {Unkown: 0, Grayscale: 1, AdobeRGB: 2, RGB: 3, CYMK: 4};
 const JpegImage = (function jpegImage() {
