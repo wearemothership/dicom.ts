@@ -2,6 +2,12 @@ import crypto from "crypto";
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { createObjectURL, revokeObjectURL } from "blob-util";
 
+import util from "util";
+
+if (!window.TextDecoder) {
+	window.TextDecoder = util.TextDecoder;
+}
+
 const classReplacer = (key, value) => (value?.toObject?.() ?? value);
 
 export const toJSONString = (object) => JSON.stringify(object, classReplacer);

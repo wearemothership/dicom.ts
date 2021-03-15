@@ -20,7 +20,7 @@
     "test:build": "run-s build",
     "test:lint": "eslint .",
     "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
-	"test:coverage": "cross-env CI=1 react-scripts test --coverage --env=jsdom",
+    "test:coverage": "cross-env CI=1 react-scripts test --coverage --env=jsdom",
     "test:watch": "react-scripts test --env=jsdom",
     "predeploy": "cd example && npm install && npm run build",
     "deploy": "gh-pages -d example/build"
@@ -34,7 +34,7 @@
     "@types/node": "^14.14.31",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
-    "dicom-character-set": "git+https://github.com/nickhingston/dicom-character-set.git#v1.0.2_nodefix",
+    "@wearemothership/dicom-character-set-ii": "^1.0.4",
     "jpeg-lossless-decoder-js": "git+https://github.com/rii-mango/JPEGLosslessDecoderJS.git#v2.0.4",
     "pako": "^1.0.10",
     "raw.macro": "^0.4.2",
