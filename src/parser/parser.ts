@@ -227,7 +227,9 @@ class Parser implements IParserPublic {
 		const element = data.getUint16(offset, little);
 		offset += 2;
 		if (this.explicit || !this.metaFinished) {
-			vr = Utils.getStringAt(data, offset, 2);
+			//  Utils.getStringAt(data, offset, 2);
+			vr = String.fromCharCode(data.getUint8(offset))
+				+ String.fromCharCode(data.getUint8(offset + 1));
 
 			if (!this.metaFound && this.metaFinished && (Parser.VRS.indexOf(vr) === -1)) {
 				vr = Dictionary.getVR(group, element);
@@ -296,7 +298,7 @@ class Parser implements IParserPublic {
 			charset: this.charset
 		});
 
-		if (tag.value) {
+		if (tag.hasValue()) {
 			if (tag.is(TagIds.TransferSyntax)) {
 				const [val] = tag.value as [string];
 				this.explicit = true;

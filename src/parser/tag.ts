@@ -609,7 +609,9 @@ class Tag implements ITagKey {
 
 	vr: string | null
 
-	value: TagValue
+	rawValue: TagValue | null;
+
+	convertedValue: TagValue | undefined;
 
 	offsetStart: number | null
 
@@ -620,6 +622,10 @@ class Tag implements ITagKey {
 	sublist: boolean
 
 	preformatted: boolean
+
+	littleEndian: boolean
+
+	charset: Charset
 
 	/**
 	 * The Tag constuctor.
@@ -653,23 +659,47 @@ class Tag implements ITagKey {
 		this.sublist = false;
 		this.preformatted = false;
 		this.id = createTagId(group, element);
+		this.littleEndian = littleEndian;
+		this.charset = charset;
 
+		this.rawValue = value;
 		if (value instanceof Array) {
-			this.value = value;
 			this.sublist = true;
+			this.rawValue = value;
+			this.convertedValue = value;
 		}
-		else if (value !== null) {
-			const dv = new DataView(value as Uint8Array);
-			this.value = convertValue(vr!, dv, littleEndian, charset);
+	}
 
-			if ((this.value === dv) && this.isPrivateData()) {
-				this.value = convertPrivateValue(group, element, dv);
-				this.preformatted = (this.value !== dv);
-			}
+	hasValue() {
+		return this.rawValue !== null;
+	}
+
+	get value() {
+		// oonly convert value if needed
+		return this.convertedValue || this.getConvertedValue();
+	}
+
+	getConvertedValue() {
+		if (this.rawValue === null) {
+			return null;
 		}
-		else {
-			this.value = null;
+		const {
+			rawValue,
+			vr,
+			littleEndian,
+			charset,
+			group,
+			element
+		} = this;
+		const dv = new DataView(rawValue as Uint8Array);
+		let convertedValue = convertValue(vr!, dv, littleEndian, charset);
+
+		if ((convertedValue === dv) && this.isPrivateData()) {
+			convertedValue = convertPrivateValue(group, element, dv);
+			this.preformatted = (convertedValue !== dv);
 		}
+		this.convertedValue = convertedValue;
+		return convertedValue;
 	}
 
 	/**

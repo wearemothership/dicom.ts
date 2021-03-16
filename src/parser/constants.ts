@@ -41,5 +41,3 @@ export enum ByteType {
 export type Charset = string | null;
 
 export const DefaultCharset:Charset = "ISO 2022 IR 6";
-
-export const AnotherParserConst = 0;
