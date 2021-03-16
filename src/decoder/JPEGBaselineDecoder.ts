@@ -3,7 +3,7 @@ import Decoder, { ISize } from "./Decoder";
 import { getJpegData } from "./util";
 
 class JPEGLosslessDecoder extends Decoder {
-	private jpegs:Array<ArrayBuffer> | null = null
+	private jpegs:DataView[] | null = null
 
 	protected decode(frameNo:number):Promise<DataView> {
 		const { image } = this;
@@ -12,7 +12,10 @@ class JPEGLosslessDecoder extends Decoder {
 		}
 
 		const decoder = new JpegImage();
-		decoder.parse(new Uint8Array(this.jpegs[frameNo]));
+		const jpeg = this.jpegs![frameNo];
+		const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
+
+		decoder.parse(buffer);
 		const { width, height } = <ISize> <unknown> decoder;
 		let decoded = null;
 		if (image.bitsAllocated === 8) {

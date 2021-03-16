@@ -10,7 +10,7 @@ charls.onRuntimeInitialized = async () => {
 	return Promise.resolve();
 };
 class JPEGLosslessDecoder extends Decoder {
-	private jpegs:ArrayBuffer[] | null = null
+	private jpegs:DataView[] | null = null
 
 	decode(frameNo: number):Promise<DataView> {
 		const { image } = this;
@@ -20,7 +20,8 @@ class JPEGLosslessDecoder extends Decoder {
 		return new Promise((resolve) => {
 			const charlsDecode = () => {
 				const decoder = new charls.JpegLSDecoder();
-				const buffer = new Uint8Array(this.jpegs![frameNo]);
+				const jpeg = this.jpegs![frameNo];
+				const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
 				const encodedBuffer = decoder.getEncodedBuffer(buffer.length);
 
 				encodedBuffer.set(buffer);

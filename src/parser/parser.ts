@@ -282,7 +282,7 @@ class Parser implements IParserPublic {
 				}
 			}
 
-			value = data.buffer.slice(offset, offset + length);
+			value = new DataView(data.buffer, data.byteOffset + offset, length);
 		}
 
 		offset += length;
@@ -294,7 +294,7 @@ class Parser implements IParserPublic {
 			offsetStart,
 			offsetValue,
 			offsetEnd: offset,
-			littleEndian: this.littleEndian,
+			littleEndian: little,
 			charset: this.charset
 		});
 
@@ -391,14 +391,14 @@ class Parser implements IParserPublic {
 			offset = tag.offsetEnd;
 		}
 		else if (raw) {
-			value = data.buffer.slice(offset, offset + length);
+			value = new DataView(data.buffer, offset + data.byteOffset, length);
 			offset += length;
 		}
 		else {
 			const offsetEnd = offset + length;
-
+			let tag;
 			while (offset < offsetEnd) {
-				const tag = this.getNextTag(data, offset);
+				tag = this.getNextTag(data, offset);
 				tags.push(tag);
 				offset = tag.offsetEnd;
 			}

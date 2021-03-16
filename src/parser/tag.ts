@@ -139,7 +139,7 @@ export type TagSingleValue = string | number | Date | null;
 
 interface ITagContstuctor extends ITagKey {
 	vr?: string | null
-	value?: TagValue
+	value?: DataView | Tag[] | null
 	offsetStart?: number | null
 	offsetValue?: number | null
 	offsetEnd?: number | null
@@ -609,7 +609,7 @@ class Tag implements ITagKey {
 
 	vr: string | null
 
-	rawValue: TagValue | null;
+	rawValue: DataView | Tag[] | null;
 
 	convertedValue: TagValue | undefined;
 
@@ -691,7 +691,7 @@ class Tag implements ITagKey {
 			group,
 			element
 		} = this;
-		const dv = new DataView(rawValue as Uint8Array);
+		const dv = rawValue as DataView;
 		let convertedValue = convertValue(vr!, dv, littleEndian, charset);
 
 		if ((convertedValue === dv) && this.isPrivateData()) {

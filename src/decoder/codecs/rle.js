@@ -185,16 +185,26 @@ function decode16(imageFrame, pixelData) {
 	return outFrame;
 }
 
-function decodeRLE(imageFrame, pixelData) {
+function decodeRLE(imageFrame, pixelDataView) {
 	if (imageFrame.bytesAllocated === 1) {
+		const data = new Int8Array(
+			pixelDataView.buffer,
+			pixelDataView.byteOffset,
+			pixelDataView.byteLength
+		);
 		if (imageFrame.planar) {
-			return new DataView(decode8Planar(imageFrame, new Int8Array(pixelData)));
+			return new DataView(decode8Planar(imageFrame, data));
 		}
 
-		return new DataView(decode8(imageFrame, new Int8Array(pixelData)));
+		return new DataView(decode8(imageFrame, data));
 	}
 	if (imageFrame.bytesAllocated === 2) {
-		return new DataView(decode16(imageFrame, new Int16Array(pixelData)));
+		const data = new Int16Array(
+			pixelDataView.buffer,
+			pixelDataView.byteOffset,
+			pixelDataView.byteLength / 2
+		);
+		return new DataView(decode16(imageFrame, data));
 	}
 
 	throw new Error("unsupported pixel format for RLE");

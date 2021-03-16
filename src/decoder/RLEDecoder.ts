@@ -3,7 +3,7 @@ import RLE from "./codecs/rle";
 import { getEncapsulatedData } from "./util";
 
 class RLEDecoder extends Decoder {
-	private rleData: Array<ArrayBuffer> | null = null
+	private rleData: DataView[] | null = null
 
 	protected decode(frameNo: number): Promise<DataView> {
 		const { image } = this;
@@ -14,7 +14,7 @@ class RLEDecoder extends Decoder {
 			// the first sublist item contains offsets - ignore
 			for (let ctr = 1; ctr < numTags; ctr += 1) {
 				const dataView = encapTags[ctr].value as DataView;
-				data[ctr - 1] = dataView?.buffer || null;
+				data[ctr - 1] = dataView;
 			}
 			this.rleData = data;
 		}

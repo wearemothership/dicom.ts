@@ -57,7 +57,7 @@ describe("dicom.js", () => {
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
-		expect(shaFromBuffer(buffer)).toEqual("4687e84e04162daeb5f68843d1879d42b0fa6e0b");
+		expect(shaFromBuffer(buffer)).toEqual("faf46b373c8927f274885ffcbac6f440f4c0cfb7");
 	});
 
 	it("Renders with: RLE decode and greyscale window render", async () => {
@@ -208,7 +208,7 @@ describe("dicom.js", () => {
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
-		expect(shaFromBuffer(buffer)).toEqual("447cba5c0bc8cc659978f94ab69e591833fa47cc");
+		expect(shaFromBuffer(buffer)).toEqual("4b2c20421b5a5cce1b7542d074f3ed7067320804");
 	});
 
 	it("Renders with palette conversion", async () => {
@@ -220,7 +220,7 @@ describe("dicom.js", () => {
 
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		// fs.writeFileSync("./image.png", buffer);
+		fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("c688ed677deb5d13b55314f3e22cd4e85354d2c2");
 	});
 

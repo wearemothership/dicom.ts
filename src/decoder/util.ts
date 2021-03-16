@@ -1,27 +1,27 @@
 import { Parser, Tag } from "../parser";
 
 export const getEncapsulatedData = (data:DataView): Tag[] => {
-	const { buffer } = data;
 	const parser = new Parser();
-	return parser.parseEncapsulated(new DataView(buffer));
+	return parser.parseEncapsulated(data);
 };
 
-const concatArrayOfBuffers = (buffers:Array<ArrayBuffer>):ArrayBuffer => {
+const concatDataViews = (dataViews:DataView[]):DataView => {
 	let length = 0;
 	let offset = 0;
 
-	for (let ctr = 0; ctr < buffers.length; ctr += 1) {
-		length += buffers[ctr].byteLength;
+	for (let ctr = 0; ctr < dataViews.length; ctr += 1) {
+		length += dataViews[ctr].byteLength;
 	}
 
 	const tmp = new Uint8Array(length);
-
-	for (let ctr = 0; ctr < buffers.length; ctr += 1) {
-		tmp.set(new Uint8Array(buffers[ctr]), offset);
-		offset += buffers[ctr].byteLength;
+	let dataView;
+	for (let ctr = 0; ctr < dataViews.length; ctr += 1) {
+		dataView = dataViews[ctr];
+		tmp.set(new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength), offset);
+		offset += dataViews[ctr].byteLength;
 	}
 
-	return tmp.buffer;
+	return new DataView(tmp.buffer);
 };
 
 const JPEG_MAGIC_NUMBER = [0xFF, 0xD8];
@@ -54,10 +54,10 @@ const isHeaderJPEG2000 = (data:DataView):boolean => {
 	return true;
 };
 
-export const getJpegData = (inData:DataView): ArrayBuffer[] => {
+export const getJpegData = (inData:DataView): DataView[] => {
 	const encapTags = getEncapsulatedData(inData);
-	const data:Array<Array<ArrayBuffer>> = [];
-	const dataConcat:Array<ArrayBuffer> = [];
+	const data:Array<DataView[]> = [];
+	const dataConcat:DataView[] = [];
 
 	let currentJpeg;
 	// organize data as an array of an array of JPEG parts
@@ -69,11 +69,11 @@ export const getJpegData = (inData:DataView): ArrayBuffer[] => {
 			if (isHeaderJPEG(dataView)
 				|| isHeaderJPEG2000(dataView)) {
 				currentJpeg = [];
-				currentJpeg.push(dataView.buffer);
+				currentJpeg.push(dataView);
 				data.push(currentJpeg);
 			}
 			else if (currentJpeg && dataView) {
-				currentJpeg.push(dataView.buffer);
+				currentJpeg.push(dataView);
 			}
 		}
 	}
@@ -82,7 +82,8 @@ export const getJpegData = (inData:DataView): ArrayBuffer[] => {
 	for (let ctr = 0; ctr < data.length; ctr += 1) {
 		const buffers = data[ctr];
 		if (buffers.length > 1) {
-			dataConcat[ctr] = concatArrayOfBuffers(buffers);
+			// TODO: this will be slow...is it necessary?
+			dataConcat[ctr] = concatDataViews(buffers);
 		}
 		else {
 			[dataConcat[ctr]] = data[ctr];

@@ -50,11 +50,16 @@ class ColorPaletteProgram implements IProgram {
 			format = gl.LUMINANCE;
 			internalFormat = gl.LUMINANCE;
 		}
-
+		const {
+			r,
+			g,
+			b,
+			nEntries
+		} = palette!;
 		// 1D tex
-		const r = twgl.createTexture(gl, {
-			src: new Uint8Array(palette!.r.buffer),
-			width: palette!.nEntries,
+		const red = twgl.createTexture(gl, {
+			src: new Uint8Array(r.buffer, r.byteOffset, r.byteLength),
+			width: nEntries,
 			height: 1,
 			format,
 			internalFormat,
@@ -64,9 +69,9 @@ class ColorPaletteProgram implements IProgram {
 			wrap: gl.CLAMP_TO_EDGE,
 		});
 
-		const g = twgl.createTexture(gl, {
-			src: new Uint8Array(palette!.g.buffer),
-			width: palette!.nEntries,
+		const green = twgl.createTexture(gl, {
+			src: new Uint8Array(g.buffer, g.byteOffset, g.byteLength),
+			width: nEntries,
 			height: 1,
 			format,
 			internalFormat,
@@ -76,9 +81,9 @@ class ColorPaletteProgram implements IProgram {
 			wrap: gl.CLAMP_TO_EDGE,
 		});
 
-		const b = twgl.createTexture(gl, {
-			src: new Uint8Array(palette!.b.buffer),
-			width: palette!.nEntries,
+		const blue = twgl.createTexture(gl, {
+			src: new Uint8Array(b.buffer, b.byteOffset, b.byteLength),
+			width: nEntries,
 			height: 1,
 			format,
 			internalFormat,
@@ -87,7 +92,7 @@ class ColorPaletteProgram implements IProgram {
 			mag: gl.NEAREST,
 			wrap: gl.CLAMP_TO_EDGE,
 		});
-		this.rgbTextures = [r, g, b];
+		this.rgbTextures = [red, green, blue];
 		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 		this.programInfo = programInfo;
