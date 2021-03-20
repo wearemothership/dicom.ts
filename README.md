@@ -14,10 +14,11 @@ By tightly integrating the parser, decoders and renderer, some decent perfomance
 
 ## Todo
 - consistent error handling
+- pixel padding support on > contrastify program
 - improve memory management.  Can we share wasm heap?
 - add standalone React canvas example
-- some images are not perfect with cornerstone, what is correct?
 - load series
+- ~~some images are not perfect with cornerstone, what is correct?~~
 - ~~accelerate palette conversion~~
 - ~~planar config~~
 - ~~palette conversion does not work see ./test/issues~~

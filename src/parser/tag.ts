@@ -33,6 +33,7 @@ export const TagIds: Record<string, TagTupleID> = {
 	BitsAllocated: [0x0028, 0x0100],
 	BitsStored: [0x0028, 0x0101],
 	PixelRepresentation: [0x0028, 0x0103],
+	PixelPaddingValue: [0x0028, 0x0120],
 	HighBit: [0x0028, 0x0102],
 	PhotometricInterpretation: [0x0028, 0x0004],
 	SamplesPerPixel: [0x0028, 0x0002],

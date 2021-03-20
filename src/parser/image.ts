@@ -449,10 +449,6 @@ class DCMImage implements IImageInfo {
 		return (this.tags[createTagIdWithTag(TagIds.PixelData)] !== undefined);
 	}
 
-	clearPixelData() {
-		this.tags[createTagIdWithTag(TagIds.PixelData)].value = null;
-	}
-
 	/**
 	 * Returns an orientation string (e.g., XYZ+--).
 	 * @returns {string}
@@ -843,6 +839,14 @@ class DCMImage implements IImageInfo {
 	 */
 	get pixelRepresentation(): PixelRepresentation {
 		return this.getTagValueIndexed(TagIds.PixelRepresentation);
+	}
+
+	/**
+	 * Returns the pixel padding value
+	 * @returns {PixelPaddingValue}
+	 */
+	get pixelPaddingValue(): number {
+		return this.getTagValueIndexed(TagIds.PixelPaddingValue);
 	}
 
 	/**

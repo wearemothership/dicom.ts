@@ -64,12 +64,17 @@ class GreyscaleProgram implements IProgram {
 			minPixVal,
 			invert,
 			slope,
-			intercept
+			intercept,
+			signed,
+			bitsAllocated
 		} = info;
 
 		if (!windowWidth && (maxPixVal !== null || minPixVal !== null)) {
 			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));
 			windowCenter = windowWidth / 2;
+		}
+		else if (signed) {
+			windowCenter = (windowCenter || 0) + (2 ** (bitsAllocated - 1));
 		}
 
 		twgl.setUniforms(programInfo, {

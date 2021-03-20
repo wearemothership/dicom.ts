@@ -26,12 +26,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-function decode8(imageFrame, pixelData) {
-	const frameData = pixelData;
+function decode8(imageFrame, frameData) {
 	const frameSize = imageFrame.size.numberOfPixels;
 	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples);
-	const header = new DataView(frameData.buffer, frameData.byteOffset);
-	const data = new Int8Array(frameData.buffer, frameData.byteOffset);
+
+	const header = frameData;
+	const data = new Int8Array(frameData.buffer, frameData.byteOffset, frameData.byteLength);
 	const out = new Int8Array(outFrame);
 
 	let outIndex = 0;
@@ -49,7 +49,7 @@ function decode8(imageFrame, pixelData) {
 		let maxIndex = header.getInt32((s + 2) * 4, true);
 
 		if (maxIndex === 0) {
-			maxIndex = frameData.length;
+			maxIndex = frameData.byteLength;
 		}
 
 		while (inIndex < maxIndex) {
@@ -79,12 +79,12 @@ function decode8(imageFrame, pixelData) {
 	return outFrame;
 }
 
-function decode8Planar(imageFrame, pixelData) {
-	const frameData = pixelData;
+function decode8Planar(imageFrame, frameData) {
 	const frameSize = imageFrame.size.numberOfPixels;
 	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples);
-	const header = new DataView(frameData.buffer, frameData.byteOffset);
-	const data = new Int8Array(frameData.buffer, frameData.byteOffset);
+
+	const header = frameData;
+	const data = new Int8Array(frameData.buffer, frameData.byteOffset, frameData.byteLength);
 	const out = new Int8Array(outFrame);
 
 	let outIndex = 0;
@@ -98,7 +98,7 @@ function decode8Planar(imageFrame, pixelData) {
 		let maxIndex = header.getInt32((s + 2) * 4, true);
 
 		if (maxIndex === 0) {
-			maxIndex = frameData.length;
+			maxIndex = frameData.byteLength;
 		}
 
 		const endOfSegment = frameSize * numSegments;
@@ -130,13 +130,12 @@ function decode8Planar(imageFrame, pixelData) {
 	return outFrame;
 }
 
-function decode16(imageFrame, pixelData) {
-	const frameData = pixelData;
+function decode16(imageFrame, frameData) {
 	const frameSize = imageFrame.size.numberOfPixels;
 	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples * 2);
 
-	const header = new DataView(frameData.buffer, frameData.byteOffset);
-	const data = new Uint8Array(frameData.buffer, frameData.byteOffset);
+	const header = frameData;
+	const data = new Uint8Array(frameData.buffer, frameData.byteOffset, frameData.byteLength);
 	const out = new Uint8Array(outFrame);
 
 	const numSegments = header.getInt32(0, true);
@@ -152,7 +151,7 @@ function decode16(imageFrame, pixelData) {
 		maxIndex = header.getInt32((s + 2) * 4, true);
 
 		if (maxIndex === 0) {
-			maxIndex = (frameData.length - frameData.byteOffset) * 2;
+			maxIndex = (frameData.byteLength) * 2;
 		}
 		let diff;
 		let maxI;
@@ -186,28 +185,19 @@ function decode16(imageFrame, pixelData) {
 }
 
 function decodeRLE(imageFrame, pixelDataView) {
-	if (imageFrame.bytesAllocated === 1) {
-		const data = new Int8Array(
-			pixelDataView.buffer,
-			pixelDataView.byteOffset,
-			pixelDataView.byteLength
-		);
-		if (imageFrame.planar) {
-			return new DataView(decode8Planar(imageFrame, data));
+	const { bytesAllocated, planar } = imageFrame;
+	if (bytesAllocated === 1) {
+		if (planar) {
+			return new DataView(decode8Planar(imageFrame, pixelDataView));
 		}
 
-		return new DataView(decode8(imageFrame, data));
+		return new DataView(decode8(imageFrame, pixelDataView));
 	}
-	if (imageFrame.bytesAllocated === 2) {
-		const data = new Int16Array(
-			pixelDataView.buffer,
-			pixelDataView.byteOffset,
-			pixelDataView.byteLength / 2
-		);
-		return new DataView(decode16(imageFrame, data));
+	if (bytesAllocated === 2) {
+		return new DataView(decode16(imageFrame, pixelDataView));
 	}
 
-	throw new Error("unsupported pixel format for RLE");
+	throw new Error("Unsupported pixel format for RLE");
 }
 
 export default decodeRLE;

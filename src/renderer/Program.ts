@@ -30,15 +30,23 @@ interface IProgram {
 export const glslUnpackWordString = (image: IDisplayInfo, integerVal:boolean = true):string => {
 	let val;
 	let divisor = "";
+	const { bitsAllocated, signed, pixelPaddingVal } = image;
 	if (!integerVal) {
 		divisor = ` / ${2 ** image.bitsStored}.0`;
 	}
-	const { signed } = image;
-	if (image.bitsAllocated <= 8) {
+	if (bitsAllocated <= 8) {
 		// one byte
-		val = "(color.r * 255.0)";
+		val = "float p = (color.r * 255.0);\n";
+		if (pixelPaddingVal !== null) {
+			let pv:number = pixelPaddingVal;
+			if (signed) {
+				// eslint-disable-next-line prefer-destructuring
+				pv = new Uint8Array(new Int8Array([pixelPaddingVal]))[0];
+			}
+			val = `${val}if (floor(p + 0.5) == ${pv}.0) return -1.0;\n`;
+		}
 		if (signed) {
-			return `float p = ${val}; return (p > 127.0 ? 255.0 - p : p)${divisor};`;
+			val = `${val}(p > 127.0 ? p - 127.0 : p + 127.0);\n`;
 		}
 	}
 	else {
@@ -47,16 +55,24 @@ export const glslUnpackWordString = (image: IDisplayInfo, integerVal:boolean = t
 		// or green channel for RGB based 16bit greyscale
 		const byte2Chan = rgb ? "g" : "a";
 		if (image.littleEndian) {
-			val = `(color.${byte2Chan} * 65535.0 + color.r * 255.0)`;
+			val = `float p = (color.${byte2Chan} * 65280.0 + color.r * 255.0);\n`;
 		}
 		else {
-			val = `(color.r * 65535.0 + color.${byte2Chan} * 255.0)`;
+			val = `float p = (color.r * 65280.0 + color.${byte2Chan} * 255.0);\n`;
+		}
+		if (pixelPaddingVal !== null) {
+			let pv:number = pixelPaddingVal;
+			if (signed) {
+				// eslint-disable-next-line prefer-destructuring
+				pv = new Uint16Array(new Int16Array([pixelPaddingVal]))[0];
+			}
+			val = `${val}if (floor(p + 0.5) == ${pv}.0) return -1.0;\n`;
 		}
 		if (signed) {
-			return `float p = ${val};return (p > 32767.0 ? 65535.0 - p : p)${divisor};`;
+			val = `${val}p = (p > 32767.0 ? p - 32767.0 : p + 32767.0);\n`;
 		}
 	}
-	return `return ${val}${divisor};`;
+	return `${val}return p${divisor};`;
 };
 
 export default IProgram;

@@ -282,7 +282,9 @@ class Parser implements IParserPublic {
 				}
 			}
 
-			value = new DataView(data.buffer, data.byteOffset + offset, length);
+			if (length > 0) {
+				value = new DataView(data.buffer, data.byteOffset + offset, length);
+			}
 		}
 
 		offset += length;

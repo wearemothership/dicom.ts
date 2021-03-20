@@ -27,6 +27,8 @@ export interface IDisplayInfo extends IDecoderInfo {
 
 	invert: boolean
 
+	pixelPaddingVal: number | null
+
 	minPixVal: number | null
 	maxPixVal: number | null
 
@@ -98,6 +100,8 @@ export const displayInfoFromDecoderInfo = (info:IDecoderInfo): IDisplayInfo => {
 		...info,
 
 		nFrames: image.numberOfFrames || 1,
+
+		pixelPaddingVal: image.pixelPaddingValue,
 
 		lut: lutInfoFromImage(info.image),
 		palette: paletteInfoFromImage(info),

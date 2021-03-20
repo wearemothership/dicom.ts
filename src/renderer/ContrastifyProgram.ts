@@ -42,12 +42,17 @@ class ContrastifyProgram implements IProgram {
 			throw new Error("Image requires WEBGL_draw_buffers");
 		}
 		this.ext = ext!;
-
-		const getWordString = glslUnpackWordString(info, false);
+		// don't ignore pixelPaddingVal in minMax calcs
+		const getMinMaxWordString = glslUnpackWordString({ ...info, pixelPaddingVal: null }, true);
+		const getWordString = glslUnpackWordString(info, true);
 
 		const minMaxFragString = minMaxShader
 			.replace("$(cellSize)", cellSize.toString())
-			.replace("$(word)", getWordString);
+			.replace("$(word)", getMinMaxWordString);
+
+		const contrastifyShaderString = contrastifyShader
+			.replace("$(word)", getWordString)
+			.replace("$(minMaxWord)", getMinMaxWordString);
 
 		this.minMaxProgramInfo = <ProgramInfo> <unknown> twgl.createProgramInfo(
 			gl,
@@ -56,7 +61,7 @@ class ContrastifyProgram implements IProgram {
 
 		this.contrastProgramInfo = <ProgramInfo> <unknown> twgl.createProgramInfo(
 			gl,
-			[vertexShader, contrastifyShader.replace("$(word)", getWordString)]
+			[vertexShader, contrastifyShaderString]
 		);
 
 		// can this be reused?
@@ -86,7 +91,7 @@ class ContrastifyProgram implements IProgram {
 			invert,
 			slope,
 			intercept
-		} = this.info;
+		} = info;
 		const { width, height } = size;
 		let w = width;
 		let h = height;
@@ -149,7 +154,7 @@ class ContrastifyProgram implements IProgram {
 			uniforms.u_srcResolution = [w, h];
 		});
 
-		// Read min/max pixel onto CPU - slow but might be useful
+		// // Read min/max pixel onto CPU - slow but might be useful
 		// const minFBI = twgl.createFramebufferInfo(gl, [
 		// 	{ attachment: lastFBI.attachments[0] }
 		// ], 1, 1);
@@ -171,16 +176,6 @@ class ContrastifyProgram implements IProgram {
 
 		gl.useProgram(contrastProgramInfo.program);
 
-		// twgl.setBuffersAndAttributes(gl, contrastProgramInfo, unitQuadBufferInfo);
-		const { signed } = info;
-		let interceptRatio = intercept;
-		if (signed && intercept < 0) {
-			interceptRatio /= (2 ** (info.bitsStored - 1));
-		}
-		else {
-			interceptRatio /= (2 ** (info.bitsStored));
-		}
-
 		twgl.setUniforms(contrastProgramInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: srcTex,
@@ -188,7 +183,7 @@ class ContrastifyProgram implements IProgram {
 			u_minColor: lastFBI.attachments[0],
 			u_maxColor: lastFBI.attachments[1],
 			u_slope: slope,
-			u_intercept: interceptRatio
+			u_intercept: intercept
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 		// cleanup on next runloop

@@ -22,7 +22,7 @@ void main() {
     // uv for first pixel in cell. +0.5 for center of pixel
     vec2 uv = (srcPixel + 0.5) / u_srcResolution;
 
-    float minVal = 1.0;
+    float minVal = 65535.0;
     float maxVal = 0.0;
     vec4 minColor = vec4(1.0, 1.0, 1.0, 1.0);
     vec4 maxColor = vec4(0.0, 0.0, 0.0, 0.0);

@@ -56,7 +56,10 @@ class Renderer {
 			else if (imageInfo.rgb) {
 				this.program = new ColorProgram(gl, imageInfo);
 			}
-			else if (imageInfo.windowCenter || imageInfo.minPixVal || imageInfo.maxPixVal) {
+			else if (imageInfo.windowCenter
+				|| imageInfo.minPixVal
+				|| imageInfo.maxPixVal
+			) {
 				this.program = new GreyscaleProgram(gl, imageInfo);
 			}
 			else if (imageInfo.lut) {

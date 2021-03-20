@@ -13,7 +13,7 @@ class RLEDecoder extends Decoder {
 			const data = new Array(numTags);
 			// the first sublist item contains offsets - ignore
 			for (let ctr = 1; ctr < numTags; ctr += 1) {
-				const dataView = encapTags[ctr].value as DataView;
+				const dataView = encapTags[ctr].rawValue as DataView;
 				data[ctr - 1] = dataView;
 			}
 			this.rleData = data;
