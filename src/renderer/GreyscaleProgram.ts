@@ -3,7 +3,7 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { glslUnpackWordString } from "./Program";
+import IProgram, { preCompileGreyscaleShader } from "./Program";
 import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
 
@@ -22,9 +22,8 @@ class GreyscaleProgram implements IProgram {
 	outputSize: ISize;
 
 	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const getWordString = glslUnpackWordString(info);
-
-		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShader.replace("$(word)", getWordString)]);
+		const greyscaleShaderString = preCompileGreyscaleShader(info, greyscaleShader);
+		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShaderString]);
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		twgl.bindFramebufferInfo(gl, null);
@@ -62,7 +61,6 @@ class GreyscaleProgram implements IProgram {
 		const {
 			maxPixVal,
 			minPixVal,
-			invert,
 			slope,
 			intercept,
 			signed,
@@ -71,7 +69,7 @@ class GreyscaleProgram implements IProgram {
 
 		if (!windowWidth && (maxPixVal !== null || minPixVal !== null)) {
 			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));
-			windowCenter = windowWidth / 2;
+			windowCenter = ((maxPixVal || 0) + (minPixVal || 0)) / 2;
 		}
 		else if (signed) {
 			windowCenter = (windowCenter || 0) + (2 ** (bitsAllocated - 1));
@@ -80,7 +78,6 @@ class GreyscaleProgram implements IProgram {
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,
-			u_invert: invert,
 			u_winWidth: windowWidth,
 			u_winCenter: windowCenter,
 			u_slope: slope,

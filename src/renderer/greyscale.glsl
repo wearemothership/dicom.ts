@@ -1,5 +1,4 @@
 precision highp float;
-uniform bool u_invert;
 uniform sampler2D u_texture;
 uniform vec2 u_resolution;
 uniform float u_slope;
@@ -17,6 +16,7 @@ void main() {
 	uv.y = 1.0 - uv.y;
 
 	float grey = greyscale(texture2D(u_texture, uv));
+	// $(pixelPadding)
 	grey = (grey * u_slope) + u_intercept;
 
 	float center = u_winCenter - 0.5;
@@ -24,9 +24,6 @@ void main() {
 	grey = (grey - center) / width + 0.5;
 	grey = clamp(grey, 0.0, 1.0);
 
-	if (u_invert) {
-		grey = 1.0 - grey;
-	}
-
+	// $(shouldInvert)
 	gl_FragColor = vec4(grey, grey, grey, 1);
 }

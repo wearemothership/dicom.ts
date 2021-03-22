@@ -75,4 +75,30 @@ export const glslUnpackWordString = (image: IDisplayInfo, integerVal:boolean = t
 	return `${val}return p${divisor};`;
 };
 
+/**
+ * replace placeholders in the glsl strings with proper code
+ * @param info the image info we are to display
+ * @param shaderString input shader program string
+ * @param integerVal should getWord return a sized integer, or a 0-1 float ratio
+ * @returns
+ */
+export const preCompileGreyscaleShader = (
+	info: IDisplayInfo,
+	shaderString: string,
+	integerVal: boolean = true
+): string => {
+	let outShaderString = shaderString.replace("$(word)", glslUnpackWordString(info, integerVal));
+	const { invert, pixelPaddingVal } = info;
+	if (invert) {
+		outShaderString = outShaderString.replace("// $(shouldInvert)", "grey = 1.0 - grey;");
+	}
+	if (pixelPaddingVal !== null) {
+		outShaderString = outShaderString.replace(
+			"// $(pixelPadding)",
+			"if (grey < 0.0) {\ngl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\nreturn;\n}\n"
+		);
+	}
+	return outShaderString;
+};
+
 export default IProgram;

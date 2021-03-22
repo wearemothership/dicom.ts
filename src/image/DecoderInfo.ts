@@ -68,6 +68,9 @@ class DecoderInfo implements IDecoderInfo {
 
 	constructor(image: DCMImage) {
 		this.image = image;
+		if (!image.pixelData) {
+			throw Error("Image has no data");
+		}
 		this.size = new ImageSize(image);
 		switch (image.transferSyntax) {
 			case TransferSyntax.CompressionJpeg:
@@ -93,15 +96,13 @@ class DecoderInfo implements IDecoderInfo {
 				this.codec = Codec.RLE;
 				break;
 			case TransferSyntax.CompressionDeflate:
+			case TransferSyntax.ImplicitLittle:
+			case TransferSyntax.ExplicitLittle:
+			case TransferSyntax.ExplicitBig:
 				this.codec = Codec.Uncompressed;
 				break;
 			default:
-				this.codec = Codec.Uncompressed;
-				// TODO: thow error?
-		}
-
-		if (!image.pixelData) {
-			throw Error("Image has no data");
+				throw Error("Unkown codec?");
 		}
 
 		this.rgb = !(image.photometricInterpretation || "").startsWith("MONO");

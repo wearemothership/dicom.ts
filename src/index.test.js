@@ -211,7 +211,7 @@ describe("dicom.js", () => {
 			// fs.writeFileSync(`./image${i}.png`, buffer);
 			sha = shaFromJSON(sha + buffer);
 		}
-		expect(sha).toEqual("4c2ae19231a09f2ba887b12d245c56532c93f33a");
+		expect(sha).toEqual("498a9871b098ff8781187513a5a40d00e8c344dc");
 	});
 
 	it("Resizes ok", async () => {

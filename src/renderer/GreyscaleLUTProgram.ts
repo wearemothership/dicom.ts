@@ -3,7 +3,7 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { glslUnpackWordString } from "./Program";
+import IProgram, { preCompileGreyscaleShader } from "./Program";
 import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
 
@@ -25,9 +25,9 @@ class GreyscaleLUTProgram implements IProgram {
 
 	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
 		const { lut } = info;
-		const getWordString = glslUnpackWordString(info);
+		const fragShaderString = preCompileGreyscaleShader(info, greyscaleLUTShader);
 
-		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleLUTShader.replace("$(word)", getWordString)]);
+		const programInfo = twgl.createProgramInfo(gl, [vertexShader, fragShaderString]);
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		twgl.bindFramebufferInfo(gl, null);
@@ -77,7 +77,7 @@ class GreyscaleLUTProgram implements IProgram {
 			texture,
 		} = frame;
 
-		const { lut, invert } = info;
+		const { lut } = info;
 
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
@@ -85,7 +85,6 @@ class GreyscaleLUTProgram implements IProgram {
 			u_lutTexture: lutTexture,
 			u_lutWidth: lut!.data.length,
 			u_firstInputValue: lut!.firstValue,
-			u_invert: invert,
 			u_maxValue: 2 ** info.bitsStored
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);

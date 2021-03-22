@@ -93,6 +93,17 @@ class DCMImage implements IImageInfo {
 	}
 
 	/**
+	 * Returns a tag matching the specified group and element tuple ignoring tagsFlat
+	 * @param {TagTupleID} tag - Tuple of group & elem like TagIds values
+	 * @returns
+	 */
+	getTopLevelTag(tag: TagTupleID):Tag {
+		const [group, element] = tag;
+		const tagId = createTagId(group, element);
+		return this.tags[tagId];
+	}
+
+	/**
 	 * get the value of the tag if exists
 	 * @param {TagTupleID} tag tuple of group and element ids
 	 * @returns the value of the tag or null if not exist
@@ -107,7 +118,7 @@ class DCMImage implements IImageInfo {
 	 * @param {Number} index the position in the value
 	 * @returns the value at index or null if not exist
 	 */
-	getTagValueIndexed(tag: TagTupleID, index:number = 0): any {
+	getTagValueIndexed(tag: TagTupleID, index:number = 0): TagValue {
 		return getSingleValueSafely(this.getTag(tag), index);
 	}
 
@@ -124,7 +135,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get columns(): number {
-		return this.getTagValueIndexed(TagIds.Cols);
+		return this.getTagValueIndexed(TagIds.Cols) as number;
 	}
 
 	/**
@@ -132,7 +143,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get rows(): number {
-		return this.getTagValueIndexed(TagIds.Rows);
+		return this.getTagValueIndexed(TagIds.Rows) as number;
 	}
 
 	/**
@@ -140,7 +151,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get seriesDescription(): string {
-		return this.getTagValueIndexed(TagIds.SeriesDescription);
+		return this.getTagValueIndexed(TagIds.SeriesDescription) as string;
 	}
 
 	/**
@@ -148,7 +159,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get seriesInstanceUID(): string {
-		return this.getTagValueIndexed(TagIds.SeriesInstanceUid);
+		return this.getTagValueIndexed(TagIds.SeriesInstanceUid) as string;
 	}
 
 	/**
@@ -156,7 +167,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get seriesNumber(): number {
-		return this.getTagValueIndexed(TagIds.SeriesNumber);
+		return this.getTagValueIndexed(TagIds.SeriesNumber) as number;
 	}
 
 	/**
@@ -164,7 +175,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get echoNumber(): number {
-		return this.getTagValueIndexed(TagIds.EchoNumber);
+		return this.getTagValueIndexed(TagIds.EchoNumber) as number;
 	}
 
 	/**
@@ -201,7 +212,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get modality(): string {
-		return this.getTagValueIndexed(TagIds.Modality);
+		return this.getTagValueIndexed(TagIds.Modality) as string;
 	}
 
 	/**
@@ -209,7 +220,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get sliceLocation(): number {
-		return this.getTagValueIndexed(TagIds.SliceLocation);
+		return this.getTagValueIndexed(TagIds.SliceLocation) as number;
 	}
 
 	/**
@@ -225,7 +236,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get imageNumber(): number {
-		return this.getTagValueIndexed(TagIds.ImageNum);
+		return this.getTagValueIndexed(TagIds.ImageNum) as number;
 	}
 
 	/**
@@ -233,7 +244,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get temporalPosition(): number {
-		return this.getTagValueIndexed(TagIds.TemporalPosition);
+		return this.getTagValueIndexed(TagIds.TemporalPosition) as number;
 	}
 
 	/**
@@ -241,7 +252,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get temporalNumber(): number {
-		return this.getTagValueIndexed(TagIds.NumberTemporalPositions);
+		return this.getTagValueIndexed(TagIds.NumberTemporalPositions) as number;
 	}
 
 	/**
@@ -249,7 +260,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get sliceGap(): number {
-		return this.getTagValueIndexed(TagIds.SliceGap);
+		return this.getTagValueIndexed(TagIds.SliceGap) as number;
 	}
 
 	/**
@@ -257,7 +268,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get sliceThickness(): number {
-		return this.getTagValueIndexed(TagIds.SliceThickness);
+		return this.getTagValueIndexed(TagIds.SliceThickness) as number;
 	}
 
 	/**
@@ -265,7 +276,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get imageMax(): number {
-		return this.getTagValueIndexed(TagIds.ImageMax);
+		return this.getTagValueIndexed(TagIds.ImageMax) as number;
 	}
 
 	/**
@@ -273,7 +284,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get imageMin(): number {
-		return this.getTagValueIndexed(TagIds.ImageMin);
+		return this.getTagValueIndexed(TagIds.ImageMin) as number;
 	}
 
 	/**
@@ -281,7 +292,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get dataScaleSlope(): number {
-		return this.getTagValueIndexed(TagIds.DataScaleSlope);
+		return this.getTagValueIndexed(TagIds.DataScaleSlope) as number;
 	}
 
 	/**
@@ -289,11 +300,11 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get dataScaleIntercept(): number {
-		return this.getTagValueIndexed(TagIds.DataScaleIntercept);
+		return this.getTagValueIndexed(TagIds.DataScaleIntercept) as number;
 	}
 
-	get dataScaleElscint() {
-		let scale = this.getTagValueIndexed(TagIds.DataScaleElscint) || 1;
+	get dataScaleElscint(): number {
+		let scale = this.getTagValueIndexed(TagIds.DataScaleElscint) as number || 1;
 
 		const bandwidth = this.pixelBandwidth;
 		scale = Math.sqrt(bandwidth) / (10 * scale);
@@ -305,23 +316,25 @@ class DCMImage implements IImageInfo {
 	}
 
 	/**
-	 * Returns the window width.
+	 * Returns the window width (from top level as frame data can have these values)
 	 * @returns {number}
 	 */
 	get windowWidth(): number {
-		return this.getTagValueIndexed(TagIds.WindowWidth);
+		const tagVal = this.getTopLevelTag(TagIds.WindowWidth)?.value as number[];
+		return tagVal?.[0];
 	}
 
 	/**
-	 * Returns the window center.
+	 * Returns the window center (from top level as frame data can have these values)
 	 * @returns {number}
 	 */
 	get windowCenter(): number {
-		return this.getTagValueIndexed(TagIds.WindowCenter);
+		const tagVal = this.getTopLevelTag(TagIds.WindowCenter)?.value as number[];
+		return tagVal?.[0];
 	}
 
-	get pixelBandwidth() {
-		return this.getTagValueIndexed(TagIds.PixelBandwidth);
+	get pixelBandwidth(): number {
+		return this.getTagValueIndexed(TagIds.PixelBandwidth) as number;
 	}
 
 	get seriesId() {
@@ -358,7 +371,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get bitsStored(): number {
-		return this.getTagValueIndexed(TagIds.BitsStored);
+		return this.getTagValueIndexed(TagIds.BitsStored) as number;
 	}
 
 	/**
@@ -366,7 +379,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get bitsAllocated(): number {
-		return this.getTagValueIndexed(TagIds.BitsAllocated);
+		return this.getTagValueIndexed(TagIds.BitsAllocated) as number;
 	}
 
 	/**
@@ -374,7 +387,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	getFrameTime(): number {
-		return this.getTagValueIndexed(TagIds.FrameTime);
+		return this.getTagValueIndexed(TagIds.FrameTime) as number;
 	}
 
 	/**
@@ -383,7 +396,7 @@ class DCMImage implements IImageInfo {
 	 */
 	getAcquisitionMatrix(): number[] {
 		const mat:[number, number] = [0, 0];
-		mat[0] = this.getTagValueIndexed(TagIds.AcquisitionMatrix);
+		mat[0] = this.getTagValueIndexed(TagIds.AcquisitionMatrix) as number;
 
 		if (this.privateDataAll === null) {
 			this.privateDataAll = this.allInterpretedPrivateData;
@@ -420,7 +433,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	getTR(): number {
-		return this.getTagValueIndexed(TagIds.Tr);
+		return this.getTagValueIndexed(TagIds.Tr) as number;
 	}
 
 	putTag(tag: Tag) {
@@ -673,8 +686,8 @@ class DCMImage implements IImageInfo {
 	 * @returns {boolean}
 	 */
 	isPalette(): boolean {
-		const value = this.getTagValueIndexed(TagIds.PhotometricInterpretation);
-		return (value && value.toLowerCase().indexOf("palette") !== -1);
+		const value = this.getTagValueIndexed(TagIds.PhotometricInterpretation) as string;
+		return (value != null && value.toLowerCase().indexOf("palette") !== -1);
 	}
 
 	get mosaicCols() {
@@ -808,7 +821,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get numberOfFrames(): number {
-		const value = this.getTagValueIndexed(TagIds.NumberOfFrames);
+		const value = this.getTagValueIndexed(TagIds.NumberOfFrames) as number;
 		return value ?? 1;
 	}
 
@@ -817,7 +830,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get samplesPerPixel(): number {
-		const value = this.getTagValueIndexed(TagIds.SamplesPerPixel);
+		const value = this.getTagValueIndexed(TagIds.SamplesPerPixel) as number;
 		return value ?? 1;
 	}
 
@@ -838,7 +851,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {PixelRepresentation}
 	 */
 	get pixelRepresentation(): PixelRepresentation {
-		return this.getTagValueIndexed(TagIds.PixelRepresentation);
+		return this.getTagValueIndexed(TagIds.PixelRepresentation) as PixelRepresentation;
 	}
 
 	/**
@@ -846,7 +859,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {PixelPaddingValue}
 	 */
 	get pixelPaddingValue(): number {
-		return this.getTagValueIndexed(TagIds.PixelPaddingValue);
+		return this.getTagValueIndexed(TagIds.PixelPaddingValue) as number;
 	}
 
 	/**
@@ -854,7 +867,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get photometricInterpretation(): string {
-		return this.getTagValueIndexed(TagIds.PhotometricInterpretation);
+		return this.getTagValueIndexed(TagIds.PhotometricInterpretation) as string;
 	}
 
 	/**
@@ -862,7 +875,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get patientName(): string {
-		return this.getTagValueIndexed(TagIds.PatientName);
+		return this.getTagValueIndexed(TagIds.PatientName) as string;
 	}
 
 	/**
@@ -870,7 +883,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get patientID(): string {
-		return this.getTagValueIndexed(TagIds.PatientId);
+		return this.getTagValueIndexed(TagIds.PatientId) as string;
 	}
 
 	/**
@@ -878,7 +891,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get studyTime(): string {
-		return this.getTagValueIndexed(TagIds.StudyTime);
+		return this.getTagValueIndexed(TagIds.StudyTime) as string;
 	}
 
 	/**
@@ -886,7 +899,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get transferSyntax(): TransferSyntax {
-		return this.getTagValueIndexed(TagIds.TransferSyntax);
+		return this.getTagValueIndexed(TagIds.TransferSyntax) as TransferSyntax;
 	}
 
 	/**
@@ -894,7 +907,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {string}
 	 */
 	get studyDate(): string {
-		return this.getTagValueIndexed(TagIds.StudyDate);
+		return this.getTagValueIndexed(TagIds.StudyDate) as string;
 	}
 
 	/**
@@ -902,7 +915,7 @@ class DCMImage implements IImageInfo {
 	 * @returns {number}
 	 */
 	get planarConfig(): number {
-		return this.getTagValueIndexed(TagIds.PlanarConfig);
+		return this.getTagValueIndexed(TagIds.PlanarConfig) as number;
 	}
 
 	/**

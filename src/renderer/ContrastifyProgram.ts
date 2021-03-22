@@ -3,7 +3,7 @@ import { ProgramInfo, BufferInfo, FramebufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { glslUnpackWordString } from "./Program";
+import IProgram, { glslUnpackWordString, preCompileGreyscaleShader } from "./Program";
 import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
 
@@ -42,17 +42,19 @@ class ContrastifyProgram implements IProgram {
 			throw new Error("Image requires WEBGL_draw_buffers");
 		}
 		this.ext = ext!;
+
 		// don't ignore pixelPaddingVal in minMax calcs
 		const getMinMaxWordString = glslUnpackWordString({ ...info, pixelPaddingVal: null }, true);
-		const getWordString = glslUnpackWordString(info, true);
 
 		const minMaxFragString = minMaxShader
 			.replace("$(cellSize)", cellSize.toString())
 			.replace("$(word)", getMinMaxWordString);
 
-		const contrastifyShaderString = contrastifyShader
-			.replace("$(word)", getWordString)
-			.replace("$(minMaxWord)", getMinMaxWordString);
+		const contrastifyShaderString = preCompileGreyscaleShader(
+			info,
+			contrastifyShader.replace("$(minMaxWord)", getMinMaxWordString),
+			true
+		);
 
 		this.minMaxProgramInfo = <ProgramInfo> <unknown> twgl.createProgramInfo(
 			gl,
@@ -88,7 +90,6 @@ class ContrastifyProgram implements IProgram {
 
 		const {
 			size,
-			invert,
 			slope,
 			intercept
 		} = info;
@@ -179,7 +180,6 @@ class ContrastifyProgram implements IProgram {
 		twgl.setUniforms(contrastProgramInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: srcTex,
-			u_invert: invert,
 			u_minColor: lastFBI.attachments[0],
 			u_maxColor: lastFBI.attachments[1],
 			u_slope: slope,
