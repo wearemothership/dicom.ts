@@ -124,7 +124,7 @@ class DCMImage implements IImageInfo {
 
 	/**
 	 * Returns the pixel data tag.
-	 * @returns {daikon.Tag}
+	 * @returns {Tag}
 	 */
 	get pixelData(): Tag {
 		return this.tags[createTagIdWithTag(TagIds.PixelData)];

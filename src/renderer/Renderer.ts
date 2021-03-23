@@ -5,7 +5,7 @@ import IProgram from "./Program";
 import GreyscaleProgram from "./GreyscaleProgram";
 import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
 import { ImageSize } from "../image/Types";
-import { DCMImage } from "../parser";
+import { DCMImage, Series } from "../parser";
 import { ISize } from "../decoder/Decoder";
 import ColorPaletteProgram from "./ColorPaletteProgram";
 
@@ -22,7 +22,8 @@ class Renderer {
 
 	private outSize: ImageSize | null = null;
 
-	constructor(canvas: HTMLCanvasElement) {
+	constructor(inCanvas: HTMLCanvasElement | null) {
+		const canvas = inCanvas || document?.createElement("canvas") || new HTMLCanvasElement();
 		const gl = canvas.getContext("webgl");
 		if (!gl) {
 			throw Error("could not create webgl from canvas");
@@ -95,5 +96,25 @@ class Renderer {
 		this.program?.destroy();
 	}
 }
+
+export const render = async (
+	image: DCMImage,
+	canvas: HTMLCanvasElement,
+	scale: number = 1.0
+): Promise<void> => {
+	if (!image) {
+		return Promise.reject(Series.parserError);
+	}
+	const renderer = new Renderer(canvas);
+
+	const outSize = new ImageSize(image).scale(scale);
+	renderer.outputSize = outSize;
+	setTimeout(() => {
+		renderer.destroy();
+	});
+	await renderer.render(image, 0);
+	renderer.destroy();
+	return Promise.resolve();
+};
 
 export default Renderer;

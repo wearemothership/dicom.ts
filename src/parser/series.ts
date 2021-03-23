@@ -237,7 +237,7 @@ const orderDicoms = (
 
 /**
  * The Series constructor.
- * @property {daikon.Image[]} images
+ * @property {DCMImage[]} images
  * @type {Function}
  */
 class Series {
@@ -318,7 +318,7 @@ class Series {
 
 	/**
 	 * Adds an image to the series.
-	 * @param {daikon.Image} image
+	 * @param {DCMImage} image
 	 */
 	addImage(image: DCMImage) {
 		this.images.push(image);
@@ -327,7 +327,7 @@ class Series {
 	/**
 	 * Returns true if the specified image is part of the series
 	 * (or if no images are yet part of the series).
-	 * @param {daikon.Image} image
+	 * @param {DCMImage} image
 	 * @returns {boolean}
 	 */
 	matchesSeries(image:any): boolean {
@@ -487,7 +487,7 @@ class Series {
 /**
  * Parses the DICOM header and return an image object.
  * @param {DataView} data
- * @returns {daikon.Image|null}
+ * @returns {DCMImage|null}
  */
 export const parseImage = (data: DataView): DCMImage | null => {
 	const parser = new Parser();

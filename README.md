@@ -6,18 +6,20 @@
 
 
 # background
-Was in the need of displaying greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task, it also seemed slow even using the webgl renderer.
+Was in the need of displaying greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task, it also slow even using the webgl renderer for some images.
 
 This is the result!
 
-By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 1.1 to 12 times faster, depending on the image and wether it was the first decode of the library.
+By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1200% faster, depending on the image type and wether it was the first decode of the library.
+
+see ./example-vs-cornerstone for how we came up with those figures.
 
 ## Todo
 - consistent error handling
-- pixel padding support on > contrastify program
-- improve memory management.  Can we share wasm heap?
+- improve memory management.  Can we share decoder wasm heap?
 - add standalone React canvas example
 - load series
+- ~~pixel padding support on > contrastify program~~
 - ~~some images are not perfect with cornerstone, what is correct?~~
 - ~~accelerate palette conversion~~
 - ~~planar config~~
@@ -44,23 +46,38 @@ npm install --save dicom.js
 
 ## Usage
 
-fix this:
-```jsx
-import React, { Component } from 'react'
+### Display on given canvas
+```js
+import dicomjs from 'dicom.js'
 
-import DICOMCanvas from 'dicom.js'
-import 'dicom.js/dist/index.css'
-
-class Example extends Component {
-  render() {
-    return <MyComponent />
-  }
+const displayDicom = async (canvas, buffer) => {
+	try {
+		const image = dicomjs.parseImage(buffer);
+		const renderer = new dicomjs.Renderer(canvas);
+		const frameNumber = 0;
+		await renderer.render(image, frameNumber);
+	}
+	catch (e) {
+		// ...
+		console.error(e);
+	}
 }
+
+// get an ArrayBuffer of the file
+const dataBuffer = ...
+
+// get your canvas, and ensure add to the DOM
+// dicomjs will create one if none provided
+const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
+
+displayDicom(canvas, dataBuffer);
+
 ```
 
 ## License
 
-MIT © [mothershipsoft](https://github.com/mothershipsoft)
+MIT © [wearemothership](https://github.com/wearemothership)
 
 parser based heavily on https://github.com/rii-mango/Daikon
 thank you - RII-UTHSCSA / martinezmj

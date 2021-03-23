@@ -5,7 +5,7 @@
   "author": "wearemothership",
   "email": "nick@wearemotehrship.com",
   "license": "MIT",
-  "repository": "mothershipsoft/dicom.js",
+  "repository": "wearemothership/dicom.js",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.ts",
@@ -13,7 +13,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "microbundle-crl --no-compress --format modern",
+    "build": "microbundle-crl --format modern",
     "start": "microbundle-crl watch --no-compress --format modern",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
@@ -38,7 +38,7 @@
     "jpeg-lossless-decoder-js": "git+https://github.com/rii-mango/JPEGLosslessDecoderJS.git#v2.0.4",
     "pako": "^1.0.10",
     "raw.macro": "^0.4.2",
-    "twgl.js": "git+https://github.com/mothershipsoft/twgl.js#v4.19.1-node-canvas-webgl",
+    "twgl.js": "git+https://github.com/wearemothership/twgl.js#v4.19.1-node-canvas-webgl",
     "typescript": "^4.2.3"
   },
   "devDependencies": {
@@ -48,11 +48,11 @@
     "blob-util": "^2.0.2",
     "canvas": "^2.6.1",
     "cross-env": "^7.0.2",
-    "dicom-test-files": "git+https://github.com/mothershipsoft/dicom-test-files.git",
+    "dicom-test-files": "git+https://github.com/wearemothership/dicom-test-files.git",
     "eslint-config-airbnb": "^18.2.1",
     "gh-pages": "^2.2.0",
     "microbundle-crl": "^0.13.10",
-    "node-canvas-webgl": "git+https://github.com/mothershipsoft/node-canvas-webgl.git#0.2.6-twgl",
+    "node-canvas-webgl": "git+https://github.com/wearemothership/node-canvas-webgl.git#0.2.6-twgl",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.4",
     "react": "^17.0.1",
