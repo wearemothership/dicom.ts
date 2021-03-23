@@ -52,10 +52,22 @@ import dicomjs from 'dicom.js'
 
 const displayDicom = async (canvas, buffer) => {
 	try {
+		// get the DCM image
 		const image = dicomjs.parseImage(buffer);
+
+		// access any tags needed, common ones have parameters
+		console.log("PatientID:", image.patientID);
+		// or use the DICOM tag group, element id pairs
+		console..log("PatientName:", image.getTagValue([0x0010, 0x0010]));
+
+		// create the renderer (keeping hold of innstance can
+		// improve 2nd image decode performance)
 		const renderer = new dicomjs.Renderer(canvas);
-		const frameNumber = 0;
-		await renderer.render(image, frameNumber);
+
+		// decode, and display frame 0 on the canvas
+		await renderer.render(image, 0);
+
+
 	}
 	catch (e) {
 		// ...
@@ -74,6 +86,10 @@ document.body.appendChild(canvas);
 displayDicom(canvas, dataBuffer);
 
 ```
+
+## Used by:
+vPOP PRO:
+https://vpop-pro.com
 
 ## License
 
