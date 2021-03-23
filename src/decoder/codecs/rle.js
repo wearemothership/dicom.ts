@@ -51,7 +51,7 @@ function decode8(imageFrame, frameData) {
 		if (maxIndex === 0) {
 			maxIndex = frameData.byteLength;
 		}
-
+		// TODO: optimise like 16 bit version
 		while (inIndex < maxIndex) {
 			const n = data[inIndex++];
 
@@ -70,57 +70,6 @@ function decode8(imageFrame, frameData) {
 				for (let i = 0; i < maxI; ++i) {
 					out[outIndex] = value;
 					outIndex += samples;
-				}
-			} /* else if (n === -128) {
-		} // do nothing */
-		}
-	}
-
-	return outFrame;
-}
-
-function decode8Planar(imageFrame, frameData) {
-	const frameSize = imageFrame.size.numberOfPixels;
-	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples);
-
-	const header = frameData;
-	const data = new Int8Array(frameData.buffer, frameData.byteOffset, frameData.byteLength);
-	const out = new Int8Array(outFrame);
-
-	let outIndex = 0;
-	const numSegments = header.getInt32(0, true);
-
-	for (let s = 0; s < numSegments; ++s) {
-		outIndex = s * frameSize;
-
-		let inIndex = header.getInt32((s + 1) * 4, true);
-
-		let maxIndex = header.getInt32((s + 2) * 4, true);
-
-		if (maxIndex === 0) {
-			maxIndex = frameData.byteLength;
-		}
-
-		const endOfSegment = frameSize * numSegments;
-
-		while (inIndex < maxIndex) {
-			const n = data[inIndex++];
-
-			if (n >= 0 && n <= 127) {
-			// copy n bytes
-				const maxI = Math.min(n + 1, endOfSegment - outIndex);
-				for (let i = 0; i < maxI; ++i) {
-					out[outIndex] = data[inIndex++];
-					outIndex++;
-				}
-			}
-			else if (n <= -1 && n >= -127) {
-				const value = data[inIndex++];
-				// run of n bytes
-				const maxI = Math.min(1 - n, endOfSegment - outIndex);
-				for (let i = 0; i < maxI; ++i) {
-					out[outIndex] = value;
-					outIndex++;
 				}
 			} /* else if (n === -128) {
 		} // do nothing */
@@ -177,20 +126,15 @@ function decode16(imageFrame, frameData) {
 					out[i] = value;
 				}
 				outIndex += diff;
-			} /* else if (n === -128) {
-		} // do nothing */
+			}
 		}
 	}
 	return outFrame;
 }
 
-function decodeRLE(imageFrame, pixelDataView) {
-	const { bytesAllocated, planar } = imageFrame;
+function decode(imageFrame, pixelDataView) {
+	const { bytesAllocated } = imageFrame;
 	if (bytesAllocated === 1) {
-		if (planar) {
-			return new DataView(decode8Planar(imageFrame, pixelDataView));
-		}
-
 		return new DataView(decode8(imageFrame, pixelDataView));
 	}
 	if (bytesAllocated === 2) {
@@ -200,4 +144,4 @@ function decodeRLE(imageFrame, pixelDataView) {
 	throw new Error("Unsupported pixel format for RLE");
 }
 
-export default decodeRLE;
+export default decode;
