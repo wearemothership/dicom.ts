@@ -1,14 +1,19 @@
-// /* eslint-disable */
+
 import * as dicomjs from "dicom.js"
+
+let renderer = null;
+let lastCanvas = null;
 
 export const GPUJSDecode = (buf, canvas) => {
 	const data = new DataView(buf);
+	// this will print tags to console - slooow
 	// dicomjs.Parser.verbose = true;
 	const image = dicomjs.parseImage(data);
-	// const w = image.getCols();
-	// const h = image.getRows();
-	// const scale = Math.min(1, Math.min(4096 / w, 4096 / h));
-	// const scale = 1.0;
-	const renderer = new dicomjs.Renderer(canvas);
+	if (canvas !== lastCanvas) {
+		lastCanvas = canvas;
+		renderer?.destroy();
+		// hold on to the renderer, or 2nd render can be slow.
+		renderer = new dicomjs.Renderer(canvas);
+	}
 	return renderer.render(image, 0);
 };

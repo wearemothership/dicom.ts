@@ -3,9 +3,6 @@ import {
 	Parser,
 	parseImage,
 } from "./parser";
-// import DICOMCanvas from "./components/DICOMCanvas";
-// import FileInput from "./components/FileInput";
-// import DICOMJSRenderer from "./components/DICOMJSRenderer";
 
 export {
 	parseImage,
@@ -13,7 +10,4 @@ export {
 	Renderer,
 	Parser,
 	// parserError: Series.parserError,
-	// DICOMCanvas,
-	// FileInput,
-	// DICOMJSRenderer
 };
