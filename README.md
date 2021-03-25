@@ -5,13 +5,14 @@
 [![NPM](https://img.shields.io/npm/v/dicom.js.svg)](https://www.npmjs.com/package/dicom.js) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 
-# background
+# Background
 We had a requirement to display greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone.js, which seems ubiquitous and feature rich - just seemed too big and complex for the task, and saw that performance could be improved.  Thought it was worth investigating accelerating things as much as possible with WebGl.
 
 This is the result!
 
-By tightly integrating the parser, decoders and renderer, moving as much as possibile to the GPU (LUT & palette conversion etc), and using safari's native jpeg2000 decoder, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1800% faster, depending on the image type and wether it was the first decode of the library.  Also library size is about a 5th of using core & wado loader.
+By tightly integrating the parser, decoders and renderer, moving as much as possibile to the GPU (LUT & palette conversion etc), only allowing modern browsers and using browsers jpeg decoder & safari's native jpeg2000 decoder, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1800% faster, depending on the image type and wether it was the first decode of the library. Also library size is about a 5th of using cornerstone core & wado loader, so page load times will be quicker too.
 
+see ./example for simple react app to load dcms to a canvas
 see ./example-vs-cornerstone for how we came up with the comparison figures.
 
 ## Install
@@ -51,8 +52,8 @@ const displayDicom = async (canvas, buffer) => {
 		// or use the DICOM tag group, element id pairs
 		console.log("PatientName:", image.getTagValue([0x0010, 0x0010]));
 
-		// create the renderer (keeping hold of an instance can
-		// improve 2nd image decode performance)
+		// create the renderer (keeping hold of an instance for the canvas can
+		// improve 2nd image decode performance hugely - see examples)
 		const renderer = new dicomjs.Renderer(canvas);
 
 		// decode, and display frame 0 on the canvas
@@ -79,10 +80,11 @@ displayDicom(canvas, dataBuffer);
 ```
 
 ## Todo
-- consistent error handling
+- consistent & more detailed error handling (parsing / decoding / rendering)
 - improve memory management.  Can we share decoder wasm heap?
-- load series
-- seperate out react lib?
+- load series support
+- make example one app with 2+ routes!
+- ~~seperate out react lib?~~
 - ~~add standalone React canvas example~~
 - ~~pixel padding support on > contrastify program~~
 - ~~some images are not perfect with cornerstone, what is correct?~~
