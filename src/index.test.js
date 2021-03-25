@@ -1,5 +1,7 @@
+/* eslint-disable import/first */
 import fs from "fs";
 
+// import {} from "jest-fetch-mock";
 import {
 	createCanvas,
 	WebGLRenderingContext,
@@ -18,8 +20,7 @@ import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
 import * as dicomjs from ".";
 
-const { DICOMCanvas, FileInput } = dicomjs;
-
+global.fetch = fetch;
 // need to be global (as they would be in browser) for twgl to get them!
 window.WebGLRenderingContext = WebGLRenderingContext;
 window.WebGLActiveInfo = WebGLActiveInfo;
@@ -42,17 +43,6 @@ const logImageTags = (image) => {
 	});
 	console.log(str);
 };
-describe("DICOMCanvas", () => {
-	it("is truthy", () => {
-		expect(DICOMCanvas).toBeTruthy();
-	});
-});
-
-describe("FileInput", () => {
-	it("is truthy", () => {
-		expect(FileInput).toBeTruthy();
-	});
-});
 
 describe("dicom.js", () => {
 	it("Renders with: RLE decode and 'contrastify' greyscale render", async () => {

@@ -109,9 +109,6 @@ export const render = async (
 
 	const outSize = new ImageSize(image).scale(scale);
 	renderer.outputSize = outSize;
-	setTimeout(() => {
-		renderer.destroy();
-	});
 	await renderer.render(image, 0);
 	renderer.destroy();
 	return Promise.resolve();

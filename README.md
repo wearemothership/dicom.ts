@@ -6,37 +6,13 @@
 
 
 # background
-Was in the need of displaying greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone just seemed too big and complex for the task, it also slow even using the webgl renderer for some images.
+We had a requirement to display greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone.js, which seems ubiquitous and feature rich - just seemed too big and complex for the task, and saw that performance could be improved.  Thought it was worth investigating accelerating things as much as possible with WebGl.
 
 This is the result!
 
-By tightly integrating the parser, decoders and renderer, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1200% faster, depending on the image type and wether it was the first decode of the library.
+By tightly integrating the parser, decoders and renderer, moving as much as possibile to the GPU (LUT & palette conversion etc), and using safari's native jpeg2000 decoder, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1800% faster, depending on the image type and wether it was the first decode of the library.  Also library size is about a 5th of using core & wado loader.
 
-see ./example-vs-cornerstone for how we came up with those figures.
-
-## Todo
-- consistent error handling
-- improve memory management.  Can we share decoder wasm heap?
-- add standalone React canvas example
-- load series
-- ~~pixel padding support on > contrastify program~~
-- ~~some images are not perfect with cornerstone, what is correct?~~
-- ~~accelerate palette conversion~~
-- ~~planar config~~
-- ~~palette conversion does not work see ./test/issues~~
-- ~~code coverage~~
-- ~~make sure adhere to licenses...~~
-- ~~J2KI files slower than cornerstone~~
-- ~~scale / maxsize~~
-- ~~LL decoder can be slower than cornerstones~~
-- ~~add typescript support~~
-- ~~complete ts impl~~
-- ~~fix microbundle warnings~~
-- ~~fix cornerstone comparison example~~
-- ~~add test framework~~
-- ~~seperate out decoders from parser~~
-- ~~seperate programs~~
-- ~~currently only supports rendering frame 0!~~
+see ./example-vs-cornerstone for how we came up with the comparison figures.
 
 ## Install
 
@@ -45,6 +21,21 @@ npm install --save dicom.js
 ```
 
 ## Usage
+
+### Run the example
+
+```bash
+git clone https://github.com/wearemothership/dicom.js
+cd dicom.js
+npm i
+npm run build
+cd example
+npm i
+npm start
+```
+
+### Run dicom.js vs cornerston.js performance example
+Same as above, but change example for
 
 ### Display on given canvas
 ```js
@@ -58,9 +49,9 @@ const displayDicom = async (canvas, buffer) => {
 		// access any tags needed, common ones have parameters
 		console.log("PatientID:", image.patientID);
 		// or use the DICOM tag group, element id pairs
-		console..log("PatientName:", image.getTagValue([0x0010, 0x0010]));
+		console.log("PatientName:", image.getTagValue([0x0010, 0x0010]));
 
-		// create the renderer (keeping hold of innstance can
+		// create the renderer (keeping hold of an instance can
 		// improve 2nd image decode performance)
 		const renderer = new dicomjs.Renderer(canvas);
 
@@ -87,6 +78,30 @@ displayDicom(canvas, dataBuffer);
 
 ```
 
+## Todo
+- consistent error handling
+- improve memory management.  Can we share decoder wasm heap?
+- load series
+- seperate out react lib?
+- ~~add standalone React canvas example~~
+- ~~pixel padding support on > contrastify program~~
+- ~~some images are not perfect with cornerstone, what is correct?~~
+- ~~accelerate palette conversion~~
+- ~~planar config~~
+- ~~palette conversion does not work see ./test/issues~~
+- ~~code coverage~~
+- ~~make sure adhere to licenses...~~
+- ~~J2KI files slower than cornerstone~~
+- ~~scale / maxsize~~
+- ~~LL decoder can be slower than cornerstones~~
+- ~~add typescript support~~
+- ~~complete ts impl~~
+- ~~fix microbundle warnings~~
+- ~~fix cornerstone comparison example~~
+- ~~add test framework~~
+- ~~seperate out decoders from parser~~
+- ~~seperate programs~~
+- ~~currently only supports rendering frame 0!~~
 ## Used by:
 vPOP PRO:
 https://vpop-pro.com

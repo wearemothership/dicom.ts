@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 // @ts-ignore
-import { convertBytes } from "@wearemothership/dicom-character-set-ii/dist/dicom-character-set";
+import { convertBytes } from "@wearemothership/dicom-character-set";
 import { Charset, DefaultCharset } from "./constants";
 
 let crcTable: number[];

@@ -1,13 +1,13 @@
 {
-	"name": "dicom.js-example",
+	"name": "dicom.js-example-vs-cornerstone",
 	"homepage": ".",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"start": "node ../node_modules/react-scripts/bin/react-scripts.js start",
-		"build": "node ../node_modules/react-scripts/bin/react-scripts.js build",
-		"test": "node ../node_modules/react-scripts/bin/react-scripts.js test",
-		"eject": "node ../node_modules/react-scripts/bin/react-scripts.js eject"
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
 	},
 	"dependencies": {
 		"cornerstone-core": "^2.3.0",
@@ -17,10 +17,11 @@
 		"dicom.js": "file:..",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1",
-		"react-scripts": "file:../node_modules/react-scripts"
+		"react-scripts": "^4.0.3"
 	},
 	"devDependencies": {
-		"@babel/plugin-syntax-object-rest-spread": "^7.8.3"
+		"@babel/plugin-syntax-object-rest-spread": "^7.8.3",
+		"@types/react": "^17.0.3"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -28,10 +29,12 @@
 			"react-app/jest"
 		]
 	},
-	"browserslist": [
-		">0.2%",
-		"not dead",
-		"not ie <= 11",
-		"not op_mini all"
-	]
+	"browserslist": {
+		"production": [
+			"last 1 Chrome version"
+		],
+		"development": [
+			"last 1 Chrome version"
+		]
+	}
 }

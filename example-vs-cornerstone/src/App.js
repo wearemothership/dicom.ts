@@ -1,7 +1,7 @@
 /* eslint-disable */
 import "./App.css";
 import cornerstone from "cornerstone-core";
-import { DICOMCanvas, FileInput } from "dicom.js";
+import { DICOMCanvas, FileInput } from "./components";
 import React, { useEffect, useState, useRef } from "react";
 import { GPUJSDecode } from "./ReadDicom";
 import CornerstoneDecode from "./CornerstoneDecoder";

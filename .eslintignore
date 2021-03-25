@@ -3,3 +3,6 @@ dist/
 node_modules/
 .snapshots/
 *.min.js
+example/
+example-vs-cornerstone/
+components/

@@ -5,14 +5,14 @@
 		"jest": true,
 		"jest/globals": true
 	},
-	"plugins": ["jest", "@typescript-eslint"],
+	"plugins": ["jest", "import", "@typescript-eslint"],
 	"extends": [
-		"eslint-config-airbnb",
-		"airbnb/hooks",
+		"eslint-config-airbnb-base",
 		"plugin:jest/recommended",
-		"plugin:jest/style"
-		// "plugin:@typescript-eslint/eslint-recommended",
-        // "plugin:@typescript-eslint/recommended"
+		"plugin:jest/style",
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript"
 	],
 	"rules": {
 		"import/extensions": [
@@ -27,12 +27,6 @@
 		],
 		"indent": [2, "tab", { "SwitchCase": 1, "VariableDeclarator": 1 }],
 		"no-tabs": 0,
-		"react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
-		"react/no-did-update-set-state": 0,
-		"react/static-property-placement": 0, // maybe re-enable?
-		"react/prop-types": 0,
-		"react/jsx-indent": [2, "tab"],
-		"react/jsx-indent-props": [2, "tab"],
 		"comma-dangle": 0, // WTF air-bnb?!
 		"linebreak-style": [
 			"error",
@@ -46,10 +40,6 @@
 		"curly": [2, "all"],
 		"brace-style": [2, "stroustrup"],
 		"semi": ["error", "always"],
-		"react/jsx-props-no-spreading": [2, {
-			"custom": "ignore"
-		}],
-		"react/jsx-fragments": [2, "syntax"],
 		"no-unused-vars": "off",
 		"@typescript-eslint/no-unused-vars": "error",
 		"no-shadow": "off",
@@ -63,10 +53,9 @@
 	"parser": "@typescript-eslint/parser",
 	"ignorePatterns": ["!.storybook"],
 	"settings": {
-		"import/resolver": {
-			"node": {
-			"extensions": [".js", ".jsx", ".ts", ".tsx"]
-			}
-		}
-	}
+		"import/extensions": [
+		  ".js",
+		  ".ts"
+		]
+	  }
 }

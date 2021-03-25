@@ -13,28 +13,21 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "microbundle-crl --format modern",
+    "build": "microbundle-crl --no-compress --format modern",
     "start": "microbundle-crl watch --no-compress --format modern",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
     "test:lint": "eslint .",
-    "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
-    "test:coverage": "cross-env CI=1 react-scripts test --coverage --env=jsdom",
-    "test:watch": "react-scripts test --env=jsdom",
+    "test:unit": "jest .",
+    "test:coverage": "jest . --coverage",
     "predeploy": "cd example && npm install && npm run build",
     "deploy": "gh-pages -d example/build"
-  },
-  "peerDependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
   },
   "dependencies": {
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.31",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "@wearemothership/dicom-character-set-ii": "^1.0.4-opt.1",
+    "@wearemothership/dicom-character-set": "^1.0.4-opt.1",
     "jpeg-lossless-decoder-js": "git+https://github.com/rii-mango/JPEGLosslessDecoderJS.git#v2.0.4",
     "pako": "^1.0.10",
     "raw.macro": "^0.4.2",
@@ -42,22 +35,38 @@
     "typescript": "^4.2.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.13.10",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.13.8",
     "@babel/plugin-proposal-optional-chaining": "^7.13.8",
+    "@babel/preset-env": "^7.13.12",
+    "@babel/preset-typescript": "^7.13.0",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.19.0",
     "babel-eslint": "^10.0.3",
+    "babel-jest": "^26.6.3",
+    "babel-plugin-macros": "^3.0.1",
     "blob-util": "^2.0.2",
     "canvas": "^2.6.1",
     "cross-env": "^7.0.2",
     "dicom-test-files": "git+https://github.com/wearemothership/dicom-test-files.git",
-    "eslint-config-airbnb": "^18.2.1",
+    "eslint": "^7.22.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-import-resolver-node": "^0.3.4",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.3.2",
     "gh-pages": "^2.2.0",
+    "jest": "^26.6.0",
     "microbundle-crl": "^0.13.10",
     "node-canvas-webgl": "git+https://github.com/wearemothership/node-canvas-webgl.git#0.2.6-twgl",
+    "node-fetch": "^3.0.0-beta.9",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.0.4",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-scripts": "^4.0.3"
+    "prettier": "^2.0.4"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "example",
+      "example-vs-cornerstone"
+    ]
   },
   "files": [
     "dist"
