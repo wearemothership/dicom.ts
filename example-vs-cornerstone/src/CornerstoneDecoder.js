@@ -8,7 +8,11 @@ cornerstoneFileImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
 
-const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) => {
+export const CornerstoneInit = (div) => {
+	// cornerstone.enable(div);
+}
+
+export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) => {
 	if (!buffer) {
 		return reject(Error("No file!"));
 	}
@@ -33,4 +37,3 @@ const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) => {
 	});
 });
 
-export default CornerstoneDecode;

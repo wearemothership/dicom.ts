@@ -3,11 +3,12 @@ import "./App.css";
 import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "./components";
 import React, { useEffect, useState, useRef } from "react";
-import { GPUJSDecode } from "./ReadDicom";
-import CornerstoneDecode from "./CornerstoneDecoder";
+import { GPUJSDecode, GPUJSInit } from "./ReadDicom";
+import { CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
 
 const renderQ = [];
+
 
 
 const DICOMDiv = ({
@@ -61,6 +62,7 @@ const DICOMWrapper = ({
 );
 
 const Renderer = ({
+	initMethod,
 	renderMethod,
 	fileBuffer,
 	children
@@ -89,6 +91,11 @@ const Renderer = ({
 		return	() => {};
 	}, [fileBuffer, renderMethod]);
 
+	useEffect(() => {
+		initMethod?.(canvasRef.current)
+		return () => {};
+	}, [canvasRef && canvasRef.current])
+
 	return (
 		<>
 			{
@@ -105,13 +112,13 @@ const Renderer = ({
 };
 
 const GPURenderer = ({ fileBuffer, children }) => (
-	<Renderer renderMethod={GPUJSDecode} fileBuffer={fileBuffer}>
+	<Renderer renderMethod={GPUJSDecode} fileBuffer={fileBuffer} initMethod={GPUJSInit}>
 		{children}
 	</Renderer>
 );
 
 const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
-	<Renderer renderMethod={CornerstoneDecode} fileBuffer={fileBuffer} file={file}>
+	<Renderer renderMethod={CornerstoneDecode} fileBuffer={fileBuffer} file={file} initMethod={CornerstoneInit}>
 		{ children }
 	</Renderer>
 );
