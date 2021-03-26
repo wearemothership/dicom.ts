@@ -1,93 +1,60 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
 
-// MIT License
-
-// Copyright (c) 2020 Chris Hafey
-
-// Optimisations
-// Copyright (c) 2021 Mothership Software ltd
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-function decode8(imageFrame, frameData) {
-	const frameSize = imageFrame.size.numberOfPixels;
-	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples);
-
-	const header = frameData;
-	const data = new Int8Array(frameData.buffer, frameData.byteOffset, frameData.byteLength);
-	const out = new Int8Array(outFrame);
+function decode8(frameInfo, dataView) {
+	const { samples, size } = frameInfo;
+	const nPixels = size.numberOfPixels;
+	const decoded = new ArrayBuffer(nPixels * samples);
+	const data = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
+	const out = new Uint8Array(decoded);
 
 	let outIndex = 0;
-	const numSegments = header.getInt32(0, true);
+	const numSegments = dataView.getInt32(0, true);
 
-	const { samples } = imageFrame;
-
-	const endOfSegment = frameSize * numSegments;
+	const endOfSegment = nPixels * numSegments;
 
 	for (let s = 0; s < numSegments; ++s) {
 		outIndex = s;
 
-		let inIndex = header.getInt32((s + 1) * 4, true);
+		let inIndex = dataView.getInt32((s + 1) * 4, true);
 
-		let maxIndex = header.getInt32((s + 2) * 4, true);
+		let maxIndex = dataView.getInt32((s + 2) * 4, true);
 
 		if (maxIndex === 0) {
-			maxIndex = frameData.byteLength;
+			maxIndex = dataView.byteLength;
 		}
-		// TODO: optimise like 16 bit version
+		let maxI;
+		let value;
+		let n;
 		while (inIndex < maxIndex) {
-			const n = data[inIndex++];
-
-			if (n >= 0 && n <= 127) {
-				// copy n bytes
-				const maxI = Math.min(n + 1, endOfSegment - outIndex);
-				for (let i = 0; i < maxI; ++i) {
+			n = data[inIndex++];
+			if (n < 0x80) {
+				maxI = Math.min((n + 1) * samples + outIndex, endOfSegment);
+				for (; outIndex < maxI; outIndex += samples) {
 					out[outIndex] = data[inIndex++];
-					outIndex += samples;
 				}
 			}
-			else if (n <= -1 && n >= -127) {
-				const value = data[inIndex++];
-				// run of n bytes
-				const maxI = Math.min(1 - n, endOfSegment - outIndex);
-				for (let i = 0; i < maxI; ++i) {
+			else if (n > 0x80) {
+				value = data[inIndex++];
+				maxI = Math.min((129 - (n ^ 0x80)) * samples + outIndex, endOfSegment);
+				for (; outIndex < maxI; outIndex += samples) {
 					out[outIndex] = value;
-					outIndex += samples;
 				}
-			} /* else if (n === -128) {
-		} // do nothing */
+			}
 		}
 	}
 
-	return outFrame;
+	return decoded;
 }
 
-function decode16(imageFrame, frameData) {
-	const frameSize = imageFrame.size.numberOfPixels;
-	const outFrame = new ArrayBuffer(frameSize * imageFrame.samples * 2);
+function decode16(frameInfo, dataView) {
+	const { samples, size } = frameInfo;
+	const nPixels = size.numberOfPixels;
+	const decoded = new ArrayBuffer(nPixels * samples * 2);
+	const data = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
+	const out = new Uint8Array(decoded);
 
-	const header = frameData;
-	const data = new Uint8Array(frameData.buffer, frameData.byteOffset, frameData.byteLength);
-	const out = new Uint8Array(outFrame);
-
-	const numSegments = header.getInt32(0, true);
+	const numSegments = dataView.getInt32(0, true);
 
 	let maxIndex = 0;
 	for (let s = 0; s < numSegments; ++s) {
@@ -95,12 +62,12 @@ function decode16(imageFrame, frameData) {
 
 		const highByte = s === 0 ? 1 : 0;
 
-		let inIndex = header.getInt32((s + 1) * 4, true);
+		let inIndex = dataView.getInt32((s + 1) * 4, true);
 
-		maxIndex = header.getInt32((s + 2) * 4, true);
+		maxIndex = dataView.getInt32((s + 2) * 4, true);
 
 		if (maxIndex === 0) {
-			maxIndex = (frameData.byteLength) * 2;
+			maxIndex = (dataView.byteLength) * 2;
 		}
 		let diff;
 		let maxI;
@@ -111,7 +78,7 @@ function decode16(imageFrame, frameData) {
 			n = data[inIndex++];
 			i = outIndex * 2 + highByte;
 			if (n < 0x80) {
-				diff = Math.min(n + 1, frameSize - outIndex);
+				diff = Math.min(n + 1, nPixels - outIndex);
 				maxI = diff * 2 + i;
 				for (; i < maxI; i += 2) {
 					out[i] = data[inIndex++];
@@ -120,7 +87,7 @@ function decode16(imageFrame, frameData) {
 			}
 			else if (n > 0x80) {
 				value = data[inIndex++];
-				diff = Math.min(129 - (n ^ 0x80), frameSize - outIndex);
+				diff = Math.min(129 - (n ^ 0x80), nPixels - outIndex);
 				maxI = diff * 2 + i;
 				for (; i < maxI; i += 2) {
 					out[i] = value;
@@ -129,19 +96,19 @@ function decode16(imageFrame, frameData) {
 			}
 		}
 	}
-	return outFrame;
+	return decoded;
 }
 
-function decode(imageFrame, pixelDataView) {
-	const { bytesAllocated } = imageFrame;
+function decode(frameInfo, pixelDataView) {
+	const { bytesAllocated } = frameInfo;
 	if (bytesAllocated === 1) {
-		return new DataView(decode8(imageFrame, pixelDataView));
+		return new DataView(decode8(frameInfo, pixelDataView));
 	}
 	if (bytesAllocated === 2) {
-		return new DataView(decode16(imageFrame, pixelDataView));
+		return new DataView(decode16(frameInfo, pixelDataView));
 	}
 
-	throw new Error("Unsupported pixel format for RLE");
+	throw new Error("Unsupported data format for RLE");
 }
 
 export default decode;
