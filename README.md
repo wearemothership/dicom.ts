@@ -1,44 +1,108 @@
 # dicom.js
-
-> A small, fast, javascript DICOM renderer
-
-[![NPM](https://img.shields.io/npm/v/dicom.js.svg)](https://www.npmjs.com/package/dicom.js) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+## A small, super-fast javascript DICOM renderer.
 
 
-# Background
-We had a requirement to display greyscale, single frame dicom files as quickly as possible in the browser.  Cornerstone.js, which seems ubiquitous and feature rich - just seemed too big and complex for the task, and saw that performance could be improved.  Thought it was worth investigating accelerating things as much as possible with WebGl.
+<p>&nbsp;</p>
 
-This is the result!
+
+We had a requirement to display greyscale, single frame dicom files as quickly as possible in the browser. Cornerstone.js, which seems ubiquitous and feature rich - just seemed too big and complex for the task, and saw that performance could be improved. We thought it was worth investigating accelerating things as much as possible with WebGl.
+
+[screenshot)
 
 By tightly integrating the parser, decoders and renderer, moving as much as possibile to the GPU (LUT & palette conversion etc), only allowing modern browsers and using browsers jpeg decoder & safari's native jpeg2000 decoder, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1800% faster, depending on the image type and wether it was the first decode of the library. Also library size is about a 5th of using cornerstone core & wado loader, so page load times will be quicker too.
 
-see ./example for simple react app to load dcms to a canvas
-see ./example-vs-cornerstone for how we came up with the comparison figures.
 
-## Install
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+To get a local copy up and running follow these simple steps.
+
+**Prerequisites**
+- [node](https://nodejs.org/en/download/)
+- [npm](https://www.npmjs.com)
+
+<p>&nbsp;</p>
+
+**Install via [npm](https://www.npmjs.com)**
 
 ```bash
 npm install --save dicom.js
 ```
 
-## Usage
-
-### Run the example
+**Or clone locally**
 
 ```bash
 git clone https://github.com/wearemothership/dicom.js
+```
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- DEMO EXAMPLES -->
+## Demo
+
+We have provied some demos of how this can be used in your project.
+
+**Online demos**
+- [Simple](https://github.com/wearemothership/dicom.js)
+- [dicom.js vs cornerston.js performance](https://github.com/wearemothership/dicom.js)
+
+<p>&nbsp;</p>
+
+**Or build and run the demos locally**
+```bash
+git clone https://github.com/wearemothership/dicom.js
 cd dicom.js
-npm i
+npm install
 npm run build
+```
+
+**Simple demo**
+```bash
 cd example
-npm i
+npm install
 npm start
 ```
 
-### Run dicom.js vs cornerston.js performance example
-Same as above, but change example for
+**Or dicom.js vs cornerston.js performance demo**
+```bash
+cd example-vs-cornerstone
+npm install
+npm start
+```
+Some DICOM test files can be found in:
+```
+dicom.js/node_modules/dicom-test-files/
+```
 
-### Display on given canvas
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+Some usage examples of how this can be used in you project.
+
+**Display on a given canvas**
 ```js
 import dicomjs from 'dicom.js'
 
@@ -79,7 +143,35 @@ displayDicom(canvas, dataBuffer);
 
 ```
 
-## Todo
+<!--_For more examples, please refer to the [Documentation](https://example.com)_ -->
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- ROADMAP -->
+## Roadmap
+
+See the [open issues](https://github.com/wearemothership/dicom.js/issues) for a list of proposed features (and known issues).
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+
+<!-- TODO -->
+## To-do
+
 - consistent & more detailed error handling (parsing / decoding / rendering)
 - improve memory management.  Can we share decoder wasm heap?
 - load series support
@@ -104,13 +196,90 @@ displayDicom(canvas, dataBuffer);
 - ~~seperate out decoders from parser~~
 - ~~seperate programs~~
 - ~~currently only supports rendering frame 0!~~
-## Used by:
-vPOP PRO:
-https://vpop-pro.com
 
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- LICENSE -->
 ## License
 
-MIT © [wearemothership](https://github.com/wearemothership)
+Distributed under the MIT License.
+https://github.com/wearemothership/dicom.js/blob/main/LICENSE.md
 
-parser based heavily on https://github.com/rii-mango/Daikon
+Copyright (c) 2021 [Mothership Software Ltd.](https://github.com/wearemothership.com)
+
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- CONTACT -->
+## Made by Mothership
+
+wearemothership.com
+
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- USED IN... -->
+## dicom.js is used in…
+
+- [vPOP PRO](https://vpop-pro.com)
+
+*Please let us know if you wish us to add your project to this list.*
+
+
+
+<p>&nbsp;</p>
+
+****
+
+<p>&nbsp;</p>
+
+
+
+<!-- ACKNOWLEDGEMENTS -->
+## Acknowledgements
+
+Parser based heavily on https://github.com/rii-mango/Daikon
 thank you - RII-UTHSCSA / martinezmj
