@@ -2,6 +2,7 @@
 import "./App.css";
 import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "./components";
+import { Flex } from "./components/Flex";
 import React, { useEffect, useState, useRef } from "react";
 import { GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
@@ -16,8 +17,8 @@ const DICOMDiv = ({
 	id,
 	renderTime,
 	canvasRef,
-	width = 512,
-	height = 512
+	width = 300,
+	height = 300
 }) => {
 	useEffect(() => {
 		const last = canvasRef.current;
@@ -30,8 +31,10 @@ const DICOMDiv = ({
 	}, [canvasRef]);
 
 	return (
-		<div style={{ display: "inline-block" }}>
-			<div>{heading}</div>
+		<Flex
+			flex="1"
+		>
+			<h4>{heading}</h4>
 			<div
 				ref={canvasRef}
 				id={id}
@@ -40,7 +43,7 @@ const DICOMDiv = ({
 				style={{ width: `${width}px`, height: `${height}px` }}
 			/>
 			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
-		</div>
+		</Flex>
 	);
 };
 
@@ -49,15 +52,24 @@ const DICOMWrapper = ({
 	id,
 	renderTime = null,
 	canvasRef,
-	width = 512,
-	height = 512
+	width = 300,
+	height = 300
 }) => (
 	(
-		<div style={{ display: "inline-block" }}>
-			<div>{heading}</div>
+		<Flex
+			flex="1"
+			margin="0 0 2em 0"
+		>
+			<h4>{heading}</h4>
+			<div
+				width={width}
+				height={height}
+				style={{ width: `${width}px`, height: `${height}px` }}
+			>
 			<DICOMCanvas id={id} canvasRef={canvasRef} width={width} height={height} />
+			</div>
 			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
-		</div>
+		</Flex>
 	)
 );
 
@@ -130,25 +142,40 @@ function App() {
 	};
 	return (
 		<div className="App">
-			<header className="App-header">
-				Select file:
-				<FileInput onFileSelected={fileSelected} />
-				{/* <div style={{ display: "flex" }}>
-					<CPURenderer fileBuffer={fileBuffer}>
-						<DICOMCanvas heading="No GPU" />
-					</CPURenderer>
+			<section>
+				<Flex>
+					<h1>dicom.js</h1>
+					A small, super-fast javascript DICOM renderer.
+				</Flex>
+			</section>
 
-				</div> */}
-				<div style={{ height: "50px" }} />
-				<div style={{ display: "flex" }}>
+			<section>
+				<Flex>
+					<FileInput onFileSelected={fileSelected} />
+					{/* <div style={{ display: "flex" }}>
+						<CPURenderer fileBuffer={fileBuffer}>
+							<DICOMCanvas heading="No GPU" />
+						</CPURenderer>
+					</div> */}
+				</Flex>
+			</section>
+
+			<section>
+				<Flex
+					flexDirection="row"
+					flexWrap="wrap"
+					justifyContent="center"
+					width="100%"
+				>
 					<GPURenderer fileBuffer={fileBuffer}>
 						<DICOMWrapper heading="dicom.js" />
 					</GPURenderer>
 					<CornerstoneRenderer fileBuffer={fileBuffer}>
 						<DICOMDiv heading="Cornerstone.js" />
 					</CornerstoneRenderer>
-				</div>
-			</header>
+				</Flex>
+			</section>
+
 		</div>
 	);
 }

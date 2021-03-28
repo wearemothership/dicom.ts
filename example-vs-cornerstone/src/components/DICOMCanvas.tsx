@@ -10,8 +10,8 @@ type DicomCanvasProps = {
 const DICOMCanvas = ({
 	id,
 	canvasRef,
-	width = 512,
-	height = 512
+	width = 300,
+	height = 300
 }: DicomCanvasProps) => (
 	<canvas
 		ref={canvasRef}
