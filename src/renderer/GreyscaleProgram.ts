@@ -4,8 +4,8 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { preCompileGreyscaleShader } from "./Program";
-import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
+import { ISize } from "../image/Types";
 
 const vertexShader = raw("./vertex.glsl");
 const greyscaleShader = raw("./greyscale.glsl");
@@ -15,15 +15,24 @@ class GreyscaleProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	info: IDisplayInfo;
-
 	gl:WebGLRenderingContext;
 
-	outputSize: ISize;
+	static programStringForInfo(info: IDisplayInfo): string {
+		return preCompileGreyscaleShader(info, greyscaleShader);
+	}
 
 	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const greyscaleShaderString = preCompileGreyscaleShader(info, greyscaleShader);
+		const greyscaleShaderString = GreyscaleProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShaderString]);
+
+		this.programInfo = programInfo;
+
+		this.gl = gl;
+		return this;
+	}
+
+	use() {
+		const { gl, programInfo } = this;
 		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		twgl.bindFramebufferInfo(gl, null);
@@ -33,30 +42,23 @@ class GreyscaleProgram implements IProgram {
 
 		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-		this.programInfo = programInfo;
-
-		this.info = info;
-		this.gl = gl;
-		this.outputSize = info.size;
-		return this;
 	}
 
-	run(frame: FrameInfo) {
+	run(frame: FrameInfo, outputSize: ISize) {
 		const {
 			gl,
 			unitQuadBufferInfo,
 			programInfo,
-			outputSize,
-			info
 		} = this;
 		const {
-			texture
+			texture,
+			imageInfo,
 		} = frame;
 
 		let {
 			windowWidth,
 			windowCenter
-		} = info;
+		} = imageInfo;
 
 		const {
 			maxPixVal,
@@ -65,7 +67,7 @@ class GreyscaleProgram implements IProgram {
 			intercept,
 			signed,
 			bitsAllocated
-		} = info;
+		} = imageInfo;
 
 		if (!windowWidth && (maxPixVal !== null || minPixVal !== null)) {
 			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));

@@ -1,9 +1,9 @@
 import { IDisplayInfo } from "./DisplayInfo";
 
 interface IFrameInfo {
-	frameNo: number;
+	frameNo: number
 
-	imageInfo: IDisplayInfo,
+	imageInfo: IDisplayInfo
 
 	texture: WebGLTexture
 

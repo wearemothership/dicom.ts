@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 import fs from "fs";
+import fetch from "node-fetch";
 
-// import {} from "jest-fetch-mock";
 import {
 	createCanvas,
 	WebGLRenderingContext,
@@ -20,7 +20,12 @@ import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
 import * as dicomjs from ".";
 
-global.fetch = fetch;
+// eslint-disable-next-line no-undef
+if (!globalThis.fetch) {
+	// eslint-disable-next-line no-undef
+	globalThis.fetch = fetch;
+}
+
 // need to be global (as they would be in browser) for twgl to get them!
 window.WebGLRenderingContext = WebGLRenderingContext;
 window.WebGLActiveInfo = WebGLActiveInfo;
@@ -101,7 +106,7 @@ describe("dicom.js", () => {
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		// fs.writeFileSync("./image.png", buffer);
+		fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("07c8030befd36cd9b865c925535f6a8fe589807c");
 	});
 

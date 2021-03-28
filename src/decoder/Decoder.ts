@@ -1,13 +1,8 @@
 import * as twgl from "twgl.js";
 import { IDecoderInfo } from "../image/DecoderInfo";
 import { displayInfoFromDecoderInfo, IDisplayInfo } from "../image/DisplayInfo";
+import { ImageSize, ISize } from "../image/Types";
 import FrameInfo from "../image/FrameInfo";
-import { ImageSize } from "../image/Types";
-
-export interface ISize {
-	width: number,
-	height: number
-}
 
 interface IDecoder {
 	outputSize: ISize

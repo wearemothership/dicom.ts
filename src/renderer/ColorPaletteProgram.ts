@@ -4,8 +4,8 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString } from "./Program";
-import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
+import { ISize } from "../image/Types";
 
 const vertexShader = raw("./vertex.glsl");
 const colorPaletteShader = raw("./colorPalette.glsl");
@@ -13,17 +13,11 @@ const colorPaletteShader = raw("./colorPalette.glsl");
 class ColorPaletteProgram implements IProgram {
 	programInfo: ProgramInfo;
 
-	unitQuadBufferInfo: BufferInfo | null = null;
-
-	info: IDisplayInfo;
+	unitQuadBufferInfo: BufferInfo;
 
 	gl:WebGLRenderingContext;
 
-	outputSize: ISize;
-
-	rgbTextures: [WebGLTexture, WebGLTexture, WebGLTexture];
-
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+	static programStringForInfo(info: IDisplayInfo): string {
 		const { palette } = info;
 		const getWordString = glslUnpackWordString(info, false);
 		const getPaletteWordString = glslUnpackWordString({
@@ -32,17 +26,42 @@ class ColorPaletteProgram implements IProgram {
 			bitsAllocated: palette!.bitsAllocated,
 			bitsStored: palette!.bitsAllocated
 		}, false);
+		return colorPaletteShader
+			.replace("$(word)", getWordString)
+			.replace("$(paletteWord)", getPaletteWordString);
+	}
 
-		const programInfo = twgl.createProgramInfo(gl, [vertexShader,
-			colorPaletteShader
-				.replace("$(word)", getWordString)
-				.replace("$(paletteWord)", getPaletteWordString)]);
-		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+		const programString = ColorPaletteProgram.programStringForInfo(info);
+		const programInfo = twgl.createProgramInfo(gl, [vertexShader, programString]);
+		this.programInfo = programInfo;
+		this.gl = gl;
+		// can this be reused?
+		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+		return this;
+	}
+
+	use() {
+		const { gl, programInfo, unitQuadBufferInfo } = this;
 
 		twgl.bindFramebufferInfo(gl, null);
 
 		gl.useProgram(programInfo.program);
 		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
+	}
+
+	run(frame: FrameInfo, outputSize: ISize) {
+		const {
+			gl,
+			unitQuadBufferInfo,
+			programInfo,
+		} = this;
+		const {
+			texture,
+			imageInfo,
+		} = frame;
+
+		const { palette, invert } = imageInfo;
 
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
@@ -92,48 +111,27 @@ class ColorPaletteProgram implements IProgram {
 			mag: gl.NEAREST,
 			wrap: gl.CLAMP_TO_EDGE,
 		});
-		this.rgbTextures = [red, green, blue];
-		// can this be reused?
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-		this.programInfo = programInfo;
-		this.gl = gl;
-		this.outputSize = info.size;
-		this.info = info;
-		return this;
-	}
-
-	run(frame: FrameInfo) {
-		const {
-			gl,
-			unitQuadBufferInfo,
-			programInfo,
-			outputSize,
-			rgbTextures,
-			info
-		} = this;
-		const {
-			texture,
-		} = frame;
-
-		const { palette, invert } = info;
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
 			u_texture: texture,
-			u_redTexture: rgbTextures[0],
-			u_greenTexture: rgbTextures[1],
-			u_blueTexture: rgbTextures[2],
+			u_redTexture: red,
+			u_greenTexture: green,
+			u_blueTexture: blue,
 			u_paletteWidth: palette!.nEntries,
 			u_invert: invert
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
+
+		setTimeout(() => {
+			gl.deleteTexture(red);
+			gl.deleteTexture(green);
+			gl.deleteTexture(blue);
+		});
 	}
 
 	destroy() {
-		const { gl, rgbTextures } = this;
-		gl.deleteProgram(this.programInfo.program);
-		gl.deleteTexture(rgbTextures[0]);
-		gl.deleteTexture(rgbTextures[1]);
-		gl.deleteTexture(rgbTextures[2]);
+		const { gl, programInfo } = this;
+		gl.deleteProgram(programInfo.program);
 	}
 }
 
