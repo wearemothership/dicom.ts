@@ -58,10 +58,10 @@ class ColorPaletteProgram implements IProgram {
 		} = this;
 		const {
 			texture,
-			imageInfo,
+			imageInfo
 		} = frame;
 
-		const { palette, invert } = imageInfo;
+		const { palette, invert, bitsAllocated } = imageInfo;
 
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
@@ -117,7 +117,7 @@ class ColorPaletteProgram implements IProgram {
 			u_redTexture: red,
 			u_greenTexture: green,
 			u_blueTexture: blue,
-			u_paletteWidth: palette!.nEntries,
+			u_paletteWidthRatio: (2 ** bitsAllocated) / palette!.nEntries,
 			u_invert: invert
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
