@@ -1,16 +1,9 @@
 import Decoder from "./Decoder";
-import charls from "./codecs/charlsjs";
+import CharLS from "./codecs/charlsjs";
 import { getJpegData } from "./util";
 
-let initialized = false;
-let initCallback = () => {};
-charls.onRuntimeInitialized = async () => {
-	initialized = true;
-	initCallback();
-	return Promise.resolve();
-};
 class JPEGLosslessDecoder extends Decoder {
-	private jpegs:DataView[] | null = null
+	private jpegs:DataView[] | null = null;
 
 	decode(frameNo: number):Promise<DataView> {
 		const { image } = this;
@@ -18,8 +11,9 @@ class JPEGLosslessDecoder extends Decoder {
 			this.jpegs = getJpegData(image.data);
 		}
 		return new Promise((resolve) => {
-			const charlsDecode = () => {
-				const decoder = new charls.JpegLSDecoder();
+			(CharLS as any)({
+			}).then((charLS: { JpegLSDecoder: new () => any; }) => {
+				const decoder = new charLS.JpegLSDecoder();
 				const jpeg = this.jpegs![frameNo];
 				const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
 				const encodedBuffer = decoder.getEncodedBuffer(buffer.length);
@@ -29,13 +23,7 @@ class JPEGLosslessDecoder extends Decoder {
 
 				const decoded = decoder.getDecodedBuffer();
 				return resolve(decoded);
-			};
-			if (!initialized) {
-				initCallback = charlsDecode;
-			}
-			else {
-				charlsDecode();
-			}
+			});
 		});
 	}
 }

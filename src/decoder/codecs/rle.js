@@ -44,13 +44,13 @@ function decode8(frameInfo, dataView) {
 		}
 	}
 
-	return decoded;
+	return new DataView(decoded, 0, nPixels * samples);
 }
 
 function decode16(frameInfo, dataView) {
 	const { samples, size } = frameInfo;
-	const nPixels = size.numberOfPixels;
-	const decoded = new ArrayBuffer(nPixels * samples * 2);
+	const outBytes = size.numberOfPixels * 2;
+	const decoded = new ArrayBuffer(outBytes * samples);
 	const data = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
 	const out = new Uint8Array(decoded);
 
@@ -58,54 +58,45 @@ function decode16(frameInfo, dataView) {
 
 	let maxIndex = 0;
 	for (let s = 0; s < numSegments; ++s) {
-		let outIndex = 0;
-
 		const highByte = s === 0 ? 1 : 0;
-
+		let outIndex = highByte;
 		let inIndex = dataView.getInt32((s + 1) * 4, true);
 
 		maxIndex = dataView.getInt32((s + 2) * 4, true);
 
 		if (maxIndex === 0) {
-			maxIndex = (dataView.byteLength) * 2;
+			maxIndex = dataView.byteLength;
 		}
-		let diff;
 		let maxI;
 		let value;
-		let i;
 		let n;
 		while (inIndex < maxIndex) {
 			n = data[inIndex++];
-			i = outIndex * 2 + highByte;
 			if (n < 0x80) {
-				diff = Math.min(n + 1, nPixels - outIndex);
-				maxI = diff * 2 + i;
-				for (; i < maxI; i += 2) {
-					out[i] = data[inIndex++];
+				maxI = Math.min((n + 1) * 2 + outIndex, outBytes);
+				for (; outIndex < maxI; outIndex += 2) {
+					out[outIndex] = data[inIndex++];
 				}
-				outIndex += diff;
 			}
 			else if (n > 0x80) {
 				value = data[inIndex++];
-				diff = Math.min(129 - (n ^ 0x80), nPixels - outIndex);
-				maxI = diff * 2 + i;
-				for (; i < maxI; i += 2) {
-					out[i] = value;
+				maxI = Math.min((129 - (n ^ 0x80)) * 2 + outIndex, outBytes);
+				for (; outIndex < maxI; outIndex += 2) {
+					out[outIndex] = value;
 				}
-				outIndex += diff;
 			}
 		}
 	}
-	return decoded;
+	return new DataView(decoded, 0, outBytes * samples);
 }
 
 function decode(frameInfo, pixelDataView) {
 	const { bytesAllocated } = frameInfo;
 	if (bytesAllocated === 1) {
-		return new DataView(decode8(frameInfo, pixelDataView));
+		return decode8(frameInfo, pixelDataView);
 	}
 	if (bytesAllocated === 2) {
-		return new DataView(decode16(frameInfo, pixelDataView));
+		return decode16(frameInfo, pixelDataView);
 	}
 
 	throw new Error("Unsupported data format for RLE");

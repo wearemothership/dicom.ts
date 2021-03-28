@@ -2,7 +2,7 @@ import * as Utils from "./utilities";
 
 const { dec2hex } = Utils;
 
-type TDICOMDictionary = Record<string, Record<string, [string, string]>>
+type TDICOMDictionary = Record<string, Record<string, [string, string]>>;
 
 const dictPrivate: TDICOMDictionary = {
 	"0207": {

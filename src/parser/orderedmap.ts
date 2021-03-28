@@ -5,11 +5,11 @@ export interface TWithIndex {
 	index: number
 }
 class OrderedMap<K extends keyof any, T> implements IOrderedMap<K, T>, TWithIndex {
-	orderedKeys: K[] = []
+	orderedKeys: K[] = [];
 
-	map: Map<K, T> = new Map<K, T>()
+	map: Map<K, T> = new Map<K, T>();
 
-	index = 0 // bit of a hack - necessary for Series
+	index = 0; // bit of a hack - necessary for Series
 
 	put(key: K, value: T) {
 		if (!this.map.get(key)) {

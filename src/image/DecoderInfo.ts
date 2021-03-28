@@ -48,23 +48,23 @@ class DecoderInfo implements IDecoderInfo {
 
 	codec: Codec;
 
-	rgb: boolean
+	rgb: boolean;
 
-	planar: boolean
+	planar: boolean;
 
-	samples: number
+	samples: number;
 
-	bitsAllocated: number
+	bitsAllocated: number;
 
-	bytesAllocated: number
+	bytesAllocated: number;
 
-	bitsStored: number
+	bitsStored: number;
 
-	signed: boolean
+	signed: boolean;
 
-	littleEndian: boolean
+	littleEndian: boolean;
 
-	data: DataView
+	data: DataView;
 
 	constructor(image: DCMImage) {
 		this.image = image;

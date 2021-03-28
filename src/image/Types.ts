@@ -1,3 +1,7 @@
+export interface ISize {
+	width: number,
+	height: number
+}
 export interface IImageSizeContructor {
 	width?: number,
 	height?: number,
@@ -5,7 +9,7 @@ export interface IImageSizeContructor {
 	columns?: number
 }
 
-export interface IImageSize {
+export interface IImageSize extends ISize {
 	width: number,
 	height: number,
 	rows: number,
@@ -13,9 +17,9 @@ export interface IImageSize {
 }
 
 export class ImageSize implements IImageSize {
-	readonly width: number
+	readonly width: number;
 
-	readonly height: number
+	readonly height: number;
 
 	constructor({
 		width,

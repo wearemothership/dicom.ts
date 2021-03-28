@@ -4,8 +4,8 @@ import { ProgramInfo, BufferInfo, FramebufferInfo } from "twgl.js";
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString, preCompileGreyscaleShader } from "./Program";
-import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
+import { ISize } from "../image/Types";
 
 const vertexShader = raw("./vertex.glsl");
 const minMaxShader = raw("./minMax.glsl");
@@ -13,7 +13,7 @@ const contrastifyShader = raw("./contrastify.glsl");
 
 const cellSize = 16;
 
-// eslint-disable-next-line camelcase
+// eslint-disable-next-line camelcase, @typescript-eslint/naming-convention
 interface WEBGL_draw_buffers {
 	drawBuffersWEBGL(buffers: Array<number>):void,
 	COLOR_ATTACHMENT0_WEBGL: number,
@@ -30,19 +30,9 @@ class ContrastifyProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	info: IDisplayInfo;
-
 	gl:WebGLRenderingContext;
 
-	outputSize: ISize;
-
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const ext = gl.getExtension("WEBGL_draw_buffers");
-		if (!ext) {
-			throw new Error("Image requires WEBGL_draw_buffers");
-		}
-		this.ext = ext!;
-
+	static programStringForInfo(info: IDisplayInfo): [string, string] {
 		// don't ignore pixelPaddingVal in minMax calcs
 		const getMinMaxWordString = glslUnpackWordString({ ...info, pixelPaddingVal: null }, true);
 
@@ -55,44 +45,61 @@ class ContrastifyProgram implements IProgram {
 			contrastifyShader.replace("$(minMaxWord)", getMinMaxWordString),
 			true
 		);
+		return [minMaxFragString, contrastifyShaderString];
+	}
+
+	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+		const ext = gl.getExtension("WEBGL_draw_buffers");
+		if (!ext) {
+			throw new Error("Image requires WEBGL_draw_buffers");
+		}
+		this.ext = ext!;
+
+		// TODO: don;t double up on program string generation
+
+		const [minMaxFrag, contrastifyFrag] = ContrastifyProgram.programStringForInfo(info);
 
 		this.minMaxProgramInfo = <ProgramInfo> <unknown> twgl.createProgramInfo(
 			gl,
-			[vertexShader, minMaxFragString]
+			[vertexShader, minMaxFrag]
 		);
 
 		this.contrastProgramInfo = <ProgramInfo> <unknown> twgl.createProgramInfo(
 			gl,
-			[vertexShader, contrastifyShaderString]
+			[vertexShader, contrastifyFrag]
 		);
 
-		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
-		this.info = info;
 		this.gl = gl;
-		this.outputSize = info.size;
 		return this;
 	}
 
-	run(frame: FrameInfo) {
+	// eslint-disable-next-line class-methods-use-this
+	use() {
+		// can't really do anything here...
+	}
+
+	run(frame: FrameInfo, outputSize: ISize) {
 		const framebuffers:Array<FramebufferInfo> = [];
 
 		const {
 			gl,
 			ext,
-			info,
 			minMaxProgramInfo,
 			contrastProgramInfo,
 			unitQuadBufferInfo,
-			outputSize
 		} = this;
+
+		const {
+			imageInfo
+		} = frame;
 
 		const {
 			size,
 			slope,
 			intercept
-		} = info;
+		} = imageInfo;
 		const { width, height } = size;
 		let w = width;
 		let h = height;

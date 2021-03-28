@@ -1,6 +1,6 @@
-import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import FrameInfo from "../image/FrameInfo";
+import { ISize } from "../image/Types";
 
 // let vertexShader = raw("./vertex.glsl");
 // let minMaxShader = raw("./minMax.glsl");
@@ -10,14 +10,15 @@ import FrameInfo from "../image/FrameInfo";
 // let colorShader = raw("./color.glsl");
 
 interface IProgram {
-	// frame: FrameInfo;
-
 	gl: WebGLRenderingContext;
-	outputSize: ISize;
-	// new (gl:WebGLRenderingContext, frame: FrameInfo): IProgram;
-
-	run(frame: FrameInfo):void
+	use():void;
+	run(frame: FrameInfo, size: ISize):void
 	destroy(): void
+}
+
+export interface IProgramSignature {
+	hash: string;
+	Type: any;
 }
 
 /**

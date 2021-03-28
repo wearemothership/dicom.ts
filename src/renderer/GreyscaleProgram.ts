@@ -4,8 +4,8 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { preCompileGreyscaleShader } from "./Program";
-import { ISize } from "../decoder/Decoder";
 import { IDisplayInfo } from "../image/DisplayInfo";
+import { ISize } from "../image/Types";
 
 const vertexShader = raw("./vertex.glsl");
 const greyscaleShader = raw("./greyscale.glsl");
@@ -15,48 +15,47 @@ class GreyscaleProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	info: IDisplayInfo;
-
 	gl:WebGLRenderingContext;
 
-	outputSize: ISize;
+	static programStringForInfo(info: IDisplayInfo): string {
+		return preCompileGreyscaleShader(info, greyscaleShader);
+	}
 
 	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const greyscaleShaderString = preCompileGreyscaleShader(info, greyscaleShader);
+		const greyscaleShaderString = GreyscaleProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShaderString]);
-		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+
+		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+
+		this.programInfo = programInfo;
+		this.gl = gl;
+		return this;
+	}
+
+	use() {
+		const { gl, programInfo, unitQuadBufferInfo } = this;
 
 		twgl.bindFramebufferInfo(gl, null);
 
 		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
-
-		// can this be reused?
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-		this.programInfo = programInfo;
-
-		this.info = info;
-		this.gl = gl;
-		this.outputSize = info.size;
-		return this;
+		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
 	}
 
-	run(frame: FrameInfo) {
+	run(frame: FrameInfo, outputSize: ISize) {
 		const {
 			gl,
 			unitQuadBufferInfo,
 			programInfo,
-			outputSize,
-			info
 		} = this;
 		const {
-			texture
+			texture,
+			imageInfo,
 		} = frame;
 
 		let {
 			windowWidth,
 			windowCenter
-		} = info;
+		} = imageInfo;
 
 		const {
 			maxPixVal,
@@ -65,13 +64,13 @@ class GreyscaleProgram implements IProgram {
 			intercept,
 			signed,
 			bitsAllocated
-		} = info;
+		} = imageInfo;
 
 		if (!windowWidth && (maxPixVal !== null || minPixVal !== null)) {
 			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));
 			windowCenter = ((maxPixVal || 0) + (minPixVal || 0)) / 2;
 		}
-		else if (signed) {
+		if (signed) {
 			windowCenter = (windowCenter || 0) + (2 ** (bitsAllocated - 1));
 		}
 

@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 import fs from "fs";
+import fetch from "node-fetch";
 
-// import {} from "jest-fetch-mock";
 import {
 	createCanvas,
 	WebGLRenderingContext,
@@ -20,7 +20,12 @@ import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
 import * as dicomjs from ".";
 
-global.fetch = fetch;
+// eslint-disable-next-line no-undef
+if (!globalThis.fetch) {
+	// eslint-disable-next-line no-undef
+	globalThis.fetch = fetch;
+}
+
 // need to be global (as they would be in browser) for twgl to get them!
 window.WebGLRenderingContext = WebGLRenderingContext;
 window.WebGLActiveInfo = WebGLActiveInfo;
@@ -101,7 +106,7 @@ describe("dicom.js", () => {
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		// fs.writeFileSync("./image.png", buffer);
+		fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("07c8030befd36cd9b865c925535f6a8fe589807c");
 	});
 
@@ -241,6 +246,20 @@ describe("dicom.js", () => {
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
 		expect(shaFromBuffer(buffer)).toEqual("f8bce5cca7c5c3f5258c524f43a037480763e167");
+	});
+
+	it("Renders with min/max pixel values", async () => {
+		// this image fails on horos and cornerstone too, no data after parse...
+		const data = fs.readFileSync("./test/medical.nema.org/compsamples_rle_20040210/IMAGES/RLE/NM1_RLE");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		const renderer = new dicomjs.Renderer(canvas);
+		await renderer.render(image, 0);
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("d1d0bd3240ce6861e79405498ec8716b1269beb3");
 	});
 
 	it("Fails gracefully when no pixel data", async () => {

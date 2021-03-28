@@ -1,26 +1,28 @@
+import sha1 from "crypto-js/sha1";
 import { decoderForImage, Decoder } from "../decoder";
 import ContrastifyProgram from "./ContrastifyProgram";
 import ColorProgram from "./ColorProgram";
-import IProgram from "./Program";
+import IProgram, { IProgramSignature } from "./Program";
 import GreyscaleProgram from "./GreyscaleProgram";
 import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
-import { ImageSize } from "../image/Types";
+import { ISize, ImageSize } from "../image/Types";
 import { DCMImage, Series } from "../parser";
-import { ISize } from "../decoder/Decoder";
 import ColorPaletteProgram from "./ColorPaletteProgram";
 
 class Renderer {
-	canvas: HTMLCanvasElement
+	canvas: HTMLCanvasElement;
 
-	image: DCMImage | null = null
+	image: DCMImage | null = null;
 
-	private gl: WebGLRenderingContext
+	private gl: WebGLRenderingContext;
 
-	private decoder: Decoder | null = null
+	private decoder: Decoder | null = null;
 
 	private program: IProgram | null = null;
 
 	private outSize: ImageSize | null = null;
+
+	private programCacheMap: Map<string, IProgram>;
 
 	constructor(inCanvas: HTMLCanvasElement | null) {
 		const canvas = inCanvas || document?.createElement("canvas") || new HTMLCanvasElement();
@@ -30,6 +32,7 @@ class Renderer {
 		}
 		this.canvas = canvas;
 		this.gl = gl!;
+		this.programCacheMap = new Map<string, IProgram>();
 	}
 
 	async render(image: DCMImage, frameNo:number = 0) {
@@ -42,43 +45,63 @@ class Renderer {
 		this.canvas.height = size!.height;
 
 		if (this.image !== image) {
-			if (this.program) {
-				// TODO: lets create a program signature, only recreate if not cached?
-				this.program.destroy();
-			}
 			this.image = image;
 			const decoder = decoderForImage(image);
 			decoder!.outputSize = new ImageSize(image);
 
 			const imageInfo = decoder!.image;
+			let signature: IProgramSignature | null = null;
 			if (imageInfo.palette) {
-				this.program = new ColorPaletteProgram(gl, imageInfo);
+				signature = {
+					hash: sha1(ColorPaletteProgram.programStringForInfo(imageInfo)).toString(),
+					Type: ColorPaletteProgram
+				};
 			}
 			else if (imageInfo.rgb) {
-				this.program = new ColorProgram(gl, imageInfo);
+				signature = {
+					hash: sha1(ColorProgram.programStringForInfo()).toString(),
+					Type: ColorProgram
+				};
 			}
 			else if (imageInfo.windowCenter
 				|| imageInfo.minPixVal
 				|| imageInfo.maxPixVal
 			) {
-				this.program = new GreyscaleProgram(gl, imageInfo);
+				signature = {
+					hash: sha1(GreyscaleProgram.programStringForInfo(imageInfo)).toString(),
+					Type: GreyscaleProgram
+				};
 			}
 			else if (imageInfo.lut) {
-				this.program = new GreyscaleLUTProgram(gl, imageInfo);
+				signature = {
+					hash: sha1(GreyscaleLUTProgram.programStringForInfo(imageInfo)).toString(),
+					Type: GreyscaleLUTProgram
+				};
 			}
 			else {
-				this.program = new ContrastifyProgram(gl, imageInfo);
+				const [s0, s1] = ContrastifyProgram.programStringForInfo(imageInfo);
+				signature = {
+					hash: sha1(s0 + s1).toString(),
+					Type: ContrastifyProgram
+				};
 			}
+			let program = this.programCacheMap.get(signature.hash);
+			if (!program) {
+				program = new signature.Type(gl, imageInfo) as IProgram;
+				this.programCacheMap.set(signature.hash, program);
+			}
+			program.use();
+			this.program = program!;
 			this.decoder = decoder;
 		}
 
-		this.program!.outputSize = size;
-
 		const frame = await this.decoder!.getFrame(gl, frameNo);
 
-		this.program!.run(frame);
+		this.program!.run(frame, size);
 
-		frame.destroy();
+		setTimeout(() => {
+			frame.destroy();
+		}, 0);
 	}
 
 	set outputSize(size:ISize) {
@@ -92,8 +115,19 @@ class Renderer {
 		return new ImageSize({ width: 0, height: 0 });
 	}
 
-	destroy(): void {
-		this.program?.destroy();
+	destroy(aggressive:boolean = false): void {
+		this.programCacheMap.forEach((program) => {
+			program.destroy();
+		});
+		this.programCacheMap = new Map();
+		this.program = null;
+		this.image = null;
+		if (aggressive) {
+			// https://stackoverflow.com/questions/23598471/how-do-i-clean-up-and-unload-a-webgl-canvas-context-from-gpu-after-use
+			this.gl.getExtension("WEBGL_lose_context")?.loseContext();
+			this.canvas.width = 1;
+			this.canvas.height = 1;
+		}
 	}
 }
 

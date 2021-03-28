@@ -3,12 +3,10 @@ import Decoder from "./Decoder";
 import { getJpegData } from "./util";
 
 class JPEG2000Decoder extends Decoder {
-	private jpegs:DataView[] | null = null
+	private jpegs:DataView[] | null = null;
 
 	protected decode(frameNo:number):Promise<DataView> {
 		const { image } = this;
-		// const frameSize = image.size.numberOfPixels
-		// 	* image.bytesAllocated;
 
 		if (!this.jpegs) {
 			this.jpegs = getJpegData(image.data);

@@ -4,7 +4,7 @@ import Decoder from "./Decoder";
 import { getJpegData } from "./util";
 
 class NativeDecoder extends Decoder {
-	private jpegData:DataView[]
+	private jpegData:DataView[];
 
 	constructor(image:IDecoderInfo) {
 		super(image);

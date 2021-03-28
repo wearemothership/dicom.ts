@@ -7,6 +7,7 @@
 	},
 	"plugins": ["jest", "import", "@typescript-eslint"],
 	"extends": [
+		"airbnb-typescript/base",
 		"eslint-config-airbnb-base",
 		"plugin:jest/recommended",
 		"plugin:jest/style",
@@ -26,8 +27,10 @@
 			}
 		],
 		"indent": [2, "tab", { "SwitchCase": 1, "VariableDeclarator": 1 }],
+		"@typescript-eslint/indent": [2, "tab", { "SwitchCase": 1, "VariableDeclarator": 1 }],
 		"no-tabs": 0,
 		"comma-dangle": 0, // WTF air-bnb?!
+		"@typescript-eslint/comma-dangle": 0,
 		"linebreak-style": [
 			"error",
 			"unix"
@@ -36,9 +39,14 @@
 			"error",
 			"double"
 		],
+		"@typescript-eslint/quotes": [
+			"error",
+			"double"
+		],
 		"no-console": "off",
 		"curly": [2, "all"],
 		"brace-style": [2, "stroustrup"],
+		"@typescript-eslint/brace-style": [2, "stroustrup"],
 		"semi": ["error", "always"],
 		"no-unused-vars": "off",
 		"@typescript-eslint/no-unused-vars": "error",
@@ -48,7 +56,8 @@
 		"@typescript-eslint/no-use-before-define": ["error"]
 	},
 	"parserOptions": {
-		"sourceType": "module"
+		"sourceType": "module",
+		"project": "./tsconfig.json"
 	},
 	"parser": "@typescript-eslint/parser",
 	"ignorePatterns": ["!.storybook"],

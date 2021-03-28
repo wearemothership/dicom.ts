@@ -4,54 +4,50 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram from "./Program";
-import { ISize } from "../decoder/Decoder";
-import { IDisplayInfo } from "../image/DisplayInfo";
+import { ISize } from "../image/Types";
+// import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const colorShader = raw("./color.glsl");
 class ContrastifyProgram implements IProgram {
 	programInfo: ProgramInfo;
 
-	unitQuadBufferInfo: BufferInfo | null = null;
-
-	info: IDisplayInfo;
+	unitQuadBufferInfo: BufferInfo;
 
 	gl:WebGLRenderingContext;
 
-	outputSize: ISize;
-
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const programInfo = twgl.createProgramInfo(gl, [vertexShader, colorShader]);
-		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-
-		twgl.bindFramebufferInfo(gl, null);
-
-		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
-
-		// can this be reused?
-		this.unitQuadBufferInfo = unitQuadBufferInfo;
-
-		this.programInfo = programInfo;
-		this.info = info;
-		this.gl = gl;
-		this.outputSize = info.size;
+	static programStringForInfo(): string {
+		return colorShader;
 	}
 
-	run(frame: FrameInfo) {
+	// don't need info! all non palette color images use same program
+	constructor(gl:WebGLRenderingContext /* , info: IDisplayInfo */) {
+		const programInfo = twgl.createProgramInfo(gl, [vertexShader, colorShader]);
+		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+		this.programInfo = programInfo;
+		this.gl = gl;
+	}
+
+	use() {
+		const { gl, programInfo, unitQuadBufferInfo } = this;
+
+		twgl.bindFramebufferInfo(gl, null);
+		gl.useProgram(programInfo.program);
+		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
+	}
+
+	run(frame: FrameInfo, outputSize: ISize) {
 		const {
 			gl,
 			programInfo,
 			unitQuadBufferInfo,
-			outputSize,
-			info,
 		} = this;
 		const {
 			invert,
 			planar,
 			slope,
 			intercept
-		} = info;
+		} = frame.imageInfo;
 		const { texture } = frame;
 		twgl.setUniforms(programInfo, {
 			u_resolution: [outputSize.width, outputSize.height],
