@@ -115,6 +115,12 @@ class Renderer {
 		return new ImageSize({ width: 0, height: 0 });
 	}
 
+	clear(): void {
+		const { gl } = this;
+		// eslint-disable-next-line no-bitwise
+		gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+	}
+
 	destroy(aggressive:boolean = false): void {
 		this.programCacheMap.forEach((program) => {
 			program.destroy();

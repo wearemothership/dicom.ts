@@ -4,18 +4,39 @@ import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "./components";
 import { Flex } from "./components/Flex";
 import React, { useEffect, useState, useRef } from "react";
-import { GPUJSDecode, GPUJSInit } from "./ReadDicom";
-import { CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
+import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
+import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
 
 const renderQ = [];
 
+const Status = ({
+	renderTime,
+	renderState
 
+}) => {
+	if (!renderState) {
+		return <div />;
+	}
+	if (renderState === "complete") {
+		return <div>{ (renderTime && `${renderTime}ms`) || "loading..."}</div>;
+	}
+	if (renderState === "error") {
+		return "error";
+	}
+	if (renderState === "waiting") {
+		return "waiting..."
+	}
+	else {
+		return "loading...";
+	}
+}
 
 const DICOMDiv = ({
 	heading,
 	id,
 	renderTime,
+	renderState,
 	canvasRef,
 	width = 300,
 	height = 300
@@ -42,7 +63,7 @@ const DICOMDiv = ({
 				height={height}
 				style={{ width: `${width}px`, height: `${height}px` }}
 			/>
-			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
+			<Status renderTime={renderTime} renderState={renderState}/>
 		</Flex>
 	);
 };
@@ -51,6 +72,7 @@ const DICOMWrapper = ({
 	heading = "",
 	id,
 	renderTime = null,
+	renderState = null,
 	canvasRef,
 	width = 300,
 	height = 300
@@ -66,34 +88,46 @@ const DICOMWrapper = ({
 				height={height}
 				style={{ width: `${width}px`, height: `${height}px` }}
 			>
-			<DICOMCanvas id={id} canvasRef={canvasRef} width={width} height={height} />
+				<DICOMCanvas id={id} canvasRef={canvasRef} width={width} height={height} />
 			</div>
-			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
+			<Status renderTime={renderTime} renderState={renderState}/>
 		</Flex>
 	)
 );
 
 const Renderer = ({
 	initMethod,
+	clearMethod,
 	renderMethod,
 	fileBuffer,
 	children
 }) => {
 	const [renderTime, setRenderTime] = useState(null);
+	const [renderState, setRenderState] = useState(null);
 	const canvasRef = useRef();
 	useEffect(() => {
 		if (fileBuffer) {
+			clearMethod(canvasRef.current);
+			setRenderState("waiting");
 			renderQ.push(() => {
+				setRenderTime(null);
+				setRenderState("loading");
 				const startTime = new Date();
 				renderMethod(fileBuffer, canvasRef.current).then(() => {
 					setRenderTime(new Date() - startTime);
+					setRenderState("complete");
 					renderQ.shift();
 					if (renderQ.length) {
 						renderQ[0]();
 					}
 				})
 				.catch((e) => {
+					setRenderState("error");
 					console.error(e);
+					renderQ.shift();
+					if (renderQ.length) {
+						renderQ[0]();
+					}
 				});
 			});
 			if (renderQ.length === 1) {
@@ -101,7 +135,7 @@ const Renderer = ({
 			}
 		}
 		return	() => {};
-	}, [fileBuffer, renderMethod]);
+	}, [fileBuffer, renderMethod, clearMethod]);
 
 	useEffect(() => {
 		initMethod?.(canvasRef.current)
@@ -115,7 +149,7 @@ const Renderer = ({
 					children,
 					(element) => React.cloneElement(
 						element,
-						{ renderTime, canvasRef }
+						{ renderTime, canvasRef, renderState }
 					)
 				)
 			}
@@ -124,13 +158,18 @@ const Renderer = ({
 };
 
 const GPURenderer = ({ fileBuffer, children }) => (
-	<Renderer renderMethod={GPUJSDecode} fileBuffer={fileBuffer} initMethod={GPUJSInit}>
+	<Renderer renderMethod={GPUJSDecode} fileBuffer={fileBuffer} initMethod={GPUJSInit} clearMethod={GPUJSClear}>
 		{children}
 	</Renderer>
 );
 
 const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
-	<Renderer renderMethod={CornerstoneDecode} fileBuffer={fileBuffer} file={file} initMethod={CornerstoneInit}>
+	<Renderer
+		renderMethod={CornerstoneDecode}
+		fileBuffer={fileBuffer}
+		file={file}
+		initMethod={CornerstoneInit} clearMethod={CornerstoneClear}
+	>
 		{ children }
 	</Renderer>
 );

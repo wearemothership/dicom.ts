@@ -18,7 +18,7 @@ const DICOMCanvas = ({
 		id={id}
 		width={width}
 		height={height}
-		style={{ width: `${width}px`, height: `${height}px` }}
+		style={{ height: `100%` }}
 	/>
 );
 

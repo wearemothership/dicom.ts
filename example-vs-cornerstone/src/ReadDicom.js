@@ -13,12 +13,15 @@ export const GPUJSInit = (canvas) => {
 	}
 }
 
+export const GPUJSClear = (buf) => {
+	renderer.clear();
+}
 
 export const GPUJSDecode = (buf) => {
 	const data = new DataView(buf);
 	// this will print tags to console - slooow
 	// dicomjs.Parser.verbose = true;
 	const image = dicomjs.parseImage(data);
-
+	renderer.outputSize = { width: image.columns, height: image.rows };
 	return renderer.render(image, 0);
 };

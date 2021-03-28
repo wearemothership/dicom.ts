@@ -12,11 +12,15 @@ export const CornerstoneInit = (div) => {
 	// cornerstone.enable(div);
 }
 
+export const CornerstoneClear = (div) => {
+	cornerstone.disable(div);
+}
+
 export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) => {
 	if (!buffer) {
 		return reject(Error("No file!"));
 	}
-	cornerstone.disable(div); // reset size...better way of doing this?
+	// cornerstone.disable(div); // reset size...better way of doing this?
 	cornerstone.enable(div);
 
 	const onRendered = () => {
@@ -33,7 +37,7 @@ export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) 
 		canvas.height = image.rows;
 		// canvas.style.width = "512px";
 		// canvas.style.height = "512px";
-		cornerstone.displayImage(div, image);
-	});
+		return cornerstone.displayImage(div, image);
+	}).catch(reject);
 });
 
