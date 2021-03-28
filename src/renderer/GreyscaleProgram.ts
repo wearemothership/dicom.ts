@@ -25,23 +25,20 @@ class GreyscaleProgram implements IProgram {
 		const greyscaleShaderString = GreyscaleProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShaderString]);
 
-		this.programInfo = programInfo;
+		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
+		this.programInfo = programInfo;
 		this.gl = gl;
 		return this;
 	}
 
 	use() {
-		const { gl, programInfo } = this;
-		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+		const { gl, programInfo, unitQuadBufferInfo } = this;
 
 		twgl.bindFramebufferInfo(gl, null);
 
 		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
-
-		// can this be reused?
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
 	}
 
 	run(frame: FrameInfo, outputSize: ISize) {
@@ -73,7 +70,7 @@ class GreyscaleProgram implements IProgram {
 			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));
 			windowCenter = ((maxPixVal || 0) + (minPixVal || 0)) / 2;
 		}
-		else if (signed) {
+		if (signed) {
 			windowCenter = (windowCenter || 0) + (2 ** (bitsAllocated - 1));
 		}
 
