@@ -13,7 +13,7 @@ const contrastifyShader = raw("./contrastify.glsl");
 
 const cellSize = 16;
 
-// eslint-disable-next-line camelcase
+// eslint-disable-next-line camelcase, @typescript-eslint/naming-convention
 interface WEBGL_draw_buffers {
 	drawBuffersWEBGL(buffers: Array<number>):void,
 	COLOR_ATTACHMENT0_WEBGL: number,

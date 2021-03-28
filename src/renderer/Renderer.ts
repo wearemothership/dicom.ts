@@ -10,13 +10,13 @@ import { DCMImage, Series } from "../parser";
 import ColorPaletteProgram from "./ColorPaletteProgram";
 
 class Renderer {
-	canvas: HTMLCanvasElement
+	canvas: HTMLCanvasElement;
 
-	image: DCMImage | null = null
+	image: DCMImage | null = null;
 
-	private gl: WebGLRenderingContext
+	private gl: WebGLRenderingContext;
 
-	private decoder: Decoder | null = null
+	private decoder: Decoder | null = null;
 
 	private program: IProgram | null = null;
 

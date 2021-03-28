@@ -21,9 +21,9 @@ export interface IPrivateDataReader {
  * @type {Function}
  */
 class Siemens implements IPrivateDataReader {
-	output: string
+	output: string;
 
-	data: DataView
+	data: DataView;
 
 	constructor(buffer: ArrayBuffer) {
 		this.output = "";

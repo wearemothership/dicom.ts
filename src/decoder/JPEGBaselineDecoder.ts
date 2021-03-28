@@ -1,9 +1,10 @@
+import { ISize } from "../image/Types";
 import { JpegImage } from "./codecs/jpeg-baseline";
-import Decoder, { ISize } from "./Decoder";
+import Decoder from "./Decoder";
 import { getJpegData } from "./util";
 
 class JPEGLosslessDecoder extends Decoder {
-	private jpegs:DataView[] | null = null
+	private jpegs:DataView[] | null = null;
 
 	protected decode(frameNo:number):Promise<DataView> {
 		const { image } = this;
@@ -16,7 +17,7 @@ class JPEGLosslessDecoder extends Decoder {
 		const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
 
 		decoder.parse(buffer);
-		const { width, height } = <ISize> <unknown> decoder;
+		const { width, height } = decoder as unknown as ISize;
 		let decoded = null;
 		if (image.bitsAllocated === 8) {
 			decoded = decoder.getData(width, height);

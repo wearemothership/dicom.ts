@@ -3,7 +3,7 @@ import RLE from "./codecs/rle";
 import { getEncapsulatedData } from "./util";
 
 class RLEDecoder extends Decoder {
-	private rleData: DataView[] | null = null
+	private rleData: DataView[] | null = null;
 
 	protected decode(frameNo: number): Promise<DataView> {
 		const { image } = this;

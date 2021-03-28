@@ -17,9 +17,9 @@ export interface IImageSize extends ISize {
 }
 
 export class ImageSize implements IImageSize {
-	readonly width: number
+	readonly width: number;
 
-	readonly height: number
+	readonly height: number;
 
 	constructor({
 		width,

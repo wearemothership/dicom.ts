@@ -3,7 +3,7 @@ import CharLS from "./codecs/charlsjs";
 import { getJpegData } from "./util";
 
 class JPEGLosslessDecoder extends Decoder {
-	private jpegs:DataView[] | null = null
+	private jpegs:DataView[] | null = null;
 
 	decode(frameNo: number):Promise<DataView> {
 		const { image } = this;

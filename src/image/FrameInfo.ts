@@ -18,11 +18,11 @@ interface IFrameInfoConstructor {
 }
 
 class FrameInfo implements IFrameInfo {
-	frameNo: number
+	frameNo: number;
 
-	imageInfo: IDisplayInfo
+	imageInfo: IDisplayInfo;
 
-	texture: WebGLTexture
+	texture: WebGLTexture;
 
 	private gl: WebGLRenderingContext;
 

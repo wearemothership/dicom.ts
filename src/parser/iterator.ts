@@ -4,9 +4,9 @@ export interface IOrderedMap<K, T> {
 }
 
 class OrderedMapIterator<K, T> {
-	orderedMap: IOrderedMap<K, T>
+	orderedMap: IOrderedMap<K, T>;
 
-	index: number
+	index: number;
 
 	constructor(orderedMap: IOrderedMap<K, T>) {
 		this.orderedMap = orderedMap;

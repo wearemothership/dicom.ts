@@ -256,7 +256,7 @@ class Series {
 	 */
 	static useExplicitSpacing: number = 0;
 
-	images:Images = []
+	images:Images = [];
 
 	imagesOriginalOrder: Images | null = null;
 

@@ -602,31 +602,31 @@ class Tag implements ITagKey {
 		return group === tagId[0] && element === tagId[1];
 	}
 
-	id: TagStringID
+	id: TagStringID;
 
-	group: number
+	group: number;
 
-	element: number
+	element: number;
 
-	vr: string | null
+	vr: string | null;
 
 	rawValue: DataView | Tag[] | null;
 
 	convertedValue: TagValue | undefined;
 
-	offsetStart: number | null
+	offsetStart: number | null;
 
-	offsetValue: number | null
+	offsetValue: number | null;
 
-	offsetEnd: number | null
+	offsetEnd: number | null;
 
-	sublist: boolean
+	sublist: boolean;
 
-	preformatted: boolean
+	preformatted: boolean;
 
-	littleEndian: boolean
+	littleEndian: boolean;
 
-	charset: Charset
+	charset: Charset;
 
 	/**
 	 * The Tag constuctor.

@@ -24,6 +24,7 @@
     "types/jpeg-lossless-decoder-js.d.ts"
   ],
   "exclude": [
+	"coverage",
     "node_modules",
     "**/*.spec.ts"
   ]
