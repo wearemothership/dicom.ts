@@ -33,8 +33,10 @@ const DICOMDiv = ({
 	return (
 		<Flex
 			flex="1"
+			margin="0 0 0 20px"
 		>
 			<h4>{heading}</h4>
+			<div className="canvas-container">
 			<div
 				ref={canvasRef}
 				id={id}
@@ -42,6 +44,7 @@ const DICOMDiv = ({
 				height={height}
 				style={{ width: `${width}px`, height: `${height}px` }}
 			/>
+			</div>
 			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
 		</Flex>
 	);
@@ -58,15 +61,10 @@ const DICOMWrapper = ({
 	(
 		<Flex
 			flex="1"
-			margin="0 0 2em 0"
 		>
 			<h4>{heading}</h4>
-			<div
-				width={width}
-				height={height}
-				style={{ width: `${width}px`, height: `${height}px` }}
-			>
-			<DICOMCanvas id={id} canvasRef={canvasRef} width={width} height={height} />
+			<div className="canvas-container">
+				<DICOMCanvas id={id} canvasRef={canvasRef} width={width} height={height} />
 			</div>
 			<div>{ (renderTime && `${renderTime}ms`) || ""}</div>
 		</Flex>
@@ -145,18 +143,41 @@ function App() {
 			<section>
 				<Flex>
 					<h1>dicom.js</h1>
-					A small, super-fast javascript DICOM renderer.
+					<p>A small, super-fast javascript DICOM renderer.</p>
+					<Flex flexDirection="row">
+						<button a href="https://github.com/wearemothership/dicom.js" className="yellow">View on Github</button>
+						<button className="pink">npm install --save dicom.js</button>
+					</Flex>
 				</Flex>
 			</section>
 
 			<section>
-				<Flex>
+				<Flex
+					flexDirection="row"
+					alignItems="center"
+					flexWrap="wrap"
+				>
+					<button id="example1" className="selected">jpeg-baseline.dcm</button>
+					<button id="example2" className="">jpeg-2000-lossless.dcm</button>
+					<button id="example3" className="">greyscale-with-lut.dcm</button>
 					<FileInput onFileSelected={fileSelected} />
 					{/* <div style={{ display: "flex" }}>
 						<CPURenderer fileBuffer={fileBuffer}>
 							<DICOMCanvas heading="No GPU" />
 						</CPURenderer>
 					</div> */}
+				</Flex>
+			</section>
+
+			<section>
+				<Flex
+					flexDirection="row"
+					alignItems="center"
+					flexWrap="wrap"
+				>
+					<small>dicom.js v cornerstone.js comparison: &nbsp;</small>
+					<button id="on" className="">On</button>
+					<button id="off" className="selected">Off</button>
 				</Flex>
 			</section>
 
@@ -170,9 +191,19 @@ function App() {
 					<GPURenderer fileBuffer={fileBuffer}>
 						<DICOMWrapper heading="dicom.js" />
 					</GPURenderer>
-					<CornerstoneRenderer fileBuffer={fileBuffer}>
+					{/* <CornerstoneRenderer fileBuffer={fileBuffer}>
 						<DICOMDiv heading="Cornerstone.js" />
-					</CornerstoneRenderer>
+					</CornerstoneRenderer> */}
+				</Flex>
+			</section>
+
+			<section>
+				<Flex
+					flexDirection="row"
+					alignItems="center"
+					flexWrap="wrap"
+				>
+					<small><a href="https://wearemothership.com">Made by Mothership</a></small>
 				</Flex>
 			</section>
 
