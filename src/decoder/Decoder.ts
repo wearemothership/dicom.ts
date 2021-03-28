@@ -60,7 +60,7 @@ class Decoder implements IDecoder {
 			internalFormat = gl.LUMINANCE;
 		}
 		if (image.planar) {
-			height *= 3;
+			height *= image.samples;
 		}
 
 		return Promise.resolve(twgl.createTexture(gl, {
