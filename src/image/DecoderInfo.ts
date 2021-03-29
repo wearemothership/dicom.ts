@@ -102,7 +102,7 @@ class DecoderInfo implements IDecoderInfo {
 				this.codec = Codec.Uncompressed;
 				break;
 			default:
-				throw Error("Unkown codec?");
+				this.codec = Codec.Uncompressed;
 		}
 
 		this.rgb = !(image.photometricInterpretation || "").startsWith("MONO");
