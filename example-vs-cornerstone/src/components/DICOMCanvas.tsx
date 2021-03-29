@@ -9,15 +9,13 @@ type DicomCanvasProps = {
 
 const DICOMCanvas = ({
 	id,
-	canvasRef,
-	width = 300,
-	height = 300
+	canvasRef
 }: DicomCanvasProps) => (
 	<canvas
 		ref={canvasRef}
 		id={id}
-		width={width}
-		height={height}
+		width={4096} // start with the canvas big - resizing up is expensive...
+		height={4096}
 		style={{ height: `100%` }}
 	/>
 );
