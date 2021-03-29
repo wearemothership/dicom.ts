@@ -148,6 +148,8 @@ function App() {
 					<Flex flexDirection="row">
 						<button a href="https://github.com/wearemothership/dicom.js" className="yellow">View on Github</button>
 						<button className="blue"><img src={CopyIcon}></img>npm install --save dicom.js</button>
+						{/* <button>.js</button>
+						<button>.ts</button> */}
 					</Flex>
 				</Flex>
 			</section>
@@ -158,9 +160,11 @@ function App() {
 					alignItems="center"
 					flexWrap="wrap"
 				>
-					<button id="example1" className="selected">jpeg-baseline.dcm</button>
-					<button id="example2" className="">jpeg-2000-lossless.dcm</button>
-					<button id="example3" className="">greyscale-with-lut.dcm</button>
+					<div className="buttons">
+						<button id="example1" className="selected">jpeg-baseline.dcm</button>
+						<button id="example2" className="">jpeg-2000-lossless.dcm</button>
+						<button id="example3" className="">greyscale-with-lut.dcm</button>
+					</div>
 					<FileInput onFileSelected={fileSelected} />
 					{/* <div style={{ display: "flex" }}>
 						<CPURenderer fileBuffer={fileBuffer}>
@@ -177,8 +181,10 @@ function App() {
 					flexWrap="wrap"
 				>
 					<small>dicom.js v cornerstone.js comparison: &nbsp;</small>
-					<button id="on" className="">On</button>
-					<button id="off" className="selected">Off</button>
+					<div className="buttons">
+						<button id="on" className="">On</button>
+						<button id="off" className="selected">Off</button>
+					</div>
 				</Flex>
 			</section>
 
