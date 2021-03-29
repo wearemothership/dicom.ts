@@ -7,6 +7,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
+import CopyIcon from './copyIcon.png';
 
 const renderQ = [];
 
@@ -146,7 +147,7 @@ function App() {
 					<p>A small, super-fast javascript DICOM renderer.</p>
 					<Flex flexDirection="row">
 						<button a href="https://github.com/wearemothership/dicom.js" className="yellow">View on Github</button>
-						<button className="pink">npm install --save dicom.js</button>
+						<button className="blue"><img src={CopyIcon}></img>npm install --save dicom.js</button>
 					</Flex>
 				</Flex>
 			</section>

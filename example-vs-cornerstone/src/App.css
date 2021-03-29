@@ -32,6 +32,7 @@ p {
 }
 
 button, ::-webkit-file-upload-button {
+	display: flex;
 	background: rgb(242, 242, 242);
 	padding: 0.5em 0.75em;
 	border-radius: 0.5em;
@@ -40,12 +41,19 @@ button, ::-webkit-file-upload-button {
 	cursor: pointer;
 }
 
+button img {
+	height: 17px;
+	margin-right: 5px;
+}
+
 
 ::-webkit-file-upload-button {
 	margin-left: 1em;
 	background:#fff;
 	border: 1px solid rgb(29, 29, 29);
 }
+
+
 
 .selected {
 	background: rgb(29, 29, 29);
@@ -59,6 +67,10 @@ button, ::-webkit-file-upload-button {
 .pink {
 	background: hotpink;
 	color: #fff;
+}
+
+.blue {
+	background: rgb(153, 226, 255);
 }
 
   section {
