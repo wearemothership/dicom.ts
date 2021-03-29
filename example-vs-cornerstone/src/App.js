@@ -3,17 +3,18 @@ import "./App.css";
 import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "./components";
 import { Flex } from "./components/Flex";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, } from "react";
 import {
 	BrowserRouter as Router,
 	Switch,
 	Route,
 	Link,
-	useParams
+	useHistory
   } from "react-router-dom";
 import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
+import CopyIcon from './copyIcon.png';
 
 const renderQ = [];
 
@@ -180,9 +181,17 @@ const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
 );
 
 const Example = (props) => {
-	let { vsconverstone } = useParams();
-	const [vsState, setVsState] = useState(vsconverstone);
+	const history = useHistory();
 	const [fileBuffer, setFileBuffer] = useState(null);
+	const [copied, setCopied] = useState(false);
+	const { cornerstone } = props;
+	const copyText = () => {
+		navigator.clipboard.writeText("npm install --save dicom.js");
+		setCopied(true);
+		setTimeout(() => {
+			setCopied(false);
+		}, 2000);
+	}
 	const fileSelected = (buff) => {
 		setFileBuffer(buff);
 	};
@@ -194,7 +203,8 @@ const Example = (props) => {
 				<p>A small, super-fast javascript DICOM renderer.</p>
 				<Flex flexDirection="row">
 					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.js"} className="yellow">View on Github</button>
-					<button className="pink">npm install --save dicom.js</button>
+					<button className="blue"  onClick={copyText}><img src={CopyIcon}></img>npm install --save dicom.js</button>
+					{copied && "Text Copied!"}
 				</Flex>
 			</Flex>
 		</section>
@@ -224,8 +234,8 @@ const Example = (props) => {
 				flexWrap="wrap"
 			>
 				<small>dicom.js v cornerstone.js comparison: &nbsp;</small>
-				<button id="on" onClick={() => {setVsState(!vsState)}} className={vsState ? "selected" : ""}>On</button>
-				<button id="off" onClick={() => {setVsState(!vsState)}} className={vsState ? "" : "selected"}>Off</button>
+				<button id="on" onClick={() => {history.push("/vs-cornerstone")}} className={cornerstone ? "selected" : ""}>On</button>
+				<button id="off" onClick={() => {history.push("/")}} className={cornerstone ? "" : "selected"}>Off</button>
 			</Flex>
 		</section>
 
@@ -240,7 +250,7 @@ const Example = (props) => {
 					<DICOMWrapper heading="dicom.js" />
 				</GPURenderer>
 
-				{vsState && <CornerstoneRenderer fileBuffer={fileBuffer}>
+				{cornerstone && <CornerstoneRenderer fileBuffer={fileBuffer}>
 					<DICOMDiv heading="Cornerstone.js" />
 				</CornerstoneRenderer>}
 			</Flex>
@@ -263,7 +273,10 @@ const Example = (props) => {
 function App() {
 	return (
 		<Router>
-			<Example />
+			<Switch>
+          		<Route path="/vs-cornerstone" children={<Example cornerstone={true}/>} />
+				<Route component={Example} />
+			</Switch>
 		</Router>
 	);
 }
