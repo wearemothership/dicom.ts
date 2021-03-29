@@ -21,8 +21,8 @@
     "test:lint": "eslint .",
     "test:unit": "jest .",
     "test:coverage": "jest . --coverage",
-    "predeploy": "cd example && npm install && npm run build",
-    "deploy": "gh-pages -d example/build"
+    "predeploy": "cd example-vs-cornerstone && npm install && npm run build && cp ../node_modules/dicom-test-files/vpop-pro.com/* ./build/static",
+    "deploy": "gh-pages -d example-vs-cornerstone/build"
   },
   "dependencies": {
     "@types/jest": "^26.0.20",

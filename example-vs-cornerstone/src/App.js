@@ -5,18 +5,21 @@ import { DICOMCanvas, FileInput } from "./components";
 import { Flex } from "./components/Flex";
 import React, { useEffect, useState, useRef, } from "react";
 import {
-	BrowserRouter as Router,
+	HashRouter as Router,
 	Switch,
 	Route,
 	Link,
-	useHistory
+	useHistory,
+	createBrowserHistory
   } from "react-router-dom";
 import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
-import CopyIcon from './copyIcon.png';
+import CopyIcon from "./copyIcon.png";
 
 const renderQ = [];
+
+const baseUrl = "/dicom.js"
 
 const Status = ({
 	renderTime,
@@ -65,15 +68,12 @@ const DICOMDiv = ({
 			margin="0 0 0 20px"
 		>
 			<h4>{heading}</h4>
-			<div className="canvas-container">
-				<div
-					ref={canvasRef}
-					id={id}
-					width={width}
-					height={height}
-					style={{ width: `${width}px`, height: `${height}px` }}
-				/>
-			</div>
+			<div
+				className="canvas-container"
+				ref={canvasRef}
+				id={id}
+				// style={{height: `${height}px` }}
+			/>
 			<Status renderTime={renderTime} renderState={renderState}/>
 		</Flex>
 	);
@@ -180,9 +180,16 @@ const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
 	</Renderer>
 );
 
+const ExampleFileButton = ({fileName, selectedFile, loadFile}) => {
+	const url = `static/${fileName}`;
+	const selected = fileName === selectedFile;
+	return <button onClick={() => loadFile(fileName)} className={selected ? "selected" : ""}>{fileName}</button>
+}
+
 const Example = (props) => {
 	const history = useHistory();
 	const [fileBuffer, setFileBuffer] = useState(null);
+	const [fileName, setFileName] = useState(null);
 	const [copied, setCopied] = useState(false);
 	const { cornerstone } = props;
 	const copyText = () => {
@@ -195,6 +202,12 @@ const Example = (props) => {
 	const fileSelected = (buff) => {
 		setFileBuffer(buff);
 	};
+
+	const loadFile = (file) => {
+		setFileName(file);
+		fetch(`${baseUrl}/static/${file}`).then((response) => response.arrayBuffer().then(setFileBuffer));
+	}
+
 	return (
 	<div className="App">
 		<section>
@@ -215,15 +228,18 @@ const Example = (props) => {
 				alignItems="center"
 				flexWrap="wrap"
 			>
-				<button id="example1" className="selected">jpeg-baseline.dcm</button>
-				<button id="example2" className="">jpeg-2000-lossless.dcm</button>
-				<button id="example3" className="">greyscale-with-lut.dcm</button>
+				<ExampleFileButton fileName="jpeg-baseline.dcm" selectedFile={fileName} loadFile={loadFile}/>
+				<ExampleFileButton fileName="jpeg-2000-lossless.dcm" selectedFile={fileName} loadFile={loadFile}/>
+				<ExampleFileButton fileName="greyscale-with-lut.dcm" selectedFile={fileName} loadFile={loadFile}/>
+			</Flex>
+		</section>
+		<section>
+			<Flex
+				flexDirection="row"
+				alignItems="left"
+				flexWrap="wrap"
+			>
 				<FileInput onFileSelected={fileSelected} />
-				{/* <div style={{ display: "flex" }}>
-					<CPURenderer fileBuffer={fileBuffer}>
-						<DICOMCanvas heading="No GPU" />
-					</CPURenderer>
-				</div> */}
 			</Flex>
 		</section>
 
@@ -262,13 +278,12 @@ const Example = (props) => {
 				alignItems="center"
 				flexWrap="wrap"
 			>
-				<small><a href="https://wearemothership.com">Made by Mothership</a></small>
+				<Link to={"https://wearemothership.com"} onClick={ () => window.location.href="https://wearemothership.com" }><small>Made by Mothership</small></Link>
 			</Flex>
 		</section>
 
 	</div>);
 }
-
 
 function App() {
 	return (
