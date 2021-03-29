@@ -4,6 +4,13 @@ import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "./components";
 import { Flex } from "./components/Flex";
 import React, { useEffect, useState, useRef } from "react";
+import {
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Link,
+	useParams
+  } from "react-router-dom";
 import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
@@ -54,15 +61,18 @@ const DICOMDiv = ({
 	return (
 		<Flex
 			flex="1"
+			margin="0 0 0 20px"
 		>
 			<h4>{heading}</h4>
-			<div
-				ref={canvasRef}
-				id={id}
-				width={width}
-				height={height}
-				style={{ width: `${width}px`, height: `${height}px` }}
-			/>
+			<div className="canvas-container">
+				<div
+					ref={canvasRef}
+					id={id}
+					width={width}
+					height={height}
+					style={{ width: `${width}px`, height: `${height}px` }}
+				/>
+			</div>
 			<Status renderTime={renderTime} renderState={renderState}/>
 		</Flex>
 	);
@@ -80,17 +90,12 @@ const DICOMWrapper = ({
 	(
 		<Flex
 			flex="1"
-			margin="0 0 2em 0"
 		>
 			<h4>{heading}</h4>
-			<div
-				width={width}
-				height={height}
-				style={{ width: `${width}px`, height: `${height}px` }}
-			>
+			<div className="canvas-container">
 				<DICOMCanvas id={id} canvasRef={canvasRef} width={width} height={height} />
 			</div>
-			<Status renderTime={renderTime} renderState={renderState}/>
+			<Status renderTime={renderTime} renderState={renderState} />
 		</Flex>
 	)
 );
@@ -174,48 +179,92 @@ const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
 	</Renderer>
 );
 
-function App() {
+const Example = (props) => {
+	let { vsconverstone } = useParams();
+	const [vsState, setVsState] = useState(vsconverstone);
 	const [fileBuffer, setFileBuffer] = useState(null);
 	const fileSelected = (buff) => {
 		setFileBuffer(buff);
 	};
 	return (
-		<div className="App">
-			<section>
-				<Flex>
-					<h1>dicom.js</h1>
-					A small, super-fast javascript DICOM renderer.
+	<div className="App">
+		<section>
+			<Flex>
+				<h1>dicom.js</h1>
+				<p>A small, super-fast javascript DICOM renderer.</p>
+				<Flex flexDirection="row">
+					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.js"} className="yellow">View on Github</button>
+					<button className="pink">npm install --save dicom.js</button>
 				</Flex>
-			</section>
+			</Flex>
+		</section>
 
-			<section>
-				<Flex>
-					<FileInput onFileSelected={fileSelected} />
-					{/* <div style={{ display: "flex" }}>
-						<CPURenderer fileBuffer={fileBuffer}>
-							<DICOMCanvas heading="No GPU" />
-						</CPURenderer>
-					</div> */}
-				</Flex>
-			</section>
+		<section>
+			<Flex
+				flexDirection="row"
+				alignItems="center"
+				flexWrap="wrap"
+			>
+				<button id="example1" className="selected">jpeg-baseline.dcm</button>
+				<button id="example2" className="">jpeg-2000-lossless.dcm</button>
+				<button id="example3" className="">greyscale-with-lut.dcm</button>
+				<FileInput onFileSelected={fileSelected} />
+				{/* <div style={{ display: "flex" }}>
+					<CPURenderer fileBuffer={fileBuffer}>
+						<DICOMCanvas heading="No GPU" />
+					</CPURenderer>
+				</div> */}
+			</Flex>
+		</section>
 
-			<section>
-				<Flex
-					flexDirection="row"
-					flexWrap="wrap"
-					justifyContent="center"
-					width="100%"
-				>
-					<GPURenderer fileBuffer={fileBuffer}>
-						<DICOMWrapper heading="dicom.js" />
-					</GPURenderer>
-					<CornerstoneRenderer fileBuffer={fileBuffer}>
-						<DICOMDiv heading="Cornerstone.js" />
-					</CornerstoneRenderer>
-				</Flex>
-			</section>
+		<section>
+			<Flex
+				flexDirection="row"
+				alignItems="center"
+				flexWrap="wrap"
+			>
+				<small>dicom.js v cornerstone.js comparison: &nbsp;</small>
+				<button id="on" onClick={() => {setVsState(!vsState)}} className={vsState ? "selected" : ""}>On</button>
+				<button id="off" onClick={() => {setVsState(!vsState)}} className={vsState ? "" : "selected"}>Off</button>
+			</Flex>
+		</section>
 
-		</div>
+		<section>
+			<Flex
+				flexDirection="row"
+				flexWrap="wrap"
+				justifyContent="center"
+				width="100%"
+			>
+				<GPURenderer fileBuffer={fileBuffer}>
+					<DICOMWrapper heading="dicom.js" />
+				</GPURenderer>
+
+				{vsState && <CornerstoneRenderer fileBuffer={fileBuffer}>
+					<DICOMDiv heading="Cornerstone.js" />
+				</CornerstoneRenderer>}
+			</Flex>
+		</section>
+
+		<section>
+			<Flex
+				flexDirection="row"
+				alignItems="center"
+				flexWrap="wrap"
+			>
+				<small><a href="https://wearemothership.com">Made by Mothership</a></small>
+			</Flex>
+		</section>
+
+	</div>);
+}
+
+
+function App() {
+	return (
+		<Router>
+			<Example />
+		</Router>
 	);
 }
 
