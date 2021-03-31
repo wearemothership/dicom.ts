@@ -220,7 +220,7 @@ class Renderer {
 		}
 		else if (imageInfo.rgb) {
 			signature = {
-				hash: sha1(ColorProgram.programStringForInfo()).toString(),
+				hash: sha1(ColorProgram.programStringForInfo(imageInfo)).toString(),
 				Type: ColorProgram
 			};
 		}

@@ -162,7 +162,7 @@ const Renderer = ({
 				renderQ[0]();
 			}
 		}
-		else {
+		else if (fileBuffer === null) {
 			setRenderState("downloading");
 		}
 		return	() => {};
@@ -213,7 +213,7 @@ const ExampleFileButton = ({fileName, selectedFile, loadFile}) => {
 
 const Example = (props) => {
 	const history = useHistory();
-	const [fileBuffer, setFileBuffer] = useState(null);
+	const [fileBuffer, setFileBuffer] = useState(undefined);
 	const [fileName, setFileName] = useState(null);
 	const [copied, setCopied] = useState(false);
 	const { cornerstone } = props;
