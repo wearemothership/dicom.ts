@@ -1,1 +1,0 @@
-Contains special case DICOMs fully anonymised
