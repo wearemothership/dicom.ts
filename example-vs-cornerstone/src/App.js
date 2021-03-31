@@ -205,7 +205,7 @@ const Example = (props) => {
 
 	const loadFile = (file) => {
 		setFileName(file);
-		fetch(`${baseUrl}/static/${file}`).then((response) => response.arrayBuffer().then(setFileBuffer));
+		fetch(`./${file}`).then((response) => response.arrayBuffer().then(setFileBuffer));
 	}
 
 	return (
