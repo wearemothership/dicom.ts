@@ -2,7 +2,7 @@
 import "./App.css";
 import cornerstone from "cornerstone-core";
 import { DICOMCanvas, FileInput } from "./components";
-import { Flex } from "./components/Flex";
+import Flex from "./components/Flex";
 import React, { useEffect, useState, useRef, } from "react";
 import {
 	HashRouter as Router,

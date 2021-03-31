@@ -1,5 +1,4 @@
-
-import * as dicomjs from "dicom.js"
+import * as dicomjs from "dicom.js";
 
 let renderer = null;
 let lastCanvas = null;
@@ -25,7 +24,7 @@ export const GPUJSInit = (canvas) => {
 			hasPixelPaddingValue: false,
 			invert: false,
 			knownWindow: true,
-		})
+		});
 
 		// greyscale-with-lut.dcm
 		renderer.primeGreyscale({
@@ -37,13 +36,13 @@ export const GPUJSInit = (canvas) => {
 			hasPixelPaddingValue: false,
 			invert: true,
 			knownWindow: false,
-		})
+		});
 	}
-}
+};
 
-export const GPUJSClear = (buf) => {
+export const GPUJSClear = (/* buf */) => {
 	renderer.clear();
-}
+};
 
 export const GPUJSDecode = (buf) => {
 	const data = new DataView(buf);

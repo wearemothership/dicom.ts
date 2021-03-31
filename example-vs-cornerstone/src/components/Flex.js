@@ -1,25 +1,43 @@
+import React from "react";
 
+const Flex = ({
+	className,
+	children,
+	justifyContent = "flex-start",
+	flexDirection = "column",
+	flexGrow = 0,
+	flexBasis = "auto",
+	flexShrink = 1,
+	flexWrap = "nowrap",
+	flex = "0 1 auto",
+	alignItems = "stretch",
+	margin = "0",
+	padding = "0",
+	width = "auto",
+	height = "auto",
+	maxWidth = "100%"
+}) => (
+	<div
+		className={className}
+		style={{
+			display: "flex",
+			justifyContent,
+			flexDirection,
+			flexGrow,
+			flexBasis,
+			flexShrink,
+			flexWrap,
+			flex,
+			alignItems,
+			margin,
+			padding,
+			width,
+			height,
+			maxWidth,
+		}}
+	>
+		{ children }
+	</div>
+);
 
-export const Flex = (props) => (
-    <div
-      className={props.className}
-      style={{
-        display: 'flex',
-        justifyContent: props.justifyContent || 'flex-start',
-        flexDirection: props.flexDirection || 'column',
-        flexGrow: props.flexGrow || 0,
-        flexBasis: props.flexBasis || 'auto',
-        flexShrink: props.flexShrink || 1,
-        flexWrap: props.flexWrap || 'nowrap',
-        flex: props.flex || '0 1 auto',
-        alignItems: props.alignItems || 'stretch',
-        margin: props.margin || '0',
-        padding: props.padding || '0',
-        width: props.width || 'auto',
-        height: props.height || 'auto',
-        maxWidth: props.maxWidth || '100%'
-      }}
-    >
-      {props.children}
-    </div>
-  )
+export default Flex;

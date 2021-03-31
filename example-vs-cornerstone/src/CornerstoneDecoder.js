@@ -8,13 +8,13 @@ cornerstoneFileImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
 
-export const CornerstoneInit = (div) => {
+export const CornerstoneInit = (/* div */) => {
 	// cornerstone.enable(div);
-}
+};
 
 export const CornerstoneClear = (div) => {
 	cornerstone.disable(div);
-}
+};
 
 export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) => {
 	if (!buffer) {
@@ -40,4 +40,3 @@ export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) 
 		return cornerstone.displayImage(div, image);
 	}).catch(reject);
 });
-

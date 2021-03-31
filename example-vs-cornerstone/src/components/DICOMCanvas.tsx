@@ -5,7 +5,7 @@ type DicomCanvasProps = {
 	canvasRef: RefObject<HTMLCanvasElement>,
 	width: number,
 	height: number
-}
+};
 
 const DICOMCanvas = ({
 	id,
@@ -14,7 +14,7 @@ const DICOMCanvas = ({
 	<canvas
 		ref={canvasRef}
 		id={id}
-		style={{ height: `100%` }}
+		style={{ height: "100%" }}
 	/>
 );
 
