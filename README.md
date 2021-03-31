@@ -1,5 +1,5 @@
 # dicom.js
-## A small, super-fast javascript DICOM renderer.
+**A small, super-fast javascript DICOM renderer**
 
 <!-- INTRODUCTION -->
 We had a requirement to display greyscale, single frame dicom files as quickly as possible in the browser. Cornerstone.js, which seems ubiquitous and feature rich - just seemed too big and complex for the task, and saw that performance could be improved. We thought it was worth investigating accelerating things as much as possible with WebGl.
@@ -141,14 +141,14 @@ Copyright (c) 2021 [Mothership Software Ltd.](https://github.com/wearemothership
 
 
 <!-- CONTACT -->
-## Made by Mothership
+### Made by Mothership
 wearemothership.com
 ****
 
 
 
 <!-- USED IN... -->
-## dicom.js is used in…
+### dicom.js is used in…
 - [vPOP PRO](https://vpop-pro.com)
 
 *Please let us know if you wish us to add your project to this list.*
@@ -157,6 +157,6 @@ wearemothership.com
 
 
 <!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
+### Acknowledgements
 Parser based heavily on https://github.com/rii-mango/Daikon
 thank you - RII-UTHSCSA / martinezmj
