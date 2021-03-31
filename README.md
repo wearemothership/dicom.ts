@@ -140,13 +140,6 @@ Copyright (c) 2021 [Mothership Software Ltd.](https://github.com/wearemothership
 
 
 
-<!-- CONTACT -->
-### Made by Mothership
-wearemothership.com
-****
-
-
-
 <!-- USED IN... -->
 ### dicom.js is used in…
 - [vPOP PRO](https://vpop-pro.com)
@@ -160,3 +153,11 @@ wearemothership.com
 ### Acknowledgements
 Parser based heavily on https://github.com/rii-mango/Daikon
 thank you - RII-UTHSCSA / martinezmj
+****
+
+
+
+<!-- CONTACT -->
+### Made by Mothership
+wearemothership.com
+****
