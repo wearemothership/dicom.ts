@@ -30,16 +30,32 @@ const Status = ({
 		return <div />;
 	}
 	if (renderState === "complete") {
-		return <div>{ (renderTime && `<GoDashboard /> ${renderTime}ms`) || "<GoSync /> loading..."}</div>;
+		return (
+			<Flex flexDirection="row" alignItems="center">
+				<GoDashboard />&nbsp;{renderTime}ms
+			</Flex>
+		)
 	}
 	if (renderState === "error") {
-		return "<GoAlert /> error";
+		return (
+			<Flex flexDirection="row" alignItems="center">
+				<GoAlert />&nbsp;Error
+			</Flex>
+		)
 	}
 	if (renderState === "waiting") {
-		return "<GoSync /> waiting..."
+		return (
+			<Flex flexDirection="row" alignItems="center">
+				<GoSync />&nbsp;Waiting...
+			</Flex>
+		)
 	}
 	else {
-		return "<GoSync /> loading...";
+		return (
+			<Flex flexDirection="row" alignItems="center">
+				<GoSync />&nbsp;Loading...
+			</Flex>
+		)
 	}
 }
 
@@ -262,8 +278,6 @@ const Example = (props) => {
 				<GPURenderer fileBuffer={fileBuffer}>
 					<DICOMWrapper heading="dicom.js" />
 				</GPURenderer>
-
-				<div>-</div>
 
 				{cornerstone && <CornerstoneRenderer fileBuffer={fileBuffer}>
 					<DICOMDiv heading="Cornerstone.js" />
