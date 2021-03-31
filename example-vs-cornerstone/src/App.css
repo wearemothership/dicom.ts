@@ -54,24 +54,26 @@ button {
 
 button, ::-webkit-file-upload-button {
 	display: flex;
+	margin-right: 0.5em;
 	background: rgb(242, 242, 242);
 	padding: 0.5em 0.75em;
 	border-radius: 0.5em;
 	border: none;
-	font-size: small;
 	cursor: pointer;
+	align-items: center;
 }
 
-button img {
-	height: 17px;
+button:active {
+	background-color: black;
+}
+
+button svg {
 	margin-right: 5px;
 }
 
 
 ::-webkit-file-upload-button {
-	margin-left: 1em;
 	background:#fff;
-	border: 1px solid rgb(29, 29, 29);
 }
 
 

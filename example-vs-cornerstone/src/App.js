@@ -15,7 +15,7 @@ import {
 import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
 import { addExtensionsToContext } from "twgl.js";
-import CopyIcon from "./copyIcon.png";
+import { GoClippy, GoMarkGithub, GoDashboard, GoSync, GoAlert, GoFileMedia } from "react-icons/go";
 
 const renderQ = [];
 
@@ -30,16 +30,16 @@ const Status = ({
 		return <div />;
 	}
 	if (renderState === "complete") {
-		return <div>{ (renderTime && `${renderTime}ms`) || "loading..."}</div>;
+		return <div>{ (renderTime && `<GoDashboard /> ${renderTime}ms`) || "<GoSync /> loading..."}</div>;
 	}
 	if (renderState === "error") {
-		return "error";
+		return "<GoAlert /> error";
 	}
 	if (renderState === "waiting") {
-		return "waiting..."
+		return "<GoSync /> waiting..."
 	}
 	else {
-		return "loading...";
+		return "<GoSync /> loading...";
 	}
 }
 
@@ -183,7 +183,7 @@ const CornerstoneRenderer = ({ fileBuffer, file, children }) => (
 const ExampleFileButton = ({fileName, selectedFile, loadFile}) => {
 	const url = `static/${fileName}`;
 	const selected = fileName === selectedFile;
-	return <button onClick={() => loadFile(fileName)} className={selected ? "selected" : ""}>{fileName}</button>
+	return <button onClick={() => loadFile(fileName)} className={selected ? "selected" : ""}><GoFileMedia /> {fileName}</button>
 }
 
 const Example = (props) => {
@@ -214,10 +214,13 @@ const Example = (props) => {
 			<Flex>
 				<h1>dicom.js</h1>
 				<p>A small, super-fast javascript DICOM renderer.</p>
-				<Flex flexDirection="row">
-					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.js"} className="yellow">View on Github</button>
-					<button className="blue"  onClick={copyText}><img src={CopyIcon}></img>npm install --save dicom.js</button>
-					{copied && "Text Copied!"}
+				<Flex
+					flexDirection="row"
+					alignItems="center"
+				>
+					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.js"} className="yellow"><GoMarkGithub /> View on Github</button>
+					<button className="blue"  onClick={copyText}><GoClippy /> npm install --save dicom.js</button>
+					{copied && <small>Copied…</small>}
 				</Flex>
 			</Flex>
 		</section>
@@ -228,17 +231,11 @@ const Example = (props) => {
 				alignItems="center"
 				flexWrap="wrap"
 			>
-				<ExampleFileButton fileName="jpeg-baseline.dcm" selectedFile={fileName} loadFile={loadFile}/>
-				<ExampleFileButton fileName="jpeg-2000-lossless.dcm" selectedFile={fileName} loadFile={loadFile}/>
-				<ExampleFileButton fileName="greyscale-with-lut.dcm" selectedFile={fileName} loadFile={loadFile}/>
-			</Flex>
-		</section>
-		<section>
-			<Flex
-				flexDirection="row"
-				alignItems="left"
-				flexWrap="wrap"
-			>
+				<div className="buttons">
+					<ExampleFileButton fileName="jpeg-baseline.dcm" selectedFile={fileName} loadFile={loadFile}/>
+					<ExampleFileButton fileName="jpeg-2000-lossless.dcm" selectedFile={fileName} loadFile={loadFile}/>
+					<ExampleFileButton fileName="greyscale-with-lut.dcm" selectedFile={fileName} loadFile={loadFile}/>
+				</div>
 				<FileInput onFileSelected={fileSelected} />
 			</Flex>
 		</section>
@@ -250,8 +247,10 @@ const Example = (props) => {
 				flexWrap="wrap"
 			>
 				<small>dicom.js v cornerstone.js comparison: &nbsp;</small>
-				<button id="on" onClick={() => {history.push("/vs-cornerstone")}} className={cornerstone ? "selected" : ""}>On</button>
-				<button id="off" onClick={() => {history.push("/")}} className={cornerstone ? "" : "selected"}>Off</button>
+				<div className="buttons">
+					<button id="on" onClick={() => {history.push("/vs-cornerstone")}} className={cornerstone ? "selected" : ""}>On</button>
+					<button id="off" onClick={() => {history.push("/")}} className={cornerstone ? "" : "selected"}>Off</button>
+				</div>
 			</Flex>
 		</section>
 
