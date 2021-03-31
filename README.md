@@ -71,14 +71,7 @@ npm install
 npm run build
 ```
 
-**Simple demo**
-```bash
-cd example
-npm install
-npm start
-```
-
-**Or dicom.js vs cornerston.js performance demo**
+**dicom.js vs cornerston.js performance demo**
 ```bash
 cd example-vs-cornerstone
 npm install
@@ -158,45 +151,6 @@ displayDicom(canvas, dataBuffer);
 ## Roadmap
 
 See the [open issues](https://github.com/wearemothership/dicom.js/issues) for a list of proposed features (and known issues).
-
-
-<p>&nbsp;</p>
-
-****
-
-<p>&nbsp;</p>
-
-
-
-
-<!-- TODO -->
-## To-do
-
-- consistent & more detailed error handling (parsing / decoding / rendering)
-- improve memory management.  Can we share decoder wasm heap?
-- load series support
-- make example one app with 2+ routes!
-- ~~seperate out react lib?~~
-- ~~add standalone React canvas example~~
-- ~~pixel padding support on > contrastify program~~
-- ~~some images are not perfect with cornerstone, what is correct?~~
-- ~~accelerate palette conversion~~
-- ~~planar config~~
-- ~~palette conversion does not work see ./test/issues~~
-- ~~code coverage~~
-- ~~make sure adhere to licenses...~~
-- ~~J2KI files slower than cornerstone~~
-- ~~scale / maxsize~~
-- ~~LL decoder can be slower than cornerstones~~
-- ~~add typescript support~~
-- ~~complete ts impl~~
-- ~~fix microbundle warnings~~
-- ~~fix cornerstone comparison example~~
-- ~~add test framework~~
-- ~~seperate out decoders from parser~~
-- ~~seperate programs~~
-- ~~currently only supports rendering frame 0!~~
-
 
 <p>&nbsp;</p>
 
