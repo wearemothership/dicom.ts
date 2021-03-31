@@ -14,8 +14,6 @@ const DICOMCanvas = ({
 	<canvas
 		ref={canvasRef}
 		id={id}
-		width={4096} // start with the canvas big - resizing up is expensive...
-		height={4096}
 		style={{ height: `100%` }}
 	/>
 );

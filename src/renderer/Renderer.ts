@@ -36,14 +36,17 @@ class Renderer {
 	}
 
 	async render(image: DCMImage, frameNo:number = 0) {
-		const { gl } = this;
+		const { gl, canvas } = this;
 		if (!this.outSize) {
 			this.outSize = new ImageSize(image);
 		}
 		const size = this.outSize!;
-		this.canvas.width = size!.width;
-		this.canvas.height = size!.height;
-
+		if (size.width !== canvas.width || size.height !== canvas.height) {
+			canvas.width = 0; // zero the canvas, makes resize much faste!
+			canvas.height = 0;
+			canvas.width = size!.width;
+			canvas.height = size!.height;
+		}
 		if (this.image !== image) {
 			this.image = image;
 			const decoder = decoderForImage(image);
