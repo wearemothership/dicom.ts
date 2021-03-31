@@ -29,6 +29,13 @@ const Status = ({
 	if (!renderState) {
 		return <div />;
 	}
+	if (renderState === "downloading") {
+		return (
+			<Flex flexDirection="row" alignItems="center">
+				<GoSync />Downloading...
+			</Flex>
+		)
+	}
 	if (renderState === "complete") {
 		return (
 			<Flex flexDirection="row" alignItems="center">
@@ -53,7 +60,7 @@ const Status = ({
 	else {
 		return (
 			<Flex flexDirection="row" alignItems="center">
-				<GoSync />&nbsp;Loading...
+				<GoSync />&nbsp;Decode / Render...
 			</Flex>
 		)
 	}
@@ -155,6 +162,9 @@ const Renderer = ({
 				renderQ[0]();
 			}
 		}
+		else {
+			setRenderState("downloading");
+		}
 		return	() => {};
 	}, [fileBuffer, renderMethod, clearMethod]);
 
@@ -220,6 +230,7 @@ const Example = (props) => {
 
 	const loadFile = (file) => {
 		setFileName(file);
+		setFileBuffer(null);
 		fetch(`./${file}`).then((response) => response.arrayBuffer().then(setFileBuffer));
 	}
 
@@ -250,6 +261,7 @@ const Example = (props) => {
 					<ExampleFileButton fileName="jpeg-baseline.dcm" selectedFile={fileName} loadFile={loadFile}/>
 					<ExampleFileButton fileName="jpeg-2000-lossless.dcm" selectedFile={fileName} loadFile={loadFile}/>
 					<ExampleFileButton fileName="greyscale-with-lut.dcm" selectedFile={fileName} loadFile={loadFile}/>
+					<ExampleFileButton fileName="greyscale-windowed.dcm" selectedFile={fileName} loadFile={loadFile}/>
 				</div>
 				<FileInput onFileSelected={fileSelected} />
 			</Flex>

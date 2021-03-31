@@ -21,6 +21,29 @@ export interface IProgramSignature {
 	Type: any;
 }
 
+export interface IGreyscaleProgramType {
+	bitsAllocated?: number
+	bitsStored?: number
+	signed?: boolean
+	littleEndian?: boolean
+
+	hasLut?: boolean
+	hasPixelPaddingValue?: boolean;
+	invert?: boolean
+
+	knownWindow?: boolean
+}
+export interface IColorProgramType {
+	planar?: boolean
+
+	bitsAllocated: number
+	signed?: boolean
+	littleEndian?: boolean
+
+	hasPaletteWithWordBits?: number; // 0, 8 or 16 bits
+	invert?: boolean
+}
+
 /**
  * Unpack pseudo integer or a float  from a color value
  * insert into GLSL to change behaviour depending on data
