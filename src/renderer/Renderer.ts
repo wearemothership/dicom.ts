@@ -119,7 +119,9 @@ class Renderer {
 	}
 
 	clear(): void {
-		const { gl } = this;
+		const { gl, canvas } = this;
+		canvas.width = 0; // zero the canvas, makes resize much faster!
+		canvas.height = 0;
 		// eslint-disable-next-line no-bitwise
 		gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 	}
