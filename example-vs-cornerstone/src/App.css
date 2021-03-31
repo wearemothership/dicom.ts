@@ -33,6 +33,10 @@ p {
 
 .buttons {
 	display: flex;
+	max-width: 100%;
+	overflow: hidden;
+	overflow-x: scroll;
+	-webkit-overflow-scrolling: touch;
 }
 
 .buttons button {
@@ -50,6 +54,7 @@ p {
 
 button {
 	margin-right: 0.5em;
+	white-space: nowrap;
 }
 
 button, ::-webkit-file-upload-button {
@@ -70,12 +75,6 @@ button:active {
 button svg {
 	margin-right: 5px;
 }
-
-
-::-webkit-file-upload-button {
-	background:#fff;
-}
-
 
 
 .selected {
@@ -110,8 +109,8 @@ button svg {
 	  align-items: center;
 	  background: rgb(242, 242, 242);
 	  border-radius: 10px;
-	  width: 100%;
 	  height: 400px;
+	  padding: 1em;
 	  margin-bottom: 1em;
   }
 

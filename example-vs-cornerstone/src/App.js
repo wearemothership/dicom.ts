@@ -65,7 +65,6 @@ const DICOMDiv = ({
 	return (
 		<Flex
 			flex="1"
-			margin="0 0 0 20px"
 		>
 			<h4>{heading}</h4>
 			<div
@@ -257,13 +256,14 @@ const Example = (props) => {
 		<section>
 			<Flex
 				flexDirection="row"
-				flexWrap="wrap"
 				justifyContent="center"
 				width="100%"
 			>
 				<GPURenderer fileBuffer={fileBuffer}>
 					<DICOMWrapper heading="dicom.js" />
 				</GPURenderer>
+
+				<div>-</div>
 
 				{cornerstone && <CornerstoneRenderer fileBuffer={fileBuffer}>
 					<DICOMDiv heading="Cornerstone.js" />
