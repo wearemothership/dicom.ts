@@ -27,7 +27,9 @@ const Status = ({
 
 }) => {
 	if (!renderState) {
-		return <div />;
+		return <Flex flexDirection="row" alignItems="center">
+
+		</Flex>
 	}
 	if (renderState === "downloading") {
 		return (
@@ -90,12 +92,12 @@ const DICOMDiv = ({
 			flex="1"
 		>
 			<h4>{heading}</h4>
-			<div
-				className="canvas-container"
-				ref={canvasRef}
-				id={id}
-				// style={{height: `${height}px` }}
-			/>
+			<div className="canvas-container">
+				<div className="cornerstone-container"
+					ref={canvasRef}
+					id={id}
+				/>
+			</div>
 			<Status renderTime={renderTime} renderState={renderState}/>
 		</Flex>
 	);

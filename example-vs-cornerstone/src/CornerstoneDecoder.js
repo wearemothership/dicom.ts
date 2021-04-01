@@ -35,8 +35,6 @@ export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) 
 		const [canvas] = div.children;
 		canvas.width = image.columns;
 		canvas.height = image.rows;
-		canvas.style.width = null;
-		canvas.style.height = "100%";
 		return cornerstone.displayImage(div, image);
 	}).catch(reject);
 });
