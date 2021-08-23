@@ -1,0 +1,753 @@
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+/* @license twgl.js 4.19.1 Copyright (c) 2015, Gregg Tavares All Rights Reserved.
+Available via the MIT license.
+see: http://github.com/greggman/twgl.js for details */
+
+/*!
+       * The buffer module from node.js, for the browser.
+       *
+       * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+       * @license  MIT
+       */
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
+
+/*! ../colors/index.js */
+
+/*! ../events.js */
+
+/*! ../internal/computeAutoVoi.js */
+
+/*! ../internal/drawImageSync.js */
+
+/*! ../internal/generateColorLut.js */
+
+/*! ../internal/generateLut.js */
+
+/*! ../internal/getDefaultViewport.js */
+
+/*! ../internal/now.js */
+
+/*! ../internal/storedColorPixelDataToCanvasImageData.js */
+
+/*! ../internal/storedPixelDataToCanvasImageData.js */
+
+/*! ../internal/storedPixelDataToCanvasImageDataColorLUT.js */
+
+/*! ../internal/storedPixelDataToCanvasImageDataPseudocolorLUT.js */
+
+/*! ../internal/storedPixelDataToCanvasImageDataRGBA.js */
+
+/*! ../internal/storedRGBAPixelDataToCanvasImageData.js */
+
+/*! ../internal/tryEnableWebgl.js */
+
+/*! ../layers.js */
+
+/*! ../rendering/renderColorImage.js */
+
+/*! ../rendering/renderGrayscaleImage.js */
+
+/*! ../rendering/renderLabelMapImage.js */
+
+/*! ../rendering/renderPseudoColorImage.js */
+
+/*! ../setToPixelCoordinateSystem.js */
+
+/*! ../triggerEvent.js */
+
+/*! ../webgl/index.js */
+
+/*! ./calculateTransform.js */
+
+/*! ./canvasToPixel.js */
+
+/*! ./colormap.js */
+
+/*! ./colors/colormap.js */
+
+/*! ./colors/index.js */
+
+/*! ./createProgramFromString.js */
+
+/*! ./createViewport.js */
+
+/*! ./disable.js */
+
+/*! ./displayImage.js */
+
+/*! ./doesImageNeedToBeRendered.js */
+
+/*! ./draw.js */
+
+/*! ./drawCompositeImage.js */
+
+/*! ./drawImage.js */
+
+/*! ./drawInvalidated.js */
+
+/*! ./enable.js */
+
+/*! ./enabledElementData.js */
+
+/*! ./enabledElements.js */
+
+/*! ./events.js */
+
+/*! ./falseColorMapping.js */
+
+/*! ./fitToWindow.js */
+
+/*! ./generateLut.js */
+
+/*! ./generateUUID.js */
+
+/*! ./getDefaultViewport.js */
+
+/*! ./getDefaultViewportForImage.js */
+
+/*! ./getImage.js */
+
+/*! ./getImageFitScale.js */
+
+/*! ./getImageSize.js */
+
+/*! ./getLut.js */
+
+/*! ./getModalityLUT.js */
+
+/*! ./getPixels.js */
+
+/*! ./getStoredPixels.js */
+
+/*! ./getTransform.js */
+
+/*! ./getVOILut.js */
+
+/*! ./getViewport.js */
+
+/*! ./imageCache.js */
+
+/*! ./imageLoader.js */
+
+/*! ./initializeRenderCanvas.js */
+
+/*! ./int16.js */
+
+/*! ./int8.js */
+
+/*! ./internal/calculateTransform.js */
+
+/*! ./internal/drawImage.js */
+
+/*! ./internal/drawImageSync.js */
+
+/*! ./internal/generateLut.js */
+
+/*! ./internal/getCanvas.js */
+
+/*! ./internal/getDefaultViewport.js */
+
+/*! ./internal/getImageFitScale.js */
+
+/*! ./internal/getImageSize.js */
+
+/*! ./internal/getModalityLUT.js */
+
+/*! ./internal/getTransform.js */
+
+/*! ./internal/guid.js */
+
+/*! ./internal/index.js */
+
+/*! ./internal/now.js */
+
+/*! ./internal/requestAnimationFrame.js */
+
+/*! ./internal/setDefaultViewport.js */
+
+/*! ./internal/storedColorPixelDataToCanvasImageData.js */
+
+/*! ./internal/storedPixelDataToCanvasImageData.js */
+
+/*! ./internal/storedPixelDataToCanvasImageDataColorLUT.js */
+
+/*! ./internal/storedPixelDataToCanvasImageDataPseudocolorLUT.js */
+
+/*! ./internal/tryEnableWebgl.js */
+
+/*! ./invalidate.js */
+
+/*! ./invalidateImageId.js */
+
+/*! ./layers.js */
+
+/*! ./lookupTable.js */
+
+/*! ./lutMatches.js */
+
+/*! ./metaData.js */
+
+/*! ./now.js */
+
+/*! ./pageToPixel.js */
+
+/*! ./pixelDataToFalseColorData.js */
+
+/*! ./pixelToCanvas.js */
+
+/*! ./renderColorImage.js */
+
+/*! ./renderGrayscaleImage.js */
+
+/*! ./renderLabelMapImage.js */
+
+/*! ./renderPseudoColorImage.js */
+
+/*! ./renderToCanvas.js */
+
+/*! ./renderWebImage.js */
+
+/*! ./renderer.js */
+
+/*! ./rendering/index.js */
+
+/*! ./rendering/renderColorImage.js */
+
+/*! ./rendering/renderGrayscaleImage.js */
+
+/*! ./rendering/renderLabelMapImage.js */
+
+/*! ./rendering/renderPseudoColorImage.js */
+
+/*! ./rendering/renderToCanvas.js */
+
+/*! ./rendering/renderWebImage.js */
+
+/*! ./requestAnimationFrame.js */
+
+/*! ./reset.js */
+
+/*! ./resize.js */
+
+/*! ./rgb.js */
+
+/*! ./saveLastRendered.js */
+
+/*! ./setDefaultViewport.js */
+
+/*! ./setToPixelCoordinateSystem.js */
+
+/*! ./setViewport.js */
+
+/*! ./shaders/index.js */
+
+/*! ./storedColorPixelDataToCanvasImageData.js */
+
+/*! ./storedPixelDataToCanvasImageData.js */
+
+/*! ./storedPixelDataToCanvasImageDataColorLUT.js */
+
+/*! ./storedPixelDataToCanvasImageDataPseudocolorLUT.js */
+
+/*! ./storedPixelDataToCanvasImageDataRGBA.js */
+
+/*! ./textureCache.js */
+
+/*! ./transform.js */
+
+/*! ./triggerEvent.js */
+
+/*! ./uint16.js */
+
+/*! ./uint8.js */
+
+/*! ./updateImage.js */
+
+/*! ./validator.js */
+
+/*! ./vertexShader.js */
+
+/*! ./webgl/index.js */
+
+/*! @wearemothership/dicom-character-set - 1.0.4-opt.1 - 2021-03-22 | (c) 2018 Radialogica, LLC | https://github.com/radialogica/dicom-character-set */
+
+/*! cornerstone-core - 2.3.0 - 2019-07-03 | (c) 2016 Chris Hafey | https://github.com/cornerstonejs/cornerstone */
+
+/*! cornerstone-file-image-loader - 0.3.0 - 2020-04-16 | (c) 2016 Chris Hafey | https://github.com/webnamics/cornerstoneFileImageLoader#readme */
+
+/*! dicom-parser - 1.8.5 - 2020-08-20 | (c) 2017 Chris Hafey | https://github.com/cornerstonejs/dicomParser */
+
+/*! exports provided: Transform */
+
+/*! exports provided: addProvider, removeProvider, default */
+
+/*! exports provided: cachedImages, setMaximumSizeBytes, putImageLoadObject, getImageLoadObject, removeImageLoadObject, getCacheInfo, purgeCache, changeImageIdCacheSize, default */
+
+/*! exports provided: convertImageToFalseColorImage, convertToFalseColorImage, restoreImage */
+
+/*! exports provided: default */
+
+/*! exports provided: default, events */
+
+/*! exports provided: default, state */
+
+/*! exports provided: drawImage, generateLut, getDefaultViewport, setDefaultViewport, requestAnimationFrame, storedPixelDataToCanvasImageData, storedColorPixelDataToCanvasImageData, storedPixelDataToCanvasImageDataColorLUT, storedPixelDataToCanvasImageDataPseudocolorLUT, internal, renderLabelMapImage, renderPseudoColorImage, renderColorImage, renderGrayscaleImage, renderWebImage, renderToCanvas, canvasToPixel, disable, displayImage, draw, drawInvalidated, enable, getElementData, removeElementData, getEnabledElement, addEnabledElement, getEnabledElementsByImageId, getEnabledElements, addLayer, removeLayer, getLayer, getLayers, getVisibleLayers, setActiveLayer, getActiveLayer, purgeLayers, setLayerImage, fitToWindow, getDefaultViewportForImage, getImage, getPixels, getStoredPixels, getViewport, loadImage, loadAndCacheImage, registerImageLoader, registerUnknownImageLoader, invalidate, invalidateImageId, pageToPixel, pixelToCanvas, reset, resize, setToPixelCoordinateSystem, setViewport, updateImage, pixelDataToFalseColorData, rendering, imageCache, metaData, webGL, colors, convertImageToFalseColorImage, convertToFalseColorImage, restoreImage, EVENTS, events, triggerEvent, default */
+
+/*! exports provided: getColormapsList, getColormap */
+
+/*! exports provided: getElementData, removeElementData */
+
+/*! exports provided: getEnabledElement, addEnabledElement, getEnabledElementsByImageId, getEnabledElements */
+
+/*! exports provided: int16DataUtilities, int16Shader */
+
+/*! exports provided: int8DataUtilities, int8Shader */
+
+/*! exports provided: isWebGLInitialized, getRenderCanvas, initRenderer, render, isWebGLAvailable */
+
+/*! exports provided: loadImage, loadAndCacheImage, registerImageLoader, registerUnknownImageLoader */
+
+/*! exports provided: renderColorImage, addColorLayer */
+
+/*! exports provided: renderGrayscaleImage, addGrayscaleLayer */
+
+/*! exports provided: renderLabelMapImage, addLabelMapLayer */
+
+/*! exports provided: renderPseudoColorImage, addPseudoColorLayer */
+
+/*! exports provided: renderWebImage */
+
+/*! exports provided: rescaleImage, addLayer, removeLayer, getLayer, getLayers, getVisibleLayers, setActiveLayer, setLayerImage, getActiveLayer, purgeLayers */
+
+/*! exports provided: rgbDataUtilities, rgbShader */
+
+/*! exports provided: shaders, dataUtilities */
+
+/*! exports provided: uint16DataUtilities, uint16Shader */
+
+/*! exports provided: uint8DataUtilities, uint8Shader */
+
+/*! exports provided: validateParameterUndefined, validateParameterUndefinedOrNull */
+
+/*! exports provided: vertexShader */
+
+/*! https://mths.be/punycode v1.4.1 by @mathias */
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*!*****************!*\
+        !*** ./draw.js ***!
+        \*****************/
+
+/*!******************!*\
+        !*** ./index.js ***!
+        \******************/
+
+/*!******************!*\
+        !*** ./reset.js ***!
+        \******************/
+
+/*!*******************!*\
+        !*** ./enable.js ***!
+        \*******************/
+
+/*!*******************!*\
+        !*** ./events.js ***!
+        \*******************/
+
+/*!*******************!*\
+        !*** ./layers.js ***!
+        \*******************/
+
+/*!*******************!*\
+        !*** ./resize.js ***!
+        \*******************/
+
+/*!********************!*\
+        !*** ./disable.js ***!
+        \********************/
+
+/*!*********************!*\
+        !*** ./getImage.js ***!
+        \*********************/
+
+/*!*********************!*\
+        !*** ./metaData.js ***!
+        \*********************/
+
+/*!**********************!*\
+        !*** ./getPixels.js ***!
+        \**********************/
+
+/*!***********************!*\
+        !*** ./imageCache.js ***!
+        \***********************/
+
+/*!***********************!*\
+        !*** ./invalidate.js ***!
+        \***********************/
+
+/*!************************!*\
+        !*** ./fitToWindow.js ***!
+        \************************/
+
+/*!************************!*\
+        !*** ./getViewport.js ***!
+        \************************/
+
+/*!************************!*\
+        !*** ./imageLoader.js ***!
+        \************************/
+
+/*!************************!*\
+        !*** ./pageToPixel.js ***!
+        \************************/
+
+/*!************************!*\
+        !*** ./setViewport.js ***!
+        \************************/
+
+/*!************************!*\
+        !*** ./updateImage.js ***!
+        \************************/
+
+/*!************************!*\
+        !*** ./webgl/index.js ***!
+        \************************/
+
+/*!*************************!*\
+        !*** ./colors/index.js ***!
+        \*************************/
+
+/*!*************************!*\
+        !*** ./displayImage.js ***!
+        \*************************/
+
+/*!*************************!*\
+        !*** ./generateUUID.js ***!
+        \*************************/
+
+/*!*************************!*\
+        !*** ./internal/now.js ***!
+        \*************************/
+
+/*!*************************!*\
+        !*** ./triggerEvent.js ***!
+        \*************************/
+
+/*!**************************!*\
+        !*** ./canvasToPixel.js ***!
+        \**************************/
+
+/*!**************************!*\
+        !*** ./internal/guid.js ***!
+        \**************************/
+
+/*!**************************!*\
+        !*** ./pixelToCanvas.js ***!
+        \**************************/
+
+/*!***************************!*\
+        !*** ./internal/index.js ***!
+        \***************************/
+
+/*!***************************!*\
+        !*** ./webgl/renderer.js ***!
+        \***************************/
+
+/*!****************************!*\
+        !*** ./colors/colormap.js ***!
+        \****************************/
+
+/*!****************************!*\
+        !*** ./drawInvalidated.js ***!
+        \****************************/
+
+/*!****************************!*\
+        !*** ./enabledElements.js ***!
+        \****************************/
+
+/*!****************************!*\
+        !*** ./getStoredPixels.js ***!
+        \****************************/
+
+/*!****************************!*\
+        !*** ./rendering/index.js ***!
+        \****************************/
+
+/*!*****************************!*\
+        !*** ./rendering/getLut.js ***!
+        \*****************************/
+
+/*!******************************!*\
+        !*** ./falseColorMapping.js ***!
+        \******************************/
+
+/*!******************************!*\
+        !*** ./invalidateImageId.js ***!
+        \******************************/
+
+/*!******************************!*\
+        !*** ./webgl/shaders/rgb.js ***!
+        \******************************/
+
+/*!*******************************!*\
+        !*** ./colors/lookupTable.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./enabledElementData.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./internal/drawImage.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./internal/getCanvas.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./internal/getVOILut.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./internal/transform.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./internal/validator.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./webgl/shaders/int8.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./webgl/textureCache.js ***!
+        \*******************************/
+
+/*!*******************************!*\
+        !*** ./webgl/vertexShader.js ***!
+        \*******************************/
+
+/*!********************************!*\
+        !*** ./webgl/shaders/index.js ***!
+        \********************************/
+
+/*!********************************!*\
+        !*** ./webgl/shaders/int16.js ***!
+        \********************************/
+
+/*!********************************!*\
+        !*** ./webgl/shaders/uint8.js ***!
+        \********************************/
+
+/*!*********************************!*\
+        !*** ./internal/generateLut.js ***!
+        \*********************************/
+
+/*!*********************************!*\
+        !*** ./rendering/lutMatches.js ***!
+        \*********************************/
+
+/*!*********************************!*\
+        !*** ./webgl/shaders/uint16.js ***!
+        \*********************************/
+
+/*!**********************************!*\
+        !*** ./internal/getImageSize.js ***!
+        \**********************************/
+
+/*!**********************************!*\
+        !*** ./internal/getTransform.js ***!
+        \**********************************/
+
+/*!***********************************!*\
+        !*** ./internal/drawImageSync.js ***!
+        \***********************************/
+
+/*!************************************!*\
+        !*** ./internal/computeAutoVoi.js ***!
+        \************************************/
+
+/*!************************************!*\
+        !*** ./internal/createViewport.js ***!
+        \************************************/
+
+/*!************************************!*\
+        !*** ./internal/getModalityLUT.js ***!
+        \************************************/
+
+/*!************************************!*\
+        !*** ./internal/tryEnableWebgl.js ***!
+        \************************************/
+
+/*!*************************************!*\
+        !*** ./rendering/renderToCanvas.js ***!
+        \*************************************/
+
+/*!*************************************!*\
+        !*** ./rendering/renderWebImage.js ***!
+        \*************************************/
+
+/*!**************************************!*\
+        !*** ./internal/generateColorLut.js ***!
+        \**************************************/
+
+/*!**************************************!*\
+        !*** ./internal/getImageFitScale.js ***!
+        \**************************************/
+
+/*!**************************************!*\
+        !*** ./pixelDataToFalseColorData.js ***!
+        \**************************************/
+
+/*!***************************************!*\
+        !*** ./getDefaultViewportForImage.js ***!
+        \***************************************/
+
+/*!***************************************!*\
+        !*** ./rendering/renderColorImage.js ***!
+        \***************************************/
+
+/*!***************************************!*\
+        !*** ./rendering/saveLastRendered.js ***!
+        \***************************************/
+
+/*!***************************************!*\
+        !*** ./setToPixelCoordinateSystem.js ***!
+        \***************************************/
+
+/*!****************************************!*\
+        !*** ./internal/calculateTransform.js ***!
+        \****************************************/
+
+/*!****************************************!*\
+        !*** ./internal/drawCompositeImage.js ***!
+        \****************************************/
+
+/*!****************************************!*\
+        !*** ./internal/getDefaultViewport.js ***!
+        \****************************************/
+
+/*!****************************************!*\
+        !*** ./internal/setDefaultViewport.js ***!
+        \****************************************/
+
+/*!******************************************!*\
+        !*** ./rendering/renderLabelMapImage.js ***!
+        \******************************************/
+
+/*!******************************************!*\
+        !*** ./webgl/createProgramFromString.js ***!
+        \******************************************/
+
+/*!*******************************************!*\
+        !*** ./internal/requestAnimationFrame.js ***!
+        \*******************************************/
+
+/*!*******************************************!*\
+        !*** ./rendering/renderGrayscaleImage.js ***!
+        \*******************************************/
+
+/*!*********************************************!*\
+        !*** ./rendering/initializeRenderCanvas.js ***!
+        \*********************************************/
+
+/*!*********************************************!*\
+        !*** ./rendering/renderPseudoColorImage.js ***!
+        \*********************************************/
+
+/*!************************************************!*\
+        !*** ./rendering/doesImageNeedToBeRendered.js ***!
+        \************************************************/
+
+/*!******************************************************!*\
+        !*** ./internal/storedPixelDataToCanvasImageData.js ***!
+        \******************************************************/
+
+/*!**********************************************************!*\
+        !*** ./internal/storedPixelDataToCanvasImageDataRGBA.js ***!
+        \**********************************************************/
+
+/*!**********************************************************!*\
+        !*** ./internal/storedRGBAPixelDataToCanvasImageData.js ***!
+        \**********************************************************/
+
+/*!***********************************************************!*\
+        !*** ./internal/storedColorPixelDataToCanvasImageData.js ***!
+        \***********************************************************/
+
+/*!**************************************************************!*\
+        !*** ./internal/storedPixelDataToCanvasImageDataColorLUT.js ***!
+        \**************************************************************/
+
+/*!********************************************************************!*\
+        !*** ./internal/storedPixelDataToCanvasImageDataPseudocolorLUT.js ***!
+        \********************************************************************/
+
+/** @license React v0.20.1
+ * scheduler.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v16.13.1
+ * react-is.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v17.0.1
+ * react-dom.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v17.0.1
+ * react-jsx-runtime.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v17.0.1
+ * react.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
