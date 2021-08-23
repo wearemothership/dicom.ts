@@ -37,8 +37,8 @@ git clone https://github.com/wearemothership/dicom.ts
 We have provied some demos of how this can be used in your project.
 
 #### Online demos
-- [Simple](https://github.com/wearemothership/dicom.ts)
-- [dicom.ts vs cornerston.js performance](https://github.com/wearemothership/dicom.ts)
+- [Simple](https://wearemothership.github.io/dicom.ts)
+- [dicom.ts vs cornerston.js performance](https://wearemothership.github.io/dicom.ts/#/vs-cornerstone)
 
 #### Or build and run the demos locally
 ```bash
