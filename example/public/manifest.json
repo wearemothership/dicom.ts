@@ -1,6 +1,6 @@
 {
-  "short_name": "dicom.js",
-  "name": "dicom.js",
+  "short_name": "dicom.ts",
+  "name": "dicom.ts",
   "icons": [
     {
       "src": "favicon.ico",

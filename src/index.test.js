@@ -49,7 +49,7 @@ const logImageTags = (image) => {
 	console.log(str);
 };
 
-describe("dicom.js", () => {
+describe("dicom.ts", () => {
 	it("Renders with: RLE decode and 'contrastify' greyscale render", async () => {
 		const data = fs.readFileSync("./test/medical.nema.org/compsamples_rle_20040210/IMAGES/RLE/CT1_RLE");
 		const dataView = new DataView(new Uint8Array(data).buffer);

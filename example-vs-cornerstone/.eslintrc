@@ -63,10 +63,10 @@
 	"ignorePatterns": ["!.storybook"],
 	"settings": {
 		"import/core-modules": [
-			"dicom.js"
+			"dicom.ts"
 		],
 		"import/external-module-folders": [
-			"../dicom.js/node_modules"
+			"../dicom.ts/node_modules"
 		],
 		"import/extensions": [
 		  ".js",
