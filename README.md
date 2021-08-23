@@ -1,4 +1,4 @@
-# dicom.js
+# dicom.ts
 **A small, super-fast javascript DICOM renderer**
 
 <!-- INTRODUCTION -->
@@ -21,12 +21,12 @@ To get a local copy up and running follow these simple steps.
 
 #### Install via [npm](https://www.npmjs.com)
 ```bash
-npm install --save dicom.js
+npm install --save dicom.ts
 ```
 
 #### Or clone locally
 ```bash
-git clone https://github.com/wearemothership/dicom.js
+git clone https://github.com/wearemothership/dicom.ts
 ```
 ****
 
@@ -37,18 +37,18 @@ git clone https://github.com/wearemothership/dicom.js
 We have provied some demos of how this can be used in your project.
 
 #### Online demos
-- [Simple](https://github.com/wearemothership/dicom.js)
-- [dicom.js vs cornerston.js performance](https://github.com/wearemothership/dicom.js)
+- [Simple](https://github.com/wearemothership/dicom.ts)
+- [dicom.ts vs cornerston.js performance](https://github.com/wearemothership/dicom.ts)
 
 #### Or build and run the demos locally
 ```bash
-git clone https://github.com/wearemothership/dicom.js
-cd dicom.js
+git clone https://github.com/wearemothership/dicom.ts
+cd dicom.ts
 npm install
 npm run build
 ```
 
-#### dicom.js vs cornerston.js performance demo
+#### dicom.ts vs cornerston.js performance demo
 ```bash
 cd example-vs-cornerstone
 npm install
@@ -56,7 +56,7 @@ npm start
 ```
 Some DICOM test files can be found in:
 ```
-dicom.js/node_modules/dicom-test-files/
+dicom.ts/node_modules/dicom-test-files/
 ```
 ****
 
@@ -68,7 +68,7 @@ Some usage examples of how this can be used in you project.
 
 #### Display on a given canvas
 ```js
-import dicomjs from 'dicom.js'
+import dicomjs from 'dicom.ts'
 
 const displayDicom = async (canvas, buffer) => {
 	try {
@@ -112,7 +112,7 @@ displayDicom(canvas, dataBuffer);
 
 <!-- ROADMAP -->
 ### Roadmap
-See the [open issues](https://github.com/wearemothership/dicom.js/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/wearemothership/dicom.ts/issues) for a list of proposed features (and known issues).
 ****
 
 
@@ -133,7 +133,7 @@ Contributions are what make the open source community such an amazing place to b
 <!-- LICENSE -->
 ### License
 Distributed under the MIT License.
-https://github.com/wearemothership/dicom.js/blob/main/LICENSE.md
+https://github.com/wearemothership/dicom.ts/blob/main/LICENSE.md
 
 Copyright (c) 2021 [Mothership Software Ltd.](https://github.com/wearemothership.com)
 ****
@@ -141,7 +141,7 @@ Copyright (c) 2021 [Mothership Software Ltd.](https://github.com/wearemothership
 
 
 <!-- USED IN... -->
-### dicom.js is used in…
+### dicom.ts is used in…
 - [vPOP PRO](https://vpop-pro.com)
 
 *Please let us know if you wish us to add your project to this list.*

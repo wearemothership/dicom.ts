@@ -6,7 +6,7 @@ import React, {
 	useEffect,
 	ReactChildren,
 } from "react";
-import { parseImage, render, Renderer } from "dicom.js";
+import { parseImage, render, Renderer } from "dicom.ts";
 
 const parseDecodeAndRender = (buf: ArrayBuffer, canvas: HTMLCanvasElement): Promise<void> => {
 	const data = new DataView(buf);

@@ -1,4 +1,4 @@
-import * as dicomjs from "dicom.js";
+import * as dicomjs from "dicom.ts";
 
 let renderer = null;
 let lastCanvas = null;

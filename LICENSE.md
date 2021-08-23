@@ -1,4 +1,4 @@
-## dicom.js
+## dicom.ts
 MIT License
 Copyright (c) 2021 Mothership software Ltd
 

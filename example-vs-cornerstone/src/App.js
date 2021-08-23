@@ -19,7 +19,7 @@ import { GoClippy, GoMarkGithub, GoDashboard, GoSync, GoAlert, GoFileMedia } fro
 
 const renderQ = [];
 
-const baseUrl = "/dicom.js"
+const baseUrl = "/dicom.ts"
 
 const Status = ({
 	renderTime,
@@ -220,7 +220,7 @@ const Example = (props) => {
 	const [copied, setCopied] = useState(false);
 	const { cornerstone } = props;
 	const copyText = () => {
-		navigator.clipboard.writeText("npm install --save dicom.js");
+		navigator.clipboard.writeText("npm install --save dicom.ts");
 		setCopied(true);
 		setTimeout(() => {
 			setCopied(false);
@@ -240,14 +240,14 @@ const Example = (props) => {
 	<div className="App">
 		<section>
 			<Flex>
-				<h1>dicom.js</h1>
+				<h1>dicom.ts</h1>
 				<p>A small, super-fast javascript DICOM renderer.</p>
 				<Flex
 					flexDirection="row"
 					alignItems="center"
 				>
-					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.js"} className="yellow"><GoMarkGithub /> View on Github</button>
-					<button className="blue"  onClick={copyText}><GoClippy /> npm install --save dicom.js</button>
+					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.ts"} className="yellow"><GoMarkGithub /> View on Github</button>
+					<button className="blue"  onClick={copyText}><GoClippy /> npm install --save dicom.ts</button>
 					{copied && <small>Copied…</small>}
 				</Flex>
 			</Flex>
@@ -275,7 +275,7 @@ const Example = (props) => {
 				alignItems="center"
 				flexWrap="wrap"
 			>
-				<small>dicom.js v cornerstone.js comparison: &nbsp;</small>
+				<small>dicom.ts v cornerstone.js comparison: &nbsp;</small>
 				<div className="buttons">
 					<button id="on" onClick={() => {history.push("/vs-cornerstone")}} className={cornerstone ? "selected" : ""}>On</button>
 					<button id="off" onClick={() => {history.push("/")}} className={cornerstone ? "" : "selected"}>Off</button>
@@ -290,7 +290,7 @@ const Example = (props) => {
 				width="100%"
 			>
 				<GPURenderer fileBuffer={fileBuffer}>
-					<DICOMWrapper heading="dicom.js" />
+					<DICOMWrapper heading="dicom.ts" />
 				</GPURenderer>
 
 				{cornerstone && <CornerstoneRenderer fileBuffer={fileBuffer}>
