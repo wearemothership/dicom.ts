@@ -149,8 +149,8 @@ class Renderer {
 		}
 		const size = this.outSize!;
 		if (size.width !== canvas.width || size.height !== canvas.height) {
-			canvas.width = 0; // zero the canvas, makes resize much faste!
-			canvas.height = 0;
+			canvas.width = 1; // near zero the canvas, makes resize much faste!
+			canvas.height = 1;
 			canvas.width = size!.width;
 			canvas.height = size!.height;
 		}
