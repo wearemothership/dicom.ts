@@ -1,5 +1,5 @@
 {
-  "name": "dicom.js",
+  "name": "dicom.ts",
   "version": "0.4.1",
   "description": "A small, fast, javascript DICOM renderer",
   "author": "wearemothership",
