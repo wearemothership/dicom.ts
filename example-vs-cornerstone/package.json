@@ -17,6 +17,8 @@
 		"dicom.js": "file:..",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1",
+		"react-icons": "^4.2.0",
+		"react-router-dom": "^5.2.0",
 		"react-scripts": "^4.0.3"
 	},
 	"devDependencies": {
@@ -28,6 +30,11 @@
 			"react-app",
 			"react-app/jest"
 		]
+	},
+	"jest": {
+		"moduleNameMapper": {
+			"^dicom.js$": "<rootDir>/../dist/index.modern.js"
+		}
 	},
 	"browserslist": {
 		"production": [

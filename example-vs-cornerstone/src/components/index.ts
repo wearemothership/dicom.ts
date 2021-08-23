@@ -4,4 +4,4 @@ import DICOMCanvas from "./DICOMCanvas";
 export {
 	FileInput,
 	DICOMCanvas
-}
+};

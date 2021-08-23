@@ -1,11 +1,12 @@
 {
   "name": "dicom.js",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A small, fast, javascript DICOM renderer",
   "author": "wearemothership",
   "email": "nick@wearemotehrship.com",
   "license": "MIT",
   "repository": "wearemothership/dicom.js",
+  "homepage": "https://wearemothership.github.io/dicom.js",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.ts",
@@ -21,8 +22,8 @@
     "test:lint": "eslint .",
     "test:unit": "jest .",
     "test:coverage": "jest . --coverage",
-    "predeploy": "cd example && npm install && npm run build",
-    "deploy": "gh-pages -d example/build"
+    "predeploy": "cd example-vs-cornerstone && npm install && npm run build",
+    "deploy": "gh-pages -d example-vs-cornerstone/build"
   },
   "dependencies": {
     "@types/jest": "^26.0.20",
@@ -48,7 +49,7 @@
     "babel-jest": "^26.6.3",
     "babel-plugin-macros": "^3.0.1",
     "blob-util": "^2.0.2",
-    "canvas": "^2.6.1",
+    "canvas": "^2.8.0",
     "cross-env": "^7.0.2",
     "dicom-test-files": "git+https://github.com/wearemothership/dicom-test-files.git",
     "eslint": "^7.22.0",

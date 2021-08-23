@@ -23,7 +23,7 @@ type FileInputProps = {
 	onFileSelected(data:ArrayBuffer): void,
 	onReadError:((error: Error) => void) | null,
 	inputRef: RefObject<HTMLInputElement> | null,
-}
+};
 
 const FileInput = ({
 	onFileSelected,

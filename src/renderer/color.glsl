@@ -2,7 +2,7 @@ precision highp float;
 uniform bool u_invert;
 uniform sampler2D u_texture;
 uniform vec2 u_resolution;
-uniform bool u_planar;
+
 uniform float u_slope;
 uniform float u_intercept;
 
@@ -37,17 +37,12 @@ void main() {
 	vec4 color;
 	vec2 uv = gl_FragCoord.xy / u_resolution;
 	uv.y = 1.0 - uv.y;
-	if (u_planar) {
-		color = getPlanar(uv);
-	}
-	else {
-		color = texture2D(u_texture, uv);
-	}
+
+	color = // $(getColor);
+
   	color = (color * u_slope) + u_intercept;
 
-	if (u_invert) {
-		color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
-	}
+	// $(u_invert)
 
 	gl_FragColor = color;
 }
