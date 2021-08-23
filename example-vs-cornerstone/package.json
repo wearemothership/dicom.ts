@@ -35,7 +35,7 @@
 		"moduleNameMapper": {
 			"^dicom.js$": "<rootDir>/../dist/index.modern.js"
 		}
-	  },
+	},
 	"browserslist": {
 		"production": [
 			"last 1 Chrome version"
