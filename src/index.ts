@@ -4,7 +4,7 @@ import {
 	parseImage,
 } from "./parser";
 
-export {
+export default {
 	parseImage,
 	render,
 	Renderer,
