@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": "wearemothership/dicom.ts",
   "homepage": "https://wearemothership.github.io/dicom.ts",
-  "main": "dist/index.js",
+  "main": "dist/index.modern.js",
   "module": "dist/index.modern.js",
   "source": "src/index.ts",
   "engines": {
