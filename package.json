@@ -1,6 +1,6 @@
 {
   "name": "dicom.ts",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A small, fast, typescript DICOM renderer",
   "author": "wearemothership",
   "email": "nick@wearemothership.com",
