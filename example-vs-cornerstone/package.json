@@ -10,20 +10,20 @@
 		"eject": "react-scripts eject"
 	},
 	"dependencies": {
-		"cornerstone-core": "^2.3.0",
+		"cornerstone-core": "^2.6.0",
 		"cornerstone-file-image-loader": "^0.3.0",
 		"cornerstone-wado-image-loader": "git+https://github.com/webnamics/cornerstoneWADOImageLoader.git",
-		"dicom-parser": "^1.8.7",
+		"dicom-parser": "^1.8.9",
 		"dicom.ts": "file:..",
-		"react": "^17.0.1",
-		"react-dom": "^17.0.1",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
 		"react-icons": "^4.2.0",
-		"react-router-dom": "^5.2.0",
+		"react-router-dom": "^5.3.0",
 		"react-scripts": "^4.0.3"
 	},
 	"devDependencies": {
 		"@babel/plugin-syntax-object-rest-spread": "^7.8.3",
-		"@types/react": "^17.0.3"
+		"@types/react": "^17.0.26"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -38,10 +38,16 @@
 	},
 	"browserslist": {
 		"production": [
-			"last 1 Chrome version"
+			">1.0%",
+			"not ie 11",
+			"not dead",
+			"not op_mini all"
 		],
 		"development": [
-			"last 1 Chrome version"
+			">1.0%",
+			"not ie 11",
+			"not dead",
+			"not op_mini all"
 		]
 	}
 }

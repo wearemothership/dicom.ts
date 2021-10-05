@@ -38,7 +38,7 @@ We have provied some demos of how this can be used in your project.
 
 #### Online demos
 - [Simple](https://wearemothership.github.io/dicom.ts)
-- [dicom.ts vs cornerston.js performance](https://wearemothership.github.io/dicom.ts/#/vs-cornerstone)
+- [dicom.ts vs cornerstone.js performance](https://wearemothership.github.io/dicom.ts/#/vs-cornerstone)
 
 #### Or build and run the demos locally
 ```bash
