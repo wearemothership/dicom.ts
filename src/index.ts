@@ -4,10 +4,9 @@ import {
 	parseImage,
 } from "./parser";
 
-export default {
+export {
 	parseImage,
 	render,
 	Renderer,
 	Parser,
-	// parserError: Series.parserError,
 };
