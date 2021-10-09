@@ -24,24 +24,39 @@ import { shaFromBuffer, shaFromJSON } from "./testUtils";
 
 import * as dicomjs from ".";
 
-// eslint-disable-next-line no-undef
+/* eslint-disable */
 if (!globalThis.fetch) {
-	// eslint-disable-next-line no-undef
 	globalThis.fetch = fetch;
 }
 
 // need to be global (as they would be in browser) for twgl to get them!
-window.WebGLRenderingContext = WebGLRenderingContext;
-window.WebGLActiveInfo = WebGLActiveInfo;
-window.WebGLFramebuffer = WebGLFramebuffer;
-window.WebGLBuffer = WebGLBuffer;
-window.WebGLDrawingBufferWrapper = WebGLDrawingBufferWrapper;
-window.WebGLProgram = WebGLProgram;
-window.WebGLRenderbuffer = WebGLRenderbuffer;
-window.WebGLShader = WebGLShader;
-window.WebGLShaderPrecisionFormat = WebGLShaderPrecisionFormat;
-window.WebGLTexture = WebGLTexture;
-window.WebGLUniformLocation = WebGLUniformLocation;
+if (globalThis.window) {
+	window.WebGLRenderingContext = WebGLRenderingContext;
+	window.WebGLActiveInfo = WebGLActiveInfo;
+	window.WebGLFramebuffer = WebGLFramebuffer;
+	window.WebGLBuffer = WebGLBuffer;
+	window.WebGLDrawingBufferWrapper = WebGLDrawingBufferWrapper;
+	window.WebGLProgram = WebGLProgram;
+	window.WebGLRenderbuffer = WebGLRenderbuffer;
+	window.WebGLShader = WebGLShader;
+	window.WebGLShaderPrecisionFormat = WebGLShaderPrecisionFormat;
+	window.WebGLTexture = WebGLTexture;
+	window.WebGLUniformLocation = WebGLUniformLocation;
+}
+else {
+	globalThis.WebGLRenderingContext = WebGLRenderingContext;
+	globalThis.WebGLActiveInfo = WebGLActiveInfo;
+	globalThis.WebGLFramebuffer = WebGLFramebuffer;
+	globalThis.WebGLBuffer = WebGLBuffer;
+	globalThis.WebGLDrawingBufferWrapper = WebGLDrawingBufferWrapper;
+	globalThis.WebGLProgram = WebGLProgram;
+	globalThis.WebGLRenderbuffer = WebGLRenderbuffer;
+	globalThis.WebGLShader = WebGLShader;
+	globalThis.WebGLShaderPrecisionFormat = WebGLShaderPrecisionFormat;
+	globalThis.WebGLTexture = WebGLTexture;
+	globalThis.WebGLUniformLocation = WebGLUniformLocation;
+}
+/* eslint-enable */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logImageTags = (image) => {

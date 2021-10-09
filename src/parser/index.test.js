@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import fs from "fs";
 import { parseImage } from ".";
 import { shaFromJSON /* , toJSONString */ } from "../testUtils";

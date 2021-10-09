@@ -174,7 +174,7 @@ class Parser implements IParserPublic {
 			}
 		}
 		catch (err) {
-			this.error = err;
+			this.error = err as Error;
 		}
 		return tags;
 	}
@@ -186,7 +186,7 @@ class Parser implements IParserPublic {
 			tag = this.getNextTag(data, offset, false);
 		}
 		catch (err) {
-			this.error = err;
+			this.error = err as Error;
 		}
 		return tag;
 	}

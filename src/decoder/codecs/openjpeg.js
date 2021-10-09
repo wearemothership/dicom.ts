@@ -688,7 +688,7 @@ var OpenJPEGWASM = (function () {
 			function isDataURI(filename) {
 				return String.prototype.startsWith ? filename.startsWith(dataURIPrefix) : filename.indexOf(dataURIPrefix) === 0
 			}
-			var wasmBinaryFile = raw("./openjpeg.wasm.base64");
+			var wasmBinaryFile = ENVIRONMENT_IS_WEB && raw("./openjpeg.wasm.base64") || "openjpeg.wasm";
 			if (!isDataURI(wasmBinaryFile)) {
 				wasmBinaryFile = locateFile(wasmBinaryFile)
 			}
