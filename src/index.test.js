@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /* eslint-disable import/first */
 import fs from "fs";
 import fetch from "node-fetch";
