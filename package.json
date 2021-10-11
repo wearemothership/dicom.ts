@@ -5,10 +5,17 @@
   "author": "wearemothership",
   "keywords": [
     "dicom",
+    "parser",
     "renderer",
+    "canvas",
     "typescript",
+    "glsl",
     "image",
-    "jpeg"
+    "jpeg",
+    "jpeg2000",
+    "jpeglossless",
+    "jpegls",
+    "RLE"
   ],
   "email": "nick@wearemothership.com",
   "license": "MIT",
