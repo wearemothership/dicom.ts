@@ -4,7 +4,8 @@ import crypto from "crypto";
 
 import util from "util";
 
-if (!window.TextDecoder) {
+// eslint-disable-next-line no-undef
+if (globalThis.window && !window.TextDecoder) {
 	window.TextDecoder = util.TextDecoder;
 }
 

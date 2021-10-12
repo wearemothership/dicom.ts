@@ -799,7 +799,7 @@ var CharLS = (function (opts) {
 	function isFileURI(filename) {
 		return hasPrefix(filename, fileURIPrefix)
 	}
-	var wasmBinaryFile = raw("./charlsjs.wasm.base64");
+	var wasmBinaryFile = ENVIRONMENT_IS_WEB && raw("./charlsjs.wasm.base64") || "charlsjs.wasm";;
 	if (!isDataURI(wasmBinaryFile)) {
 		wasmBinaryFile = locateFile(wasmBinaryFile)
 	}

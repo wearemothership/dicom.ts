@@ -3,7 +3,20 @@
   "version": "1.0.0",
   "description": "A small, fast, typescript DICOM renderer",
   "author": "wearemothership",
-  "keywords": ["dicom", "renderer", "typescript", "image", "jpeg"],
+  "keywords": [
+    "dicom",
+    "parser",
+    "renderer",
+    "canvas",
+    "typescript",
+    "glsl",
+    "image",
+    "jpeg",
+    "jpeg2000",
+    "jpeglossless",
+    "jpegls",
+    "RLE"
+  ],
   "email": "nick@wearemothership.com",
   "license": "MIT",
   "repository": "wearemothership/dicom.ts",
@@ -28,7 +41,7 @@
     "test:lint": "eslint .",
     "test:unit": "jest .",
     "test:coverage": "jest . --coverage",
-    "predeploy": "cd example-vs-cornerstone && npm install && npm run build",
+    "predeploy": "cd example-vs-cornerstone && npm install && SKIP_PREFLIGHT_CHECK=true npm run build",
     "deploy": "gh-pages -d example-vs-cornerstone/build"
   },
   "dependencies": {
