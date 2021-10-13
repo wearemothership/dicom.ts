@@ -21,20 +21,20 @@
   "license": "MIT",
   "repository": "wearemothership/dicom.ts",
   "homepage": "https://wearemothership.github.io/dicom.ts",
-  "main": "dist/index.js",
+  "main": "dist/index.umd.js",
   "module": "dist/index.modern.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "exports": {
-    "require": "./dist/index.js",
+    "require": "./dist/index.umd.js",
     "default": "./dist/index.modern.js"
   },
   "engines": {
     "node": ">=10"
   },
   "scripts": {
-    "build": "rimraf dist && microbundle-crl --no-compress -f modern,cjs",
-    "start": "rimraf dist && microbundle-crl watch --no-compress -f modern,cjs",
+    "build": "rimraf dist && microbundle-crl --no-compress -f modern,umd",
+    "start": "rimraf dist && microbundle-crl watch --no-compress -f modern,umd",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
