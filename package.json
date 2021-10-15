@@ -44,6 +44,9 @@
     "predeploy": "cd example-vs-cornerstone && npm install && SKIP_PREFLIGHT_CHECK=true npm run build",
     "deploy": "gh-pages -d example-vs-cornerstone/build"
   },
+  "browser": {
+    "crypto": false
+  },
   "dependencies": {
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.31",
