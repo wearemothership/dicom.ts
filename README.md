@@ -46,7 +46,7 @@ npm install
 npm run build
 ```
 
-#### dicom.ts vs cornerston.js performance demo
+#### dicom.ts vs cornerstone.js performance demo
 ```bash
 cd example-vs-cornerstone
 npm install
