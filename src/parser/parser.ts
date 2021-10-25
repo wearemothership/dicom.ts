@@ -93,7 +93,7 @@ class Parser implements IParserPublic {
 
 	metaFinished = false;
 
-	metaFinishedOffset= -1;
+	metaFinishedOffset = -1;
 
 	needsDeflate = false;
 
@@ -375,7 +375,7 @@ class Parser implements IParserPublic {
 		const element = data.getUint16(offset, this.littleEndian);
 		offset += 2;
 
-		const length = data.getUint32(offset, this.littleEndian);
+		let length = data.getUint32(offset, this.littleEndian);
 		offset += 4;
 
 		const offsetValue = offset;
@@ -393,6 +393,7 @@ class Parser implements IParserPublic {
 			offset = tag.offsetEnd;
 		}
 		else if (raw) {
+			length = Math.min(data.byteLength - offset - data.byteOffset, length);
 			value = new DataView(data.buffer, offset + data.byteOffset, length);
 			offset += length;
 		}

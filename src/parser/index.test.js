@@ -172,4 +172,19 @@ describe("parser tests", () => {
 		// 	console.log(fileNameToTagHash);
 		// }
 	});
+
+	it("Parses issue #19 OK", () => {
+		const data = fs.readFileSync("./test/dicom-ts-issues/parse-issue-19.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = parseImage(dataView);
+		expect(image).toBeTruthy();
+		expect(image.tags).toBeTruthy();
+		// console.log(toJSONString(image.tags));
+		// fileNameToTagHash[key] = shaFromJSON(image.tags);
+		expect(shaFromJSON(image.tags)).toEqual("c18190989e0b6fc58c19287507d4074c46b45c35");
+		// i += 1;
+		// if (i >= fileKeys.length) {
+		// 	console.log(fileNameToTagHash);
+		// }
+	});
 });

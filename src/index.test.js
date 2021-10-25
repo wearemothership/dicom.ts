@@ -242,7 +242,7 @@ describe("dicom.ts", () => {
 	});
 
 	it("Renders with palette conversion", async () => {
-		const data = fs.readFileSync("./test/current-issues/US-PAL-8-10x-echo.dcm");
+		const data = fs.readFileSync("./test/dicom-ts-issues/US-PAL-8-10x-echo.dcm");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
@@ -254,8 +254,21 @@ describe("dicom.ts", () => {
 		expect(shaFromBuffer(buffer)).toEqual("fa93934a7ca2b9f88cd9c14a80898aa5ed4ce70e");
 	});
 
+	it("Renders buffer size issue #19", async () => {
+		const data = fs.readFileSync("./test/dicom-ts-issues/parse-issue-19.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		await dicomjs.render(image, canvas);
+
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("4dafa216bd61e48c38e0c15ebbb45e65aac7634c");
+	});
+
 	it("Renders RGB with planar configuration", async () => {
-		const data = fs.readFileSync("./test/current-issues/US-RGB-8-epicard.dcm");
+		const data = fs.readFileSync("./test/dicom-ts-issues/US-RGB-8-epicard.dcm");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
@@ -283,7 +296,7 @@ describe("dicom.ts", () => {
 
 	it("Renders with no transfer syntax, planar & palette size ratio", async () => {
 		// this image fails on horos and cornerstone too, no data after parse...
-		const data = fs.readFileSync("./test/current-issues/OT-PAL-8-face.dcm");
+		const data = fs.readFileSync("./test/dicom-ts-issues/OT-PAL-8-face.dcm");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
