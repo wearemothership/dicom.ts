@@ -1,4 +1,4 @@
-import sha1 from "crypto-js/sha1";
+import sha1 from "sha1";
 import { decoderForImage, Decoder } from "../decoder";
 import ContrastifyProgram from "./ContrastifyProgram";
 import ColorProgram from "./ColorProgram";

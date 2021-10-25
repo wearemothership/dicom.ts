@@ -72,7 +72,7 @@ var OpenJPEGWASM = (function () {
 			var read_, readAsync, readBinary, setWindowTitle;
 			var nodeFS;
 			var nodePath;
-			if (ENVIRONMENT_IS_NODE) {
+			if (ENVIRONMENT_HAS_NODE) {
 				scriptDirectory = __dirname + "/";
 				read_ = function shell_read(filename, binary) {
 					if (!nodeFS) nodeFS = require("fs");
@@ -688,7 +688,7 @@ var OpenJPEGWASM = (function () {
 			function isDataURI(filename) {
 				return String.prototype.startsWith ? filename.startsWith(dataURIPrefix) : filename.indexOf(dataURIPrefix) === 0
 			}
-			var wasmBinaryFile = ENVIRONMENT_IS_WEB && raw("./openjpeg.wasm.base64") || "openjpeg.wasm";
+			var wasmBinaryFile =  !ENVIRONMENT_HAS_NODE && raw("./openjpeg.wasm.base64") || "openjpeg.wasm";
 			if (!isDataURI(wasmBinaryFile)) {
 				wasmBinaryFile = locateFile(wasmBinaryFile)
 			}
