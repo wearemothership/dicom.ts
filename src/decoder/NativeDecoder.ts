@@ -16,7 +16,7 @@ class NativeDecoder extends Decoder {
 		const { width, height } = this.outputSize;
 		const jpegFrameData = this.jpegData?.[frameNo];
 		if (!jpegFrameData) {
-			throw Error("Invalid data");
+			throw Error("No Native JPEG image data");
 		}
 		const blob = new Blob([jpegFrameData]);
 		const src = URL.createObjectURL(blob);

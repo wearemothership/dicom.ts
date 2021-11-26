@@ -325,4 +325,34 @@ describe("dicom.ts", () => {
 		expect(image).toBeTruthy();
 		expect(error.message).toEqual("Image has no data");
 	});
+
+	// issues:
+	it("Renders issue #20 wrong transfer syntax in file", async () => {
+		// this image fails on horos too, no data after parse...
+		const data = fs.readFileSync("./test/dicom-ts-issues/20-wrong-transfer-syntax.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = dicomjs.parseImage(dataView);
+		const canvas = createCanvas(512, 512);
+		const renderer = new dicomjs.Renderer(canvas);
+		let error = null;
+		try {
+			// expect this to fail
+			await renderer.render(image, 0);
+			expect(false).toBeTruthy();
+		}
+		catch (e) {
+			error = e;
+			// for some reason, DCMTK movescu -> Orthanc -> storescp uncompresses,
+			// but doesnt update the transfer syntax tag...should it?
+			image.transferSyntax = dicomjs.TransferSyntax.ImplicitLittle;
+			renderer.image = null; // make sure we re-attempt creating decoder
+			await renderer.render(image, 0);
+		}
+		expect(error.message).toEqual("No JPEG-LS image data");
+
+		expect(image).toBeTruthy();
+		const buffer = canvas.toBuffer("image/png");
+		// fs.writeFileSync("./image.png", buffer);
+		expect(shaFromBuffer(buffer)).toEqual("e57fae79bac8f46ea6e3d72aef53da94dd830660");
+	});
 });

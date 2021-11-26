@@ -11,6 +11,9 @@ class JPEG2000Decoder extends Decoder {
 		if (!this.jpegs) {
 			this.jpegs = getJpegData(image.data);
 		}
+		if (!this.jpegs?.length) {
+			return Promise.reject(new Error("No JPEG2000 image data"));
+		}
 		return new Promise((resolve) => {
 			OpenJpeg().then((OJ: { J2KDecoder: new () => any; }) => {
 				const decoder = new OJ.J2KDecoder();
