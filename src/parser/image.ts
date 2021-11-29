@@ -903,6 +903,13 @@ class DCMImage implements IImageInfo {
 	}
 
 	/**
+	 * Sets the tranfer syntax - so we can override it
+	 */
+	set transferSyntax(syntax: TransferSyntax) {
+		this.getTag(TagIds.TransferSyntax).convertedValue = syntax;
+	}
+
+	/**
 	 * Returns the study date.
 	 * @returns {string}
 	 */

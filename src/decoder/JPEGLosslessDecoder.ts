@@ -10,6 +10,9 @@ class JPEGLosslessDecoder extends Decoder {
 		if (!this.jpegs) {
 			this.jpegs = getJpegData(image.data);
 		}
+		if (!this.jpegs?.length) {
+			return Promise.reject(new Error("No JPEG lossless image data"));
+		}
 		const decoder = new jpegLossless.Decoder();
 		const jpeg = this.jpegs![frameNo];
 		const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);

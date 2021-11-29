@@ -10,6 +10,9 @@ class JPEGLosslessDecoder extends Decoder {
 		if (!this.jpegs) {
 			this.jpegs = getJpegData(image.data);
 		}
+		if (!this.jpegs?.length) {
+			return Promise.reject(new Error("No JPEG-LS image data"));
+		}
 		return new Promise((resolve) => {
 			(CharLS as any)({
 			}).then((charLS: { JpegLSDecoder: new () => any; }) => {
