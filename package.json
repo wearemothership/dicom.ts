@@ -47,7 +47,7 @@
   "dependencies": {
     "@types/node": "^14.14.31",
     "@wearemothership/dicom-character-set": "^1.0.4-opt.1",
-    "jpeg-lossless-decoder-js": "git+https://github.com/rii-mango/JPEGLosslessDecoderJS.git#v2.0.4",
+    "jpeg-lossless-decoder-js": "^2.0.4",
     "pako": "^1.0.10",
     "raw.macro": "^0.4.2",
     "sha1": "^1.1.1",
