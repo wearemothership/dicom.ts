@@ -308,10 +308,9 @@ const getStringValue = (rawData: DataView, charset?: Charset, vr?: string) => {
 
 const getSingleStringValue = (
 	rawData: DataView,
-	// eslint-disable-next-line default-param-last
 	maxLength: number = 0,
-	charset?: Charset,
-	vr?: string
+	charset: Charset | undefined = undefined,
+	vr: string | undefined = undefined
 ):[string] => {
 	const len = Math.min(rawData.byteLength, maxLength);
 	return [Utils.getStringAt(rawData, 0, len, charset, vr).trim()];
