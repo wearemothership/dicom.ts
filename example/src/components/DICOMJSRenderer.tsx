@@ -2,7 +2,6 @@ import React, {
 	ReactNode,
 	ReactElement,
 	useRef,
-	useState,
 	useEffect,
 	ReactChildren,
 } from "react";
@@ -29,29 +28,29 @@ const DICOMJSRenderer = ({
 	dataBuffer,
 	children
 }: RenderProps) => {
-	const [renderer, setRenderer] = useState<Renderer | null>(null);
+	const rendererRef = useRef<Renderer>();
 	const canvasRef = useRef<HTMLCanvasElement>();
 
 	useEffect(() => {
-		if (dataBuffer && renderer) {
+		if (dataBuffer && rendererRef.current) {
 			console.time("parse and render")
 			const image = parseImage(new DataView(dataBuffer));
-			renderer.render(image!, 0).then(() => {
+			rendererRef.current.render(image!, 0).then(() => {
 				complete?.(canvasRef.current!)
 				console.timeEnd("parse and render")
 			});
 		}
 		return	() => {};
-	}, [dataBuffer, renderer, complete]);
+	}, [dataBuffer, complete]);
 
 	useEffect(() => {
-		if (canvasRef.current) {
-			setRenderer(new Renderer(canvasRef.current));
+		if (canvasRef.current && !rendererRef.current) {
+			rendererRef.current = new Renderer(canvasRef.current);
 		}
 		return () => {
-			renderer?.destroy();
+			rendererRef.current?.destroy();
 		}
-	}, [canvasRef.current]);
+	}, []);
 
 	return (
 		// microbundle doesnt like shorthand?
