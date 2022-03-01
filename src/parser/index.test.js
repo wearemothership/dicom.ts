@@ -181,7 +181,7 @@ describe("parser tests", () => {
 		expect(image.tags).toBeTruthy();
 		// console.log(toJSONString(image.tags));
 		// fileNameToTagHash[key] = shaFromJSON(image.tags);
-		expect(shaFromJSON(image.tags)).toEqual("c18190989e0b6fc58c19287507d4074c46b45c35");
+		expect(shaFromJSON(image.tags)).toBe("c18190989e0b6fc58c19287507d4074c46b45c35");
 		// i += 1;
 		// if (i >= fileKeys.length) {
 		// 	console.log(fileNameToTagHash);
