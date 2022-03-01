@@ -18,7 +18,7 @@ export const CornerstoneClear = (div) => {
 
 export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) => {
 	if (!buffer) {
-		return reject(Error("No file!"));
+		reject(Error("No file!"));
 	}
 	// cornerstone.disable(div); // reset size...better way of doing this?
 	cornerstone.enable(div);
@@ -31,7 +31,7 @@ export const CornerstoneDecode = (buffer, div) => new Promise((resolve, reject) 
 	div.addEventListener("cornerstoneimagerendered", onRendered);
 
 	const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.addBuffer(buffer);
-	return cornerstone.loadImage(imageId).then((image) => {
+	cornerstone.loadImage(imageId).then((image) => {
 		const [canvas] = div.children;
 		canvas.width = image.columns;
 		canvas.height = image.rows;

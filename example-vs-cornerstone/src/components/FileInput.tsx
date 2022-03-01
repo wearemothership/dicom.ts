@@ -2,7 +2,7 @@ import React, { RefObject } from "react";
 
 export const readFile = (file: File):Promise<ArrayBuffer> => new Promise((resolve, reject) => {
 	if (!file) {
-		return reject(Error("no file!"));
+		reject(Error("no file!"));
 	}
 
 	const blob = file.slice(0, file.size);
@@ -11,12 +11,11 @@ export const readFile = (file: File):Promise<ArrayBuffer> => new Promise((resolv
 	reader.onloadend = (evt) => {
 		if (evt.target?.readyState === FileReader.DONE) {
 			// console.timeEnd("load");
-			return resolve(evt.target?.result as ArrayBuffer);
+			resolve(evt.target?.result as ArrayBuffer);
 		}
-		return reject(Error("could not load!"));
+		reject(Error("could not load!"));
 	};
 	reader.readAsArrayBuffer(blob);
-	return null;
 });
 
 type FileInputProps = {
