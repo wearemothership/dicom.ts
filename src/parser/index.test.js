@@ -1,5 +1,4 @@
 import fs from "fs";
-import { toMatchImageSnapshot } from "jest-image-snapshot";
 import util from "util";
 import { parseImage } from ".";
 
@@ -7,8 +6,6 @@ import { parseImage } from ".";
 if (globalThis.window && !window.TextDecoder) {
 	window.TextDecoder = util.TextDecoder;
 }
-
-expect.extend({ toMatchImageSnapshot });
 
 describe("parser tests", () => {
 	const path = "./test/medical.nema.org/";
@@ -151,7 +148,7 @@ describe("parser tests", () => {
 		const image = parseImage(dataView);
 		expect(image).toBeTruthy();
 		expect(image.tags).toBeTruthy();
-		expect(image.tags).toMatchImageSnapshot();
+		expect(image.tags).toMatchSnapshot();
 	});
 	const specificKey = "multiframe/DISCIMG/IMAGES/BRMULTI"; // fileKeys[1];
 	it("Parses specific file OK", () => {
@@ -160,7 +157,7 @@ describe("parser tests", () => {
 		const image = parseImage(dataView);
 		expect(image).toBeTruthy();
 		expect(image.tags).toBeTruthy();
-		expect(image.tags).toMatchImageSnapshot();
+		expect(image.tags).toMatchSnapshot();
 	});
 
 	it("Parses issue #19 OK", () => {
@@ -169,6 +166,6 @@ describe("parser tests", () => {
 		const image = parseImage(dataView);
 		expect(image).toBeTruthy();
 		expect(image.tags).toBeTruthy();
-		expect(image.tags).toMatchImageSnapshot();
+		expect(image.tags).toMatchSnapshot();
 	});
 });
