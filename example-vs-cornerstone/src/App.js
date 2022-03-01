@@ -6,15 +6,13 @@ import Flex from "./components/Flex";
 import React, { useEffect, useState, useRef, } from "react";
 import {
 	HashRouter as Router,
-	Switch,
+	Routes,
 	Route,
 	Link,
-	useHistory,
-	createBrowserHistory
+	useNavigate
   } from "react-router-dom";
 import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
-import { addExtensionsToContext } from "twgl.js";
 import { GoClippy, GoMarkGithub, GoDashboard, GoSync, GoAlert, GoFileMedia } from "react-icons/go";
 
 const renderQ = [];
@@ -214,7 +212,7 @@ const ExampleFileButton = ({fileName, selectedFile, loadFile}) => {
 }
 
 const Example = (props) => {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [fileBuffer, setFileBuffer] = useState(undefined);
 	const [fileName, setFileName] = useState(null);
 	const [copied, setCopied] = useState(false);
@@ -233,7 +231,9 @@ const Example = (props) => {
 	const loadFile = (file) => {
 		setFileName(file);
 		setFileBuffer(null);
-		fetch(`./${file}`).then((response) => response.arrayBuffer().then(setFileBuffer));
+		fetch(`images/${file}`)
+			.then((response) => response.arrayBuffer().then(setFileBuffer))
+			.catch((error) => console.error(error));
 	}
 
 	return (
@@ -277,8 +277,8 @@ const Example = (props) => {
 			>
 				<small>dicom.ts v cornerstone.js comparison: &nbsp;</small>
 				<div className="buttons">
-					<button id="on" onClick={() => {history.push("/vs-cornerstone")}} className={cornerstone ? "selected" : ""}>On</button>
-					<button id="off" onClick={() => {history.push("/")}} className={cornerstone ? "" : "selected"}>Off</button>
+					<button id="on" onClick={() => {navigate("/vs-cornerstone")}} className={cornerstone ? "selected" : ""}>On</button>
+					<button id="off" onClick={() => {navigate("/")}} className={cornerstone ? "" : "selected"}>Off</button>
 				</div>
 			</Flex>
 		</section>
@@ -315,10 +315,10 @@ const Example = (props) => {
 function App() {
 	return (
 		<Router>
-			<Switch>
-          		<Route path="/vs-cornerstone" children={<Example cornerstone={true}/>} />
-				<Route component={Example} />
-			</Switch>
+			<Routes>
+          		<Route path="/vs-cornerstone" element={<Example cornerstone={true}/>} />
+				<Route path="/" element={<Example />} />
+			</Routes>
 		</Router>
 	);
 }
