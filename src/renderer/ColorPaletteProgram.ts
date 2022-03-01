@@ -38,7 +38,6 @@ class ColorPaletteProgram implements IProgram {
 		this.gl = gl;
 		// can this be reused?
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-		return this;
 	}
 
 	use() {

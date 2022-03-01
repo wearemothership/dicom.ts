@@ -308,6 +308,7 @@ const getStringValue = (rawData: DataView, charset?: Charset, vr?: string) => {
 
 const getSingleStringValue = (
 	rawData: DataView,
+	// eslint-disable-next-line default-param-last
 	maxLength: number = 0,
 	charset?: Charset,
 	vr?: string
@@ -326,18 +327,22 @@ const getDateStringValue = (rawData: DataView): TagValue => {
 		if (dotFormat) {
 			parts = stringData[ctr].split(".");
 			if (parts.length === 3) {
-				data[ctr] = new Date(Utils.safeParseInt(parts[0]),
+				data[ctr] = new Date(
+					Utils.safeParseInt(parts[0]),
 					Utils.safeParseInt(parts[1]) - 1,
-					Utils.safeParseInt(parts[2]));
+					Utils.safeParseInt(parts[2])
+				);
 			}
 			else {
 				data[ctr] = new Date();
 			}
 		}
 		else if (stringData[ctr].length === 8) {
-			data[ctr] = new Date(Utils.safeParseInt(stringData[ctr].substring(0, 4)),
+			data[ctr] = new Date(
+				Utils.safeParseInt(stringData[ctr].substring(0, 4)),
 				Utils.safeParseInt(stringData[ctr].substring(4, 6)) - 1,
-				Utils.safeParseInt(stringData[ctr].substring(6, 8)));
+				Utils.safeParseInt(stringData[ctr].substring(6, 8))
+			);
 		}
 		else {
 			data[ctr] = Date.parse(stringData[ctr]);

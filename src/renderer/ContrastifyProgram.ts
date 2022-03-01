@@ -72,7 +72,6 @@ class ContrastifyProgram implements IProgram {
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		this.gl = gl;
-		return this;
 	}
 
 	// eslint-disable-next-line class-methods-use-this

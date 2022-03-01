@@ -20,21 +20,23 @@ class NativeDecoder extends Decoder {
 		}
 		const blob = new Blob([jpegFrameData]);
 		const src = URL.createObjectURL(blob);
-		return new Promise((resolve, reject) => twgl.createTexture(gl, {
-			src,
-			width,
-			height,
-			type: gl.UNSIGNED_BYTE,
-			min: gl.NEAREST,
-			mag: gl.NEAREST,
-			wrap: gl.CLAMP_TO_EDGE,
-		}, (error, texture) => {
-			URL.revokeObjectURL(src);
-			if (error) {
-				return reject(error);
-			}
-			return resolve(texture);
-		}));
+		return new Promise((resolve, reject) => {
+			twgl.createTexture(gl, {
+				src,
+				width,
+				height,
+				type: gl.UNSIGNED_BYTE,
+				min: gl.NEAREST,
+				mag: gl.NEAREST,
+				wrap: gl.CLAMP_TO_EDGE,
+			}, (error, texture) => {
+				URL.revokeObjectURL(src);
+				if (error) {
+					reject(error);
+				}
+				resolve(texture);
+			});
+		});
 	}
 }
 

@@ -38,7 +38,8 @@ class Decoder implements IDecoder {
 		const bytesPerFrame = data.byteLength / nFrames;
 		const dv = new DataView(
 			data.buffer,
-			data.byteOffset + bytesPerFrame * frameNo, bytesPerFrame
+			data.byteOffset + bytesPerFrame * frameNo,
+			bytesPerFrame
 		);
 		return Promise.resolve(dv);
 	}
