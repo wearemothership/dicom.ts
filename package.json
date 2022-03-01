@@ -86,7 +86,7 @@
     "jest": "^27.5.1",
     "jest-image-snapshot": "^4.5.1",
     "microbundle": "^0.14.2",
-    "node-canvas-webgl": "file:../node-canvas-webgl",
+    "node-canvas-webgl": "git+https://github.com/wearemothership/node-canvas-webgl.git#0.2.7-twgl",
     "node-fetch": "^2.6.7",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
