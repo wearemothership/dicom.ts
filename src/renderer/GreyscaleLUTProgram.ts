@@ -31,7 +31,6 @@ class GreyscaleLUTProgram implements IProgram {
 		this.programInfo = programInfo;
 		this.gl = gl;
 		this.info = info;
-		return this;
 	}
 
 	use() {

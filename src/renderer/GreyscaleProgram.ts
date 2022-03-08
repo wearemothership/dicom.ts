@@ -29,7 +29,6 @@ class GreyscaleProgram implements IProgram {
 
 		this.programInfo = programInfo;
 		this.gl = gl;
-		return this;
 	}
 
 	use() {

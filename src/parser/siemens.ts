@@ -148,6 +148,7 @@ class Siemens implements IPrivateDataReader {
 	 * @param {number} element
 	 * @returns {boolean}
 	 */
+	// eslint-disable-next-line class-methods-use-this
 	canRead = (group: number, element: number): boolean => (
 		(group === GROUP_CSA)
 		&& ((element === ELEMENT_CSA1)

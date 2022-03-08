@@ -1,7 +1,8 @@
 /* eslint-disable */
 import "./App.css";
 import { DICOMCanvas, DICOMJSRenderer, FileInput } from "./components";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
+
 
 
 function App() {
