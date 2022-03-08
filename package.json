@@ -41,7 +41,7 @@
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
     "test:lint": "eslint .",
-    "test:unit": "jest . -u",
+    "test:unit": "jest .",
     "test:coverage": "jest . --coverage",
     "predeploy": "cd example-vs-cornerstone && npm install && SKIP_PREFLIGHT_CHECK=true npm run build",
     "deploy": "gh-pages -d example-vs-cornerstone/build",
