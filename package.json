@@ -1,6 +1,6 @@
 {
   "name": "dicom.ts",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A small, fast, typescript DICOM renderer",
   "author": "wearemothership",
   "keywords": [
@@ -38,14 +38,13 @@
     "postbuild": "browserify -s dicom.ts -p esmify ./dist/index.modern.js > ./dist/browser.js",
     "start": "rimraf dist && microbundle watch --no-compress -f modern,cjs",
     "prepare": "run-s build",
-    "test": "run-s test:unit test:lint test:build",
+    "test": "run-s test:unit test:lint test:build", 
     "test:build": "run-s build",
     "test:lint": "eslint .",
     "test:unit": "jest .",
     "test:coverage": "jest . --coverage",
     "predeploy": "cd example-vs-cornerstone && npm install && SKIP_PREFLIGHT_CHECK=true npm run build",
-    "deploy": "gh-pages -d example-vs-cornerstone/build",
-    "postinstall": "rimraf ./test && cp -r ./node_modules/dicom-test-files ./test"
+    "deploy": "gh-pages -d example-vs-cornerstone/build"
   },
   "dependencies": {
     "@types/node": "^17.0.21",
