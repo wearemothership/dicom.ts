@@ -8,7 +8,7 @@ if (globalThis.window && !window.TextDecoder) {
 }
 
 describe("parser tests", () => {
-	const path = "./test/medical.nema.org/";
+	const path = "./node_modules/dicom-test-files/medical.nema.org/";
 
 	const file = [
 		"compsamples_j2k/IMAGES/J2KI/CT1_J2KI",
@@ -161,7 +161,7 @@ describe("parser tests", () => {
 	});
 
 	it("Parses issue #19 OK", () => {
-		const data = fs.readFileSync("./test/dicom-ts-issues/parse-issue-19.dcm");
+		const data = fs.readFileSync("./node_modules/dicom-test-files/dicom-ts-issues/parse-issue-19.dcm");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = parseImage(dataView);
 		expect(image).toBeTruthy();
