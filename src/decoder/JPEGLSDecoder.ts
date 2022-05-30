@@ -12,8 +12,11 @@ class JPEGLosslessDecoder extends Decoder {
 		if (!this.jpegs?.length) {
 			return Promise.reject(new Error("No JPEG-LS image data"));
 		}
-		return import("./codecs/charlsjs").then((CharLS) => (CharLS as any)({})
-			.then((charLS: { JpegLSDecoder: new () => any; }) => {
+
+		return new Promise((resolve) => {
+			let charLS: { JpegLSDecoder: new () => any; };
+
+			const init = () => {
 				const decoder = new charLS.JpegLSDecoder();
 				const jpeg = this.jpegs![frameNo];
 				const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
@@ -23,8 +26,15 @@ class JPEGLosslessDecoder extends Decoder {
 				decoder.decode();
 
 				const decoded = decoder.getDecodedBuffer();
-				return decoded;
-			}));
+				return resolve(decoded);
+			};
+
+			import("./codecs/charlsjs").then((CharLS) => {
+				charLS = CharLS.default({
+					onRuntimeInitialized: init
+				});
+			});
+		});
 	}
 }
 
