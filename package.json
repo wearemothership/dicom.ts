@@ -54,7 +54,7 @@
     "pako": "^2.0.4",
     "raw.macro": "^0.4.2",
     "sha1": "^1.1.1",
-    "twgl.js": "git+https://github.com/wearemothership/twgl.js#v4.19.1",
+    "twgl.js": "git+https://github.com/wearemothership/twgl.js#v4.19.1-node-canvas-webgl",
     "typescript": "^4.7.2"
   },
   "devDependencies": {
