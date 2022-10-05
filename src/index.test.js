@@ -78,8 +78,7 @@ const logImageTags = (image) => {
 describe("dicom.ts", () => {
 	it("Renders with: RLE decode and 'contrastify' greyscale render", async () => {
 		const data = fs.readFileSync("./node_modules/dicom-test-files/medical.nema.org/compsamples_rle_20040210/IMAGES/RLE/CT1_RLE");
-		const dataView = new DataView(new Uint8Array(data).buffer);
-		const image = dicomjs.parseImage(dataView);
+		const image = dicomjs.parseImage(new Uint8Array(data).buffer); // use array buffer
 		const canvas = createCanvas(512, 512);
 		const renderer = new dicomjs.Renderer(canvas);
 		await renderer.render(image, 0);
@@ -98,7 +97,7 @@ describe("dicom.ts", () => {
 	it("Renders with: RLE decode and greyscale window render", async () => {
 		const data = fs.readFileSync("./node_modules/dicom-test-files/medical.nema.org/compsamples_rle_20040210/IMAGES/RLE/CT2_RLE");
 		const dataView = new DataView(new Uint8Array(data).buffer);
-		const image = dicomjs.parseImage(dataView);
+		const image = dicomjs.parseImage(dataView); // use DataView
 		// logImageTags(image);
 		const canvas = createCanvas(512, 512);
 		const renderer = new dicomjs.Renderer(canvas);

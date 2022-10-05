@@ -486,12 +486,20 @@ class Series {
 
 /**
  * Parses the DICOM header and return an image object.
- * @param {DataView} data
+ * @param {DataView|ArrayBuffer} data
  * @returns {DCMImage|null}
  */
-export const parseImage = (data: DataView): DCMImage | null => {
+export const parseImage = (data: DataView | ArrayBuffer): DCMImage | null => {
 	const parser = new Parser();
-	const image = parser.parse(data);
+	let dataView;
+	if (data instanceof DataView) {
+		dataView = data as DataView;
+	}
+	else {
+		dataView = new DataView(data as ArrayBuffer);
+	}
+
+	const image = parser.parse(dataView);
 
 	if (parser.hasError()) {
 		Series.parserError = parser.error as Error;
