@@ -89,6 +89,8 @@ class Parser implements IParserPublic {
 
 	explicit = true;
 
+	metaExplicit = true;
+
 	metaFound = false;
 
 	metaFinished = false;
@@ -226,16 +228,22 @@ class Parser implements IParserPublic {
 
 		const element = data.getUint16(offset, little);
 		offset += 2;
-		if (this.explicit || !this.metaFinished) {
-			//  Utils.getStringAt(data, offset, 2);
+		let useImplicitVR = true;
+
+		if ((this.explicit && this.metaFinished) || (this.metaExplicit && !this.metaFinished)) {
 			vr = String.fromCharCode(data.getUint8(offset))
 				+ String.fromCharCode(data.getUint8(offset + 1));
 
-			if (!this.metaFound && this.metaFinished && (Parser.VRS.indexOf(vr) === -1)) {
-				vr = Dictionary.getVR(group, element);
-				length = data.getUint32(offset, little);
-				offset += 4;
-				this.explicit = false;
+			const foundVR = (Parser.VRS.indexOf(vr) !== -1);
+			if (!foundVR && (
+				(!this.metaFound && this.metaFinished) || (this.metaFound && !this.metaFinished)
+			)) {
+				if (this.metaFinished) {
+					this.explicit = false;
+				}
+				else {
+					this.metaExplicit = false;
+				}
 			}
 			else {
 				offset += 2;
@@ -250,9 +258,11 @@ class Parser implements IParserPublic {
 					length = data.getUint16(offset, little);
 					offset += 2;
 				}
+				useImplicitVR = false;
 			}
 		}
-		else {
+
+		if (useImplicitVR) {
 			vr = Dictionary.getVR(group, element);
 			length = data.getUint32(offset, little);
 
@@ -267,7 +277,7 @@ class Parser implements IParserPublic {
 
 		const isPixelData = Tag.isEqual({ group, element }, TagIds.PixelData);
 
-		if ((vr === "SQ") || ((this.level > 0) && (Parser.DATA_VRS.indexOf(vr) !== -1))) {
+		if ((vr === "SQ") || ((this.level > 0) && (Parser.DATA_VRS.indexOf(vr!) !== -1))) {
 			value = this.parseSublist(data, offset, length, vr !== "SQ");
 
 			if (length === Parser.UNDEFINED_LENGTH) {
