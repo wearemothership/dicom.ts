@@ -1,6 +1,6 @@
 {
   "name": "dicom.ts",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A small, fast, typescript DICOM renderer",
   "author": "wearemothership",
   "keywords": [
@@ -84,7 +84,7 @@
     "gh-pages": "^4.0.0",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
-    "jest-image-snapshot": "^4.5.1",
+    "jest-image-snapshot": "^5.2.0",
     "microbundle": "^0.15.0",
     "node-canvas-webgl": "git+https://github.com/wearemothership/node-canvas-webgl.git#0.2.7-twgl",
     "node-fetch": "^2.6.7",
