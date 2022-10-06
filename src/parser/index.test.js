@@ -160,8 +160,17 @@ describe("parser tests", () => {
 		expect(image.tags).toMatchSnapshot();
 	});
 
-	it("Parses issue #19 OK", () => {
+	it("Parses issue #19 OK", () => { // https://github.com/wearemothership/dicom.ts/issues/19
 		const data = fs.readFileSync("./node_modules/dicom-test-files/dicom-ts-issues/parse-issue-19.dcm");
+		const dataView = new DataView(new Uint8Array(data).buffer);
+		const image = parseImage(dataView);
+		expect(image).toBeTruthy();
+		expect(image.tags).toBeTruthy();
+		expect(image.tags).toMatchSnapshot();
+	});
+
+	it("Parses issue #54 OK", () => { // https://github.com/wearemothership/dicom.ts/issues/54
+		const data = fs.readFileSync("./node_modules/dicom-test-files/dicom-ts-issues/54-implicit-file-meta-info.dcm");
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = parseImage(dataView);
 		expect(image).toBeTruthy();
