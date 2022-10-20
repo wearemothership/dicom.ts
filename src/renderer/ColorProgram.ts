@@ -10,12 +10,14 @@ import { IDisplayInfo } from "../image/DisplayInfo";
 
 const vertexShader = raw("./vertex.glsl");
 const colorShader = raw("./color.glsl");
+
+//======================================================================================
 class ColorProgram implements IProgram {
 	programInfo: ProgramInfo;
 
 	unitQuadBufferInfo: BufferInfo;
 
-	gl:WebGLRenderingContext;
+	gl:WebGL2RenderingContext;
 
 	static programStringForInfo(imageInfo: IDisplayInfo): string {
 		const { planar, invert } = imageInfo;
@@ -33,7 +35,7 @@ class ColorProgram implements IProgram {
 	}
 
 	// don't need info! all non palette color images use same program
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 		const shaderString = ColorProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, shaderString]);
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);

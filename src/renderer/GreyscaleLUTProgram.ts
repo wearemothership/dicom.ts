@@ -17,13 +17,13 @@ class GreyscaleLUTProgram implements IProgram {
 
 	info: IDisplayInfo;
 
-	gl:WebGLRenderingContext;
+	gl:WebGL2RenderingContext;
 
 	static programStringForInfo(info: IDisplayInfo): string {
 		return preCompileGreyscaleShader(info, greyscaleLUTShader);
 	}
 
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 		const fragShaderString = GreyscaleLUTProgram.programStringForInfo(info);
 
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, fragShaderString]);

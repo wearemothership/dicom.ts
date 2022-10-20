@@ -15,6 +15,8 @@ import { Charset, DefaultCharset, TransferSyntax } from "./constants";
 const MAGIC_COOKIE_OFFSET = 128;
 const MAGIC_COOKIE = [68, 73, 67, 77];
 
+//--------------------------------------------------------
+
 /**
  * Returns true if the DICOM magic cookie is found.
  * @param {DataView} data
@@ -30,6 +32,8 @@ const isMagicCookieFound = (data: DataView): boolean => {
 	}
 	return true;
 };
+
+//--------------------------------------------------------
 
 const findFirstTagOffset = (data: DataView): number => {
 	const magicCookieLength = MAGIC_COOKIE.length;
@@ -59,13 +63,15 @@ const findFirstTagOffset = (data: DataView): number => {
 	}
 	return offset;
 };
-
+//====================================================================================
 interface IParserPublic {
 	littleEndian:boolean;
 	explicit:boolean;
 	error?: Error | null;
 	charset?:Charset;
 }
+
+//--------------------------------------------------------
 
 /**
  * Parser class
@@ -89,8 +95,6 @@ class Parser implements IParserPublic {
 
 	explicit = true;
 
-	metaExplicit = true;
-
 	metaFound = false;
 
 	metaFinished = false;
@@ -109,8 +113,10 @@ class Parser implements IParserPublic {
 
 	charset?:Charset = null;
 
+	//--------------------------------------------------------
+
 	/**
-	 * Parses this data and returns an image object.
+	 * Parses this data from a Dicom file and returns an image object.
 	 * @param {DataView} data
 	 * @returns {Image|null}
 	 */
@@ -157,7 +163,8 @@ class Parser implements IParserPublic {
 
 		return image;
 	}
-
+	
+	//--------------------------------------------------------
 	parseEncapsulated(data: DataView): Tag[] {
 		this.encapsulation = true;
 		const tags: Tag[] = [];
@@ -180,7 +187,7 @@ class Parser implements IParserPublic {
 		}
 		return tags;
 	}
-
+	//--------------------------------------------------------
 	testForValidTag(data: DataView):any {
 		let tag = null;
 		try {
@@ -192,7 +199,7 @@ class Parser implements IParserPublic {
 		}
 		return tag;
 	}
-
+	//--------------------------------------------------------
 	getNextTag(data: DataView, offsetStart: number, testForTag:boolean = false):any {
 		let group = 0;
 		let value = null;
@@ -228,22 +235,16 @@ class Parser implements IParserPublic {
 
 		const element = data.getUint16(offset, little);
 		offset += 2;
-		let useImplicitVR = true;
-
-		if ((this.explicit && this.metaFinished) || (this.metaExplicit && !this.metaFinished)) {
+		if (this.explicit || !this.metaFinished) {
+			//  Utils.getStringAt(data, offset, 2);
 			vr = String.fromCharCode(data.getUint8(offset))
 				+ String.fromCharCode(data.getUint8(offset + 1));
 
-			const foundVR = (Parser.VRS.indexOf(vr) !== -1);
-			if (!foundVR && (
-				(!this.metaFound && this.metaFinished) || (this.metaFound && !this.metaFinished)
-			)) {
-				if (this.metaFinished) {
-					this.explicit = false;
-				}
-				else {
-					this.metaExplicit = false;
-				}
+			if (!this.metaFound && this.metaFinished && (Parser.VRS.indexOf(vr) === -1)) {
+				vr = Dictionary.getVR(group, element);
+				length = data.getUint32(offset, little);
+				offset += 4;
+				this.explicit = false;
 			}
 			else {
 				offset += 2;
@@ -258,11 +259,9 @@ class Parser implements IParserPublic {
 					length = data.getUint16(offset, little);
 					offset += 2;
 				}
-				useImplicitVR = false;
 			}
 		}
-
-		if (useImplicitVR) {
+		else {
 			vr = Dictionary.getVR(group, element);
 			length = data.getUint32(offset, little);
 
@@ -277,7 +276,7 @@ class Parser implements IParserPublic {
 
 		const isPixelData = Tag.isEqual({ group, element }, TagIds.PixelData);
 
-		if ((vr === "SQ") || ((this.level > 0) && (Parser.DATA_VRS.indexOf(vr!) !== -1))) {
+		if ((vr === "SQ") || ((this.level > 0) && (Parser.DATA_VRS.indexOf(vr) !== -1))) {
 			value = this.parseSublist(data, offset, length, vr !== "SQ");
 
 			if (length === Parser.UNDEFINED_LENGTH) {
@@ -343,7 +342,7 @@ class Parser implements IParserPublic {
 		}
 		return tag;
 	}
-
+	//--------------------------------------------------------
 	parseSublist(data: DataView, offsetStart:number, length:number, raw:boolean): Array<Tag> {
 		const tags = [];
 		let offset = offsetStart;
@@ -373,7 +372,7 @@ class Parser implements IParserPublic {
 
 		return tags;
 	}
-
+	//--------------------------------------------------------
 	parseSublistItem(data:DataView, offsetStart:number, raw:boolean): Tag {
 		let offset = offsetStart;
 		let value = null;
@@ -433,5 +432,29 @@ class Parser implements IParserPublic {
 		return (this.error !== null);
 	}
 }
+
+
+//--------------------------------------------------------
+/**
+ * Parses the DICOM header and return an image object.
+ * @param {DataView} data
+ * @returns {DCMImage|null}
+ */
+ export const parseImage = (data: DataView): DCMImage | null => {
+	const parser = new Parser();
+	const image = parser.parse(data);
+
+	// if (parser.hasError()) {
+	// 	Series.parserError = parser.error as Error;
+	// 	return null;
+	// }
+
+	if (parser.inflated) {
+		image.inflated = parser.inflated;
+	}
+
+	return image;
+};
+
 
 export default Parser;

@@ -1,18 +1,11 @@
 import { TransferSyntax } from "../parser/constants";
 import DCMImage from "../parser/image";
-import { ImageSize } from "./Types";
+import { displayInfoFromDecoderInfo } from "./DisplayInfo";
+import { ImageSize, Codec,IDecoderInfo } from "./Types";
 
-/* eslint-disable no-bitwise */
-export enum Codec {
-	Uncompressed	= 0x0,
-	JPEG 			= 0x1,		// baseline
-	JPEGExt			= 0x1 << 1,	// baseline 12bit (extended)
-	JPEG2000 		= 0x1 << 2,
-	JPEGLS 			= 0x1 << 3,
-	JPEGLossless 	= 0x1 << 4,
-	RLE				= 0x1 << 5,
-}
+export type {IDecoderInfo};
 
+//--------------------------------------------------------
 const Signed = 0x8;
 export enum PixelDataType {
 	Uint8 		= 0x1,
@@ -22,26 +15,10 @@ export enum PixelDataType {
 }
 /* eslint-enable no-bitwise */
 
-/**
- * Decoder input info
- */
-export interface IDecoderInfo {
-	image: DCMImage // orignal image data
 
-	size: ImageSize
-	codec: Codec
-	rgb: boolean
-	planar: boolean
-	samples: number
-	bitsAllocated: number
-	bytesAllocated: number
-	bitsStored: number
-	signed: boolean
-	littleEndian: boolean
-	data: DataView
-}
+//--------------------------------------------------------
 
-class DecoderInfo implements IDecoderInfo {
+export class DecoderInfo implements IDecoderInfo {
 	image: DCMImage;
 
 	size: ImageSize;
@@ -64,7 +41,8 @@ class DecoderInfo implements IDecoderInfo {
 
 	littleEndian: boolean;
 
-	data: DataView;
+	/* A reference to the raw (encoded?)image rawData. */
+	rawData: DataView;
 
 	constructor(image: DCMImage) {
 		this.image = image;
@@ -112,9 +90,9 @@ class DecoderInfo implements IDecoderInfo {
 		this.bytesAllocated = Math.round(image.bitsAllocated / 8);
 		this.bitsStored = image.bitsStored;
 		this.signed = image.pixelRepresentation === 1;
-		this.data = image.pixelData.value as DataView;
+		this.rawData = image.pixelData.value as DataView;
 		this.littleEndian = image.littleEndian;
 	}
 }
 
-export const decodeInfoForImage = (image: DCMImage):IDecoderInfo => new DecoderInfo(image);
+// export const decodeInfoForImage = (image: DCMImage):IDecoderInfo => new DecoderInfo(image);

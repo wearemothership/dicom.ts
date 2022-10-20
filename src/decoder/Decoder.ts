@@ -1,81 +1,58 @@
-import * as twgl from "twgl.js";
+
 import { IDecoderInfo } from "../image/DecoderInfo";
 import { displayInfoFromDecoderInfo, IDisplayInfo } from "../image/DisplayInfo";
 import { ImageSize, ISize } from "../image/Types";
-import FrameInfo from "../image/FrameInfo";
 
+
+//=======================================================================================
 interface IDecoder {
-	outputSize: ISize
-	image: IDisplayInfo
-	getFrame(gl:WebGL2RenderingContext, frameNo:number):Promise<FrameInfo>
-	// createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture>
+	image: IDisplayInfo 
+	getFramePixels(frameNo:number):Promise<Blob>
 }
 
+//========================================================================================
 class Decoder implements IDecoder {
 	image: IDisplayInfo;
 
-	outputSize: ImageSize;
+	constructor(decoderInfo:IDecoderInfo) {
+		/* Converting the image from a decoderInfo to a image. */
+		this.image = displayInfoFromDecoderInfo(decoderInfo);
 
-	constructor(image:IDecoderInfo) {
-		this.image = displayInfoFromDecoderInfo(image);
-
-		this.outputSize = image.size;
 	}
-
-	async getFrame(gl:WebGLRenderingContext, frameNo:number):Promise<FrameInfo> {
-		const texture = await this.createTexture(gl, frameNo);
-		return new FrameInfo({
-			imageInfo: this.image,
-			frameNo,
-			gl,
-			texture
-		});
-	}
-
+//------------------------------------------------------------------------------
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected decode(frameNo:number):Promise<DataView> {
-		const { data, nFrames } = this.image;
-		const bytesPerFrame = data.byteLength / nFrames;
+		const { rawData, nFrames } = this.image;
+		const bytesPerFrame = rawData.byteLength / nFrames;
 		const dv = new DataView(
-			data.buffer,
-			data.byteOffset + bytesPerFrame * frameNo,
+			rawData.buffer,
+			rawData.byteOffset + bytesPerFrame * frameNo,
 			bytesPerFrame
 		);
 		return Promise.resolve(dv);
 	}
-
-	protected async createTexture(gl:WebGLRenderingContext, frameNo:number):Promise<WebGLTexture> {
-		const pixelData = await this.decode(frameNo);
-		const buffer = new Uint8Array(pixelData.buffer, pixelData.byteOffset, pixelData.byteLength);
-		let { height } = this.outputSize;
-		const { width } = this.outputSize;
-		const { image } = this;
-		let format = gl.LUMINANCE_ALPHA;
-		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (image.rgb && !image.planar && !image.palette) {
-			format = gl.RGB;
-			internalFormat = gl.RGB;
+//------------------------------------------------------------------------------
+	
+	/**
+	 * It decodes the frames of the image and returns a Blob containing the pixel data of all the
+	 * frames
+	 * @param {number} frameNo - the frame number to decode. If negative, all frames are decoded.
+	 * @returns A Blob object.
+	 */
+	async getFramePixels(frameNo:number):Promise<Blob> {
+		let currFrame = frameNo < 0 ? 0 : frameNo;
+		let endFrame = frameNo < 0 ? this.image.nFrames : frameNo+1;
+		let frameDataAray = [];
+		for(; currFrame < endFrame; currFrame++){
+			/*decode frame-by-frame and collate*/
+			const pixelData = await this.decode(currFrame);
+			frameDataAray.push(pixelData);
 		}
-		else if (image.bytesAllocated === 1) {
-			format = gl.LUMINANCE;
-			internalFormat = gl.LUMINANCE;
-		}
-		if (image.planar) {
-			height *= image.samples;
-		}
-
-		return Promise.resolve(twgl.createTexture(gl, {
-			src: buffer,
-			width,
-			height,
-			format,
-			internalFormat,
-			type: gl.UNSIGNED_BYTE,
-			min: gl.NEAREST,
-			mag: gl.NEAREST,
-			wrap: gl.CLAMP_TO_EDGE,
-		}));
+		/*concatenate all the frames' pixel data*/
+	
+		return new Blob(frameDataAray);
 	}
+
 }
 
 export default Decoder;

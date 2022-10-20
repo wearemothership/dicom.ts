@@ -10,37 +10,39 @@ import { ISize } from "../image/Types";
 const vertexShader = raw("./vertex.glsl");
 const greyscaleShader = raw("./greyscale.glsl");
 
+//======================================================================================
 class GreyscaleProgram implements IProgram {
 	programInfo: ProgramInfo;
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	gl:WebGLRenderingContext;
+	gl:WebGL2RenderingContext;
 
 	static programStringForInfo(info: IDisplayInfo): string {
 		return preCompileGreyscaleShader(info, greyscaleShader);
 	}
 
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 		const greyscaleShaderString = GreyscaleProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, greyscaleShaderString]);
 
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+		// this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		this.programInfo = programInfo;
 		this.gl = gl;
 	}
-
+	//-----------------------------------------------------------------------------
 	use() {
 		const { gl, programInfo, unitQuadBufferInfo } = this;
 
 		twgl.bindFramebufferInfo(gl, null);
 
 		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
 	}
 
-	run(frame: FrameInfo, outputSize: ISize) {
+	
+	//-----------------------------------------------------------------------------
+	run(frame: FrameInfo, size: ISize) {
 		const {
 			gl,
 			unitQuadBufferInfo,
@@ -72,9 +74,25 @@ class GreyscaleProgram implements IProgram {
 		if (signed) {
 			windowCenter = (windowCenter || 0) + (2 ** (bitsAllocated - 1));
 		}
+		const imgSize = frame.imageInfo.size;
+		const nFrames:number = frame.imageInfo.nFrames;
+		
+		const arrays = {
+			position: [0,0,frame.frameNo, imgSize.width,0,frame.frameNo, 
+						imgSize.width, imgSize.height,frame.frameNo, 0,imgSize.height,frame.frameNo],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);//twgl.primitives.createXYQuadBufferInfo(gl);
+		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
+		const modviewproj = twgl.m4.ortho(imgSize.width*0.0,imgSize.width*1.0, 
+											imgSize.height*1.0,imgSize.height*0.0,
+											-1-nFrames,1);
+		//VC??? - left it here
 
+		//set also the model-view-project matrix4
 		twgl.setUniforms(programInfo, {
-			u_resolution: [outputSize.width, outputSize.height],
+			u_resolution: [imgSize.width, imgSize.height, nFrames],
+			u_matrix: modviewproj,
 			u_texture: texture,
 			u_winWidth: windowWidth,
 			u_winCenter: windowCenter,
@@ -84,6 +102,8 @@ class GreyscaleProgram implements IProgram {
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 	}
 
+	
+	//-----------------------------------------------------------------------------
 	destroy() {
 		this.gl.deleteProgram(this.programInfo.program);
 	}

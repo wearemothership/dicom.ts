@@ -1,6 +1,10 @@
+#version 300 es
+
 precision highp float;
+
+layout(location = 0) out vec4 out_0;
 uniform bool u_invert;
-uniform sampler2D u_texture;
+uniform highp sampler3D u_texture;
 uniform vec2 u_resolution;
 
 uniform float u_slope;
@@ -13,13 +17,13 @@ vec4 getPlanar(vec2 coord) {
 
 	float xPos = coord.x;
 
-	vec4 red = texture2D(u_texture, vec2(xPos, yPos));
+	vec4 red = texture(u_texture, vec3(xPos, yPos, 0.5));
 
 	yPos = yPos + third;
-	vec4 green = texture2D(u_texture, vec2(xPos, yPos));
+	vec4 green = texture(u_texture, vec3(xPos, yPos, 0.5));
 
 	yPos = yPos + third;
-	vec4 blue = texture2D(u_texture, vec2(xPos, yPos));
+	vec4 blue = texture(u_texture, vec3(xPos, yPos, 0.5));
 
 	if (col == 0) {
 		return vec4(red.r, green.r, blue.r, 1.0);
@@ -44,5 +48,5 @@ void main() {
 
 	// $(u_invert)
 
-	gl_FragColor = color;
+	out_0 = color;
 }

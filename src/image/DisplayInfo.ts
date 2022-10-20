@@ -1,44 +1,12 @@
-import { IDecoderInfo } from "./DecoderInfo";
+
 import DCMImage from "../parser/image";
 import { TagIds } from "../parser/tag";
+import {IDecoderInfo, IImageLutInfo, IImagePaletteInfo,IDisplayInfo} from "./Types";
 
-export interface IImageLutInfo {
-	nEntries: number;
-	firstValue: number;
-	bitsStored: number;
-	data: Uint8Array | Uint16Array
-}
 
-export interface IImagePaletteInfo {
-	nEntries: number;
-	firstValue: number;
-	bitsAllocated: number;
-	r: DataView;
-	g: DataView;
-	b: DataView;
-}
+export type {IDisplayInfo};
 
-export interface IDisplayInfo extends IDecoderInfo {
-
-	nFrames: number
-
-	lut: IImageLutInfo | null
-	palette: IImagePaletteInfo | null
-
-	invert: boolean
-
-	pixelPaddingVal: number | null
-
-	minPixVal: number | null
-	maxPixVal: number | null
-
-	windowCenter: number | null
-	windowWidth: number | null
-
-	slope: number
-	intercept: number
-}
-
+//--------------------------------------------------------
 const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 	const lutDescriptor = image.getTagValue(TagIds.VoiLutDescriptor) as number[];
 	if (lutDescriptor?.length !== 3) {
@@ -70,6 +38,8 @@ const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 	};
 };
 
+
+//--------------------------------------------------------
 const paletteInfoFromImage = (info: IDecoderInfo): IImagePaletteInfo | null => {
 	const { image } = info;
 	const reds = image.getTagValue(TagIds.PaletteRed) as DataView;
@@ -91,6 +61,21 @@ const paletteInfoFromImage = (info: IDecoderInfo): IImagePaletteInfo | null => {
 	return null;
 };
 
+
+//--------------------------------------------------------
+/**
+ * It takes a decoder info object and returns a display info object
+ * @param {IDecoderInfo} info - The decoder info object.
+ * @returns An object with the following properties:
+ * 	- nFrames: number of frames
+ * 	- pixelPaddingVal: pixel padding value
+ * 	- lut: lut info
+ * 	- palette: palette info
+ * 	- minPixVal: minimum pixel value
+ * 	- maxPixVal: maximum pixel value
+ * 	- windowCenter: window center
+ * 	- windowWidth: window
+ */
 export const displayInfoFromDecoderInfo = (info:IDecoderInfo): IDisplayInfo => {
 	const { image } = info;
 	let invert = image.getTagValueIndexed(TagIds.LutShape) === "inverse";

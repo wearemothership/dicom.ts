@@ -1,11 +1,15 @@
-#extension GL_EXT_draw_buffers : require
+#version 300 es
 
 precision mediump float;
 
+layout(location = 0) out vec4 out_0;
+layout(location = 1) out vec4 out_1;
+
+
 #define CELL_SIZE $(cellSize)
 
-uniform sampler2D u_minTexture;
-uniform sampler2D u_maxTexture;
+uniform highp sampler2D u_minTexture;
+uniform highp sampler2D u_maxTexture;
 uniform vec2 u_srcResolution;
 
 float greyscale(vec4 color) {
@@ -29,13 +33,13 @@ void main() {
     for (int y = 0; y < CELL_SIZE; ++y) {
         for (int x = 0; x < CELL_SIZE; ++x) {
             vec2 off = uv + vec2(x, y) * onePixel;
-            vec4 colorMin = texture2D(u_minTexture, off);
+            vec4 colorMin = texture(u_minTexture, off);
             float grey = greyscale(colorMin);
             if (minVal > grey) {
                 minColor = colorMin;
                 minVal = grey;
             }
-            vec4 colorMax = texture2D(u_maxTexture, off);
+            vec4 colorMax = texture(u_maxTexture, off);
             grey = greyscale(colorMax);
             if (maxVal < grey) {
                 maxColor = colorMax;
@@ -44,6 +48,6 @@ void main() {
         }
     }
 
-    gl_FragData[0] = minColor;
-    gl_FragData[1] = maxColor;
+    out_0 = minColor;
+    out_1 = maxColor;
 }

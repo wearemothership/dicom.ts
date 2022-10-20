@@ -7,14 +7,16 @@ import JPEG2000Decoder from "./JPEG2000Decoder";
 import JPEGBaselineDecoder from "./JPEGBaselineDecoder";
 
 import DCMImage from "../parser/image";
-import { Codec, decodeInfoForImage } from "../image/DecoderInfo";
+import { DecoderInfo } from "../image/DecoderInfo";
+import { Codec } from "../image/Types";
 
 export { Decoder };
 
 const hasCreateObjectURL = !!URL.createObjectURL;
 
+//======================================================================
 export const decoderForImage = (image:DCMImage):Decoder | null => {
-	const info = decodeInfoForImage(image);
+	const info = new DecoderInfo(image);
 	switch (info.codec) {
 		case Codec.JPEG:
 			if (hasCreateObjectURL) {

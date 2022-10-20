@@ -1,4 +1,4 @@
-import Renderer, { render } from "./renderer/Renderer";
+import ImageRenderer/*, { renderImage }*/ from "./renderer/Renderer";
 import {
 	TransferSyntax,
 	Parser,
@@ -8,7 +8,7 @@ import {
 export {
 	TransferSyntax,
 	parseImage,
-	render,
-	Renderer,
+	// renderImage,
+	ImageRenderer,
 	Parser,
 };

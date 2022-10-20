@@ -1,7 +1,7 @@
 import Dictionary from "./dictionary";
 import DCMImage from "./image";
-import Parser from "./parser";
-import Series, { parseImage } from "./series";
+import Parser, { parseImage } from "./parser";
+import Series from "../image/series";
 import { TransferSyntax } from "./constants";
 import Tag from "./tag";
 

@@ -10,19 +10,13 @@ import { ISize } from "../image/Types";
 const vertexShader = raw("./vertex.glsl");
 const minMaxShader = raw("./minMax.glsl");
 const contrastifyShader = raw("./contrastify.glsl");
+console.log(minMaxShader);
 
 const cellSize = 16;
 
-// eslint-disable-next-line camelcase, @typescript-eslint/naming-convention
-interface WEBGL_draw_buffers {
-	drawBuffersWEBGL(buffers: Array<number>):void,
-	COLOR_ATTACHMENT0_WEBGL: number,
-	COLOR_ATTACHMENT1_WEBGL: number
-}
 
 class ContrastifyProgram implements IProgram {
 	// eslint-disable-next-line camelcase
-	ext: WEBGL_draw_buffers;
 
 	minMaxProgramInfo: ProgramInfo;
 
@@ -30,7 +24,7 @@ class ContrastifyProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo | null = null;
 
-	gl:WebGLRenderingContext;
+	gl:WebGL2RenderingContext;
 
 	static programStringForInfo(info: IDisplayInfo): [string, string] {
 		// don't ignore pixelPaddingVal in minMax calcs
@@ -48,12 +42,7 @@ class ContrastifyProgram implements IProgram {
 		return [minMaxFragString, contrastifyShaderString];
 	}
 
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
-		const ext = gl.getExtension("WEBGL_draw_buffers");
-		if (!ext) {
-			throw new Error("Image requires WEBGL_draw_buffers");
-		}
-		this.ext = ext!;
+	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 
 		// TODO: don;t double up on program string generation
 
@@ -68,6 +57,17 @@ class ContrastifyProgram implements IProgram {
 			gl,
 			[vertexShader, contrastifyFrag]
 		);
+
+		const arrays = {
+			position: [0,0,frame.frameNo, imgSize.width,0,frame.frameNo, imgSize.width, imgSize.height,frame.frameNo, 0,imgSize.height,frame.frameNo],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);//twgl.primitives.createXYQuadBufferInfo(gl);
+		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
+		const modviewproj = twgl.m4.ortho(imgSize.width*0.0,imgSize.width*1.0, 
+											imgSize.height*1.0,imgSize.height*0.0,
+											-1-frame.imageInfo.nFrames,1);
+		//VC??? - left it here
 
 		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
@@ -84,7 +84,7 @@ class ContrastifyProgram implements IProgram {
 
 		const {
 			gl,
-			ext,
+			// ext,
 			minMaxProgramInfo,
 			contrastProgramInfo,
 			unitQuadBufferInfo,
@@ -128,8 +128,7 @@ class ContrastifyProgram implements IProgram {
 				},
 			], w, h);
 			// WebGl2
-			// gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
-			ext.drawBuffersWEBGL([ext.COLOR_ATTACHMENT0_WEBGL, ext.COLOR_ATTACHMENT1_WEBGL]);
+			gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 			framebuffers.push(fbi);
 		}
 

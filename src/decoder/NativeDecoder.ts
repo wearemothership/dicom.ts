@@ -4,40 +4,25 @@ import Decoder from "./Decoder";
 import { getJpegData } from "./util";
 
 class NativeDecoder extends Decoder {
-	private jpegData:DataView[];
+	private jpegs:DataView[];
 
-	constructor(image:IDecoderInfo) {
-		super(image);
+	constructor(decoderInfo:IDecoderInfo) {
+		super(decoderInfo);
 		this.image.rgb = true; // native img decoder outputs RGB
-		this.jpegData = getJpegData(image.data);
+		this.jpegs = getJpegData(decoderInfo.rawData);
 	}
 
-	protected createTexture(gl:WebGL2RenderingContext, frameNo:number):Promise<WebGLTexture> {
-		const { width, height } = this.outputSize;
-		const jpegFrameData = this.jpegData?.[frameNo];
+	
+	protected decode(frameNo:number):Promise<DataView> {
+		
+		const jpegFrameData = this.jpegs?.[frameNo];
 		if (!jpegFrameData) {
-			throw Error("No Native JPEG image data");
+			return Promise.reject(new Error("No Native JPEG image data"));
 		}
-		const blob = new Blob([jpegFrameData]);
-		const src = URL.createObjectURL(blob);
-		return new Promise((resolve, reject) => {
-			twgl.createTexture(gl, {
-				src,
-				width,
-				height,
-				type: gl.UNSIGNED_BYTE,
-				min: gl.NEAREST,
-				mag: gl.NEAREST,
-				wrap: gl.CLAMP_TO_EDGE,
-			}, (error, texture) => {
-				URL.revokeObjectURL(src);
-				if (error) {
-					reject(error);
-				}
-				resolve(texture);
-			});
-		});
+
+		return Promise.resolve(jpegFrameData);
 	}
+
 }
 
 export default NativeDecoder;

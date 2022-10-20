@@ -15,7 +15,7 @@ class ColorPaletteProgram implements IProgram {
 
 	unitQuadBufferInfo: BufferInfo;
 
-	gl:WebGLRenderingContext;
+	gl:WebGL2RenderingContext;
 
 	static programStringForInfo(info: IDisplayInfo): string {
 		const { palette } = info;
@@ -31,7 +31,7 @@ class ColorPaletteProgram implements IProgram {
 			.replace("$(paletteWord)", getPaletteWordString);
 	}
 
-	constructor(gl:WebGLRenderingContext, info: IDisplayInfo) {
+	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 		const programString = ColorPaletteProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, programString]);
 		this.programInfo = programInfo;

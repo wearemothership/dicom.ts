@@ -1,40 +1,41 @@
-import { IDisplayInfo } from "./DisplayInfo";
 
-interface IFrameInfo {
-	frameNo: number
+import { ImageSize , IDisplayInfo, IFrameInfo} from "./Types";
 
-	imageInfo: IDisplayInfo
 
-	texture: WebGLTexture
 
-	destroy(): void
-}
-
+//--------------------------------------------------------
 interface IFrameInfoConstructor {
 	imageInfo: IDisplayInfo,
-	frameNo: number,
-	gl:WebGLRenderingContext,
-	texture: WebGLTexture
+	frameNo: number
+	pixelData: Blob
+	mat4Pix2Pat: Float32Array
+	outputSize: ImageSize
 }
 
+//--------------------------------------------------------
 class FrameInfo implements IFrameInfo {
 	frameNo: number;
 
 	imageInfo: IDisplayInfo;
+	
+	pixelData: Blob;
 
-	texture: WebGLTexture;
+	outputSize: ImageSize;
 
-	private gl: WebGLRenderingContext;
+	mat4Pix2Pat: Float32Array = new Float32Array();
+
+	texture: WebGLTexture = -1;
 
 	constructor(info: IFrameInfoConstructor) {
-		this.imageInfo = info.imageInfo;
-		this.frameNo = info.frameNo;
-		this.texture = info.texture;
-		this.gl = info.gl;
+		this.imageInfo 	= info.imageInfo;
+		this.frameNo 	= info.frameNo;
+		this.pixelData 	= info.pixelData;
+		this.mat4Pix2Pat= info.mat4Pix2Pat;
+		this.outputSize = info.outputSize;
 	}
 
 	destroy():void {
-		this.gl.deleteTexture(this.texture);
+		// this.gl.deleteTexture(this.texture);
 	}
 }
 

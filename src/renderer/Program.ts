@@ -1,4 +1,4 @@
-import { IDisplayInfo } from "../image/DisplayInfo";
+import { IDisplayInfo } from "../image/Types";
 import FrameInfo from "../image/FrameInfo";
 import { ISize } from "../image/Types";
 
@@ -9,18 +9,24 @@ import { ISize } from "../image/Types";
 // let greyscaleLUTShader = raw("./greyscaleLUT.glsl");
 // let colorShader = raw("./color.glsl");
 
+/* Defining the interface for the IProgram class. */
 interface IProgram {
-	gl: WebGLRenderingContext;
+	gl: WebGL2RenderingContext;
 	use():void;
 	run(frame: FrameInfo, size: ISize):void
 	destroy(): void
 }
 
+
+//======================================================================================
+/* Defining the interface for the IProgramSignature class. */
 export interface IProgramSignature {
 	hash: string;
 	Type: any;
 }
 
+
+//======================================================================================
 export interface IGreyscaleProgramType {
 	bitsAllocated?: number
 	bitsStored?: number
@@ -33,6 +39,8 @@ export interface IGreyscaleProgramType {
 
 	knownWindow?: boolean
 }
+
+//======================================================================================
 export interface IColorProgramType {
 	planar?: boolean
 
@@ -44,11 +52,12 @@ export interface IColorProgramType {
 	invert?: boolean
 }
 
+//======================================================================================
 /**
  * Unpack pseudo integer or a float  from a color value
  * insert into GLSL to change behaviour depending on data
  * @param {Image} image the parsed DICOM image
- * @param {Boolean} integerVal should return greyscale psuedo int (0 - 65535)
+ * @param {Boolean} integerVal should return greyscale pseudo int (0 - 65535)
  * 							   else return a 0.0-1.0 float color ratio
  */
 export const glslUnpackWordString = (image: IDisplayInfo, integerVal:boolean = true):string => {
@@ -99,6 +108,8 @@ export const glslUnpackWordString = (image: IDisplayInfo, integerVal:boolean = t
 	return `${val}return p${divisor};`;
 };
 
+
+//======================================================================================
 /**
  * replace placeholders in the glsl strings with proper code
  * @param info the image info we are to display
