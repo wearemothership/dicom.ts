@@ -1,4 +1,11 @@
-import ImageRenderer/*, { renderImage }*/ from "./renderer/Renderer";
+
+
+import { DCMImage } from "./parser";
+import Series from "./image/series";
+
+import ImageRenderer  from "./renderer/Renderer";
+import {IFrameInfo} from "./image/Types";
+
 import {
 	TransferSyntax,
 	Parser,
@@ -8,7 +15,9 @@ import {
 export {
 	TransferSyntax,
 	parseImage,
-	// renderImage,
 	ImageRenderer,
 	Parser,
+	Series,
+	DCMImage
 };
+ export type { IFrameInfo };

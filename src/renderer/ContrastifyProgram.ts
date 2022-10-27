@@ -14,7 +14,6 @@ console.log(minMaxShader);
 
 const cellSize = 16;
 
-
 class ContrastifyProgram implements IProgram {
 	// eslint-disable-next-line camelcase
 
@@ -57,19 +56,6 @@ class ContrastifyProgram implements IProgram {
 			gl,
 			[vertexShader, contrastifyFrag]
 		);
-
-		const arrays = {
-			position: [0,0,frame.frameNo, imgSize.width,0,frame.frameNo, imgSize.width, imgSize.height,frame.frameNo, 0,imgSize.height,frame.frameNo],
-			indices: [0,1,2,0,2,3]
-		}
-		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);//twgl.primitives.createXYQuadBufferInfo(gl);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
-		const modviewproj = twgl.m4.ortho(imgSize.width*0.0,imgSize.width*1.0, 
-											imgSize.height*1.0,imgSize.height*0.0,
-											-1-frame.imageInfo.nFrames,1);
-		//VC??? - left it here
-
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
 		this.gl = gl;
 	}
@@ -127,6 +113,19 @@ class ContrastifyProgram implements IProgram {
 					wrap: gl.CLAMP_TO_EDGE
 				},
 			], w, h);
+			
+		// const arrays = {
+		// 	position: [0,0,frame.frameNo, imgSize.width,0,frame.frameNo, imgSize.width, imgSize.height,frame.frameNo, 0,imgSize.height,frame.frameNo],
+		// 	indices: [0,1,2,0,2,3]
+		// }
+		// this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);//twgl.primitives.createXYQuadBufferInfo(gl);
+		// twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
+		// const modviewproj = twgl.m4.ortho(imgSize.width*0.0,imgSize.width*1.0, 
+		// 									imgSize.height*1.0,imgSize.height*0.0,
+		// 									-1-frame.imageInfo.nFrames,1);
+		// //VC??? - left it here
+
+		// this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 			// WebGl2
 			gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 			framebuffers.push(fbi);

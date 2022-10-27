@@ -22,11 +22,11 @@ class Decoder implements IDecoder {
 //------------------------------------------------------------------------------
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected decode(frameNo:number):Promise<DataView> {
-		const { rawData, nFrames } = this.image;
-		const bytesPerFrame = rawData.byteLength / nFrames;
+		const { data, nFrames } = this.image;
+		const bytesPerFrame = data.byteLength / nFrames;
 		const dv = new DataView(
-			rawData.buffer,
-			rawData.byteOffset + bytesPerFrame * frameNo,
+			data.buffer,
+			data.byteOffset + bytesPerFrame * frameNo,
 			bytesPerFrame
 		);
 		return Promise.resolve(dv);

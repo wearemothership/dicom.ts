@@ -9,7 +9,7 @@ class NativeDecoder extends Decoder {
 	constructor(decoderInfo:IDecoderInfo) {
 		super(decoderInfo);
 		this.image.rgb = true; // native img decoder outputs RGB
-		this.jpegs = getJpegData(decoderInfo.rawData);
+		this.jpegs = getJpegData(decoderInfo.data);
 	}
 
 	

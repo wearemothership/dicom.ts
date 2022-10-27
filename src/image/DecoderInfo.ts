@@ -1,6 +1,5 @@
 import { TransferSyntax } from "../parser/constants";
 import DCMImage from "../parser/image";
-import { displayInfoFromDecoderInfo } from "./DisplayInfo";
 import { ImageSize, Codec,IDecoderInfo } from "./Types";
 
 export type {IDecoderInfo};
@@ -41,8 +40,8 @@ export class DecoderInfo implements IDecoderInfo {
 
 	littleEndian: boolean;
 
-	/* A reference to the raw (encoded?)image rawData. */
-	rawData: DataView;
+	/* A reference to the raw (encoded?)image data. */
+	data: DataView;
 
 	constructor(image: DCMImage) {
 		this.image = image;
@@ -90,7 +89,7 @@ export class DecoderInfo implements IDecoderInfo {
 		this.bytesAllocated = Math.round(image.bitsAllocated / 8);
 		this.bitsStored = image.bitsStored;
 		this.signed = image.pixelRepresentation === 1;
-		this.rawData = image.pixelData.value as DataView;
+		this.data = image.pixelData.value as DataView;
 		this.littleEndian = image.littleEndian;
 	}
 }

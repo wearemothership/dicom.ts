@@ -1,12 +1,13 @@
+import * as twgl from "twgl.js";
 import OrderedMap from "../parser/orderedmap";
 import DCMImage from "../parser/image";
 import { SliceDirection } from "../parser/constants";
-import * as twgl from "twgl.js";
-import FrameInfo from "../image/FrameInfo";
-import { decoderForImage, Decoder } from "../decoder";
-import {DecoderInfo} from "./DecoderInfo"
-import {displayInfoFromDecoderInfo} from "./DisplayInfo"
-import { verify } from "crypto";
+import FrameInfo from "./FrameInfo";
+// eslint-disable-next-line import/no-cycle
+import { decoderForImage } from "../decoder";
+import { DecoderInfo } from "./DecoderInfo";
+import { displayInfoFromDecoderInfo } from "./DisplayInfo";
+// import { verify } from "crypto";
 
 type Images = DCMImage[];
 //--------------------------------------------------------
@@ -300,7 +301,7 @@ class Series {
 	error: Error | null = null;
 //--------------------------------------------------------
 	getOrder():number[] {
-		const order = [];
+		const order:number[] = [];
 		for (let ctr = 0; ctr < this.imagesOriginalOrder!.length; ctr += 1) {
 			order[ctr] = this.imagesOriginalOrder![ctr].index;
 		}
@@ -505,7 +506,7 @@ class Series {
    image like RTDose, the pixels are grouped together for texture 3D*/	
 async getFrames():Promise<FrameInfo> 
 {	
-	let frameDataAray = [];
+	let frameDataAray:Blob[] = [];
 	let numImages = 0;
 	let frameIndex = 0;
 	

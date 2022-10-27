@@ -1,13 +1,13 @@
 import sha1 from "sha1";
 import { decoderForImage, Decoder } from "../decoder";
-import IFrameInfo from "../image/FrameInfo";
+import { IFrameInfo } from "../image/Types";
 import ContrastifyProgram from "./ContrastifyProgram";
 import ColorProgram from "./ColorProgram";
 import IProgram, { IColorProgramType, IGreyscaleProgramType, IProgramSignature } from "./Program";
 import GreyscaleProgram from "./GreyscaleProgram";
 import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
 import { ISize, ImageSize } from "../image/Types";
-import { DCMImage, Series } from "../parser";
+import { DCMImage } from "../parser";
 import ColorPaletteProgram from "./ColorPaletteProgram";
 import { Codec, IDisplayInfo } from "../image/Types";
 import * as twgl from "twgl.js";
@@ -76,7 +76,7 @@ class ImageRenderer {
 			bytesAllocated: (bitsAllocated ?? 16) / 8,
 			bitsStored: bitsStored ?? bitsAllocated ?? 16,
 			littleEndian: littleEndian ?? true,
-			rawData: new DataView(new ArrayBuffer(0)),
+			data: new DataView(new ArrayBuffer(0)),
 
 			lut: hasLut ? {
 				nEntries: 0,
@@ -125,7 +125,7 @@ class ImageRenderer {
 			bytesAllocated: bitsAllocated / 8,
 			bitsStored: bitsAllocated,
 			littleEndian: littleEndian ?? true,
-			rawData: new DataView(new ArrayBuffer(0)),
+			data: new DataView(new ArrayBuffer(0)),
 			lut: null,
 			palette: hasPaletteWithWordBits ? {
 				nEntries: 0,

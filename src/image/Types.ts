@@ -87,7 +87,7 @@ export enum Codec {
 	bitsStored: number//?
 	signed: boolean//?
 	littleEndian: boolean//?
-	rawData: DataView
+	data: DataView
 }
 
 //--------------------------------------------------------
