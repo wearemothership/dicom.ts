@@ -3,7 +3,7 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { glslUnpackWordString } from "./Program";
+import IProgram, {  Uniforms,IDrawObject, glslUnpackWordString } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import { ISize } from "../image/Types";
 
@@ -49,7 +49,8 @@ class ColorPaletteProgram implements IProgram {
 		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
 	}
 
-	run(frame: FrameInfo, outputSize: ISize) {
+	//-----------------------------------------------------------------------------
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
 		const {
 			gl,
 			unitQuadBufferInfo,
@@ -110,22 +111,24 @@ class ColorPaletteProgram implements IProgram {
 			mag: gl.NEAREST,
 			wrap: gl.CLAMP_TO_EDGE,
 		});
-		twgl.setUniforms(programInfo, {
-			u_resolution: [outputSize.width, outputSize.height],
+		const imgSize = frame.imageInfo.size;
+		const nFrames:number = frame.imageInfo.nFrames;
+
+		const localUniforms = {
+			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_redTexture: red,
 			u_greenTexture: green,
 			u_blueTexture: blue,
 			u_paletteWidthRatio: (2 ** bitsAllocated) / palette!.nEntries,
 			u_invert: invert
-		});
-		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
-
-		setTimeout(() => {
-			gl.deleteTexture(red);
-			gl.deleteTexture(green);
-			gl.deleteTexture(blue);
-		});
+		};
+		return {
+			active: true,
+			programInfo,
+			bufferInfo: unitQuadBufferInfo,
+			uniforms: [localUniforms, sharedUniforms]
+		}
 	}
 
 	destroy() {

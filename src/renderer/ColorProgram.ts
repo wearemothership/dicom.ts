@@ -3,7 +3,7 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram from "./Program";
+import IProgram, {Uniforms,IDrawObject } from "./Program";
 import { ISize } from "../image/Types";
 import { IDisplayInfo } from "../image/DisplayInfo";
 // import { IDisplayInfo } from "../image/DisplayInfo";
@@ -23,10 +23,10 @@ class ColorProgram implements IProgram {
 		const { planar, invert } = imageInfo;
 		let shaderString:string;
 		if (planar) {
-			shaderString = colorShader.replace("// $(getColor);", "getPlanar(uv);\n");
+			shaderString = colorShader.replace("// $(getColor);", "getPlanar(texcoord);\n");
 		}
 		else {
-			shaderString = colorShader.replace("// $(getColor);", "texture2D(u_texture, uv);\n");
+			shaderString = colorShader.replace("// $(getColor);", "texture(u_texture, texcoord);\n");
 		}
 		if (invert) {
 			shaderString = shaderString.replace("// $(u_invert)", "color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);");
@@ -38,7 +38,14 @@ class ColorProgram implements IProgram {
 	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 		const shaderString = ColorProgram.programStringForInfo(info);
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, shaderString]);
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+		
+		/* build a normalized unit quad as a 3D geometry, which will be transformed as required*/		
+		const arrays = {			
+			position: [-1,-1,-1,  1,-1,-1,  1,1,-1,  -1,1,-1],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);
+
 		this.programInfo = programInfo;
 		this.gl = gl;
 	}
@@ -48,10 +55,10 @@ class ColorProgram implements IProgram {
 
 		twgl.bindFramebufferInfo(gl, null);
 		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
+		
 	}
 
-	run(frame: FrameInfo, outputSize: ISize) {
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
 		const {
 			gl,
 			programInfo,
@@ -63,14 +70,24 @@ class ColorProgram implements IProgram {
 			intercept
 		} = frame.imageInfo;
 		const { texture } = frame;
-		twgl.setUniforms(programInfo, {
-			u_resolution: [outputSize.width, outputSize.height],
+
+		
+		const imgSize = frame.imageInfo.size;
+		const nFrames:number = frame.imageInfo.nFrames;
+
+		const localUniforms = {
+			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_invert: invert,
 			u_slope: slope,
 			u_intercept: intercept
-		});
-		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
+		};
+		return {
+			active: true,
+			programInfo,
+			bufferInfo: unitQuadBufferInfo,
+			uniforms: [localUniforms, sharedUniforms]
+		}
 	}
 
 	destroy() {

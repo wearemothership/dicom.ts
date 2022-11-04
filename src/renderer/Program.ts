@@ -16,7 +16,7 @@ export type Uniforms = {[name: string]: any};
 interface IProgram {
 	gl: WebGL2RenderingContext;
 	use():void;
-	run(frame: FrameInfo, size: ISize):void
+	// run(frame: FrameInfo, size: ISize):void
 	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject;
 	destroy(): void
 }
@@ -62,8 +62,7 @@ export interface IDrawObject {
 	active?: boolean
 	type?: number
 	programInfo: ProgramInfo
-	bufferInfo?: BufferInfo
-	vertexArrayInfo?: VertexArrayInfo
+	bufferInfo: BufferInfo;
 	uniforms: Uniforms
 	offset?: number
 	count?: number
@@ -149,7 +148,7 @@ export const preCompileGreyscaleShader = (
 	if (pixelPaddingVal !== null) {
 		outShaderString = outShaderString.replace(
 			"// $(pixelPadding)",
-			"if (grey < 0.0) {\ngl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\nreturn;\n}\n"
+			"if (grey < 0.0) {\nout_0 = vec4(0.0, 0.0, 0.0, 0.0);\nreturn;\n}\n"
 		);
 	}
 	return outShaderString;

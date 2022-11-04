@@ -4,6 +4,7 @@ precision highp float;
 
 in vec3 texcoord;
 layout(location = 0) out vec4 out_0;
+
 uniform bool u_invert;
 uniform highp sampler3D u_texture;
 uniform highp sampler2D u_redTexture;

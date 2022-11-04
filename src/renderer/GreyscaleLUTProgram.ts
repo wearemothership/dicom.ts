@@ -3,9 +3,8 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { preCompileGreyscaleShader } from "./Program";
+import IProgram, { Uniforms, IDrawObject, preCompileGreyscaleShader } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
-import { ISize } from "../image/Types";
 
 const vertexShader = raw("./vertex.glsl");
 const greyscaleLUTShader = raw("./greyscaleLUT.glsl");
@@ -13,7 +12,7 @@ const greyscaleLUTShader = raw("./greyscaleLUT.glsl");
 class GreyscaleLUTProgram implements IProgram {
 	programInfo: ProgramInfo;
 
-	unitQuadBufferInfo: BufferInfo | null = null;
+	unitQuadBufferInfo: BufferInfo ;
 
 	info: IDisplayInfo;
 
@@ -26,6 +25,13 @@ class GreyscaleLUTProgram implements IProgram {
 	constructor(gl:WebGL2RenderingContext, info: IDisplayInfo) {
 		const fragShaderString = GreyscaleLUTProgram.programStringForInfo(info);
 
+		/* build a normalized unit quad as a 3D geometry, which will be transformed as required*/		
+		const arrays = {			
+			position: [-1,-1,-1,  1,-1,-1,  1,1,-1,  -1,1,-1],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);
+		
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, fragShaderString]);
 
 		this.programInfo = programInfo;
@@ -35,17 +41,10 @@ class GreyscaleLUTProgram implements IProgram {
 
 	use() {
 		const { gl, programInfo } = this;
-		// can this be reused?
-		const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-
 		twgl.bindFramebufferInfo(gl, null);
-
-		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
-		this.unitQuadBufferInfo = unitQuadBufferInfo;
 	}
 
-	run(frame: FrameInfo, outputSize: ISize) {
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
 		const {
 			gl,
 			unitQuadBufferInfo,
@@ -77,20 +76,24 @@ class GreyscaleLUTProgram implements IProgram {
 			mag: gl.NEAREST,
 			wrap: gl.CLAMP_TO_EDGE,
 		});
+		const imgSize = frame.imageInfo.size;
+		const nFrames:number = frame.imageInfo.nFrames;
 
-		twgl.setUniforms(programInfo, {
-			u_resolution: [outputSize.width, outputSize.height],
+		const localUniforms = {
+			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_lutTexture: lutTexture!,
 			u_lutWidth: lut!.data.length,
 			u_firstInputValue: lut!.firstValue,
 			u_maxValue: 2 ** info.bitsStored
-		});
-		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
-
-		setTimeout(() => {
-			gl.deleteTexture(lutTexture!);
-		}, 0);
+		};
+		
+		return {
+			active: true,
+			programInfo,
+			bufferInfo: unitQuadBufferInfo,
+			uniforms: [localUniforms, sharedUniforms]
+		}
 	}
 
 	destroy() {

@@ -19,8 +19,11 @@ float greyscale(vec4 color) {
 }
 
 void main() {
-	// vec2 uv = gl_FragCoord.xy / u_resolution;
-	// uv.y = 1.0 - uv.y;
+	/* check to see if the texture coordinates are all in the valid range, or abort otherwise*/
+	const vec3 vzero = vec3(0.0,0.0,0.0);
+	const vec3 vone = vec3(1.0,1.0,1.0);
+	if(step(vzero, texcoord) != vone || step(texcoord, vone) != vone)
+		discard;
 
 	float grey = greyscale(texture(u_texture, texcoord));
 	// $(pixelPadding)

@@ -21,7 +21,7 @@ class ContrastifyProgram implements IProgram {
 
 	contrastProgramInfo: ProgramInfo;
 
-	unitQuadBufferInfo?: BufferInfo ;
+	unitQuadBufferInfo: BufferInfo ;
 
 	gl:WebGL2RenderingContext;
 
@@ -56,6 +56,12 @@ class ContrastifyProgram implements IProgram {
 			gl,
 			[vertexShader, contrastifyFrag]
 		);
+		/* build a normalized unit quad as a 3D geometry, which will be transformed as required*/		
+		const arrays = {			
+			position: [-1,-1,-1,  1,-1,-1,  1,1,-1,  -1,1,-1],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);
 
 		this.gl = gl;
 	}
@@ -64,20 +70,9 @@ class ContrastifyProgram implements IProgram {
 	use() {
 		// can't really do anything here...
 	}
-
-	//-----------------------------------------------------------------------------
-	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
-		
-		return {
-			active: true,
-			programInfo: this.contrastProgramInfo,
-			bufferInfo: this.unitQuadBufferInfo,
-			uniforms: [ sharedUniforms]
-		}
-	}
 	
 
-	run(frame: FrameInfo, outputSize: ISize) {
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
 		const framebuffers:Array<FramebufferInfo> = [];
 
 		const {
@@ -178,17 +173,17 @@ class ContrastifyProgram implements IProgram {
 
 		twgl.bindFramebufferInfo(gl, null);
 
-		gl.useProgram(contrastProgramInfo.program);
+		const imgSize = frame.imageInfo.size;
+		const nFrames:number = frame.imageInfo.nFrames;
 
-		twgl.setUniforms(contrastProgramInfo, {
-			u_resolution: [outputSize.width, outputSize.height],
+		const localUniforms = {
+			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: srcTex,
 			u_minColor: lastFBI.attachments[0],
 			u_maxColor: lastFBI.attachments[1],
 			u_slope: slope,
 			u_intercept: intercept
-		});
-		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
+		};
 		// cleanup on next runloop
 		setTimeout(() => {
 			framebuffers.forEach((fbi) => {
@@ -202,6 +197,13 @@ class ContrastifyProgram implements IProgram {
 				}
 			});
 		}, 0);
+
+		return {
+			active: true,
+			programInfo: contrastProgramInfo,
+			bufferInfo: unitQuadBufferInfo,
+			uniforms: [localUniforms, sharedUniforms]
+		}
 	}
 	
 	destroy() {
