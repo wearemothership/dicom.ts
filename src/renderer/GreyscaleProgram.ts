@@ -3,7 +3,7 @@ import { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { preCompileGreyscaleShader } from "./Program";
+import IProgram, { Uniforms,IDrawObject, preCompileGreyscaleShader } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import { ISize } from "../image/Types";
 
@@ -101,6 +101,71 @@ class GreyscaleProgram implements IProgram {
 		});
 		twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 	}
+
+	
+	//-----------------------------------------------------------------------------
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
+		const {
+			gl,
+			unitQuadBufferInfo,
+			programInfo,
+		} = this;
+		const {
+			texture,
+			imageInfo,
+		} = frame;
+
+		let {
+			windowWidth,
+			windowCenter
+		} = imageInfo;
+
+		const {
+			maxPixVal,
+			minPixVal,
+			slope,
+			intercept,
+			signed,
+			bitsAllocated
+		} = imageInfo;
+
+		if (!windowWidth && (maxPixVal !== null || minPixVal !== null)) {
+			windowWidth = Math.abs((maxPixVal ?? 0) - (minPixVal ?? 0));
+			windowCenter = ((maxPixVal || 0) + (minPixVal || 0)) / 2;
+		}
+		if (signed) {
+			windowCenter = (windowCenter || 0) + (2 ** (bitsAllocated - 1));
+		}
+		const imgSize = frame.imageInfo.size;
+		const nFrames:number = frame.imageInfo.nFrames;
+		
+		const arrays = {			
+			position: [-1,-1,-1,  1,-1,-1,  1,1,-1,  -1,1,-1],
+			// position: [-1,-1,-1,  -1,-1,1,  -1,1,1,  -1,1,-1],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);
+		twgl.setBuffersAndAttributes(gl, programInfo, this.unitQuadBufferInfo!);
+
+		//set also the model-view-project matrix4
+		const localUniforms = {
+			u_resolution: [imgSize.width, imgSize.height, nFrames],
+			// u_matrix: modviewproj,
+			u_texture: texture,
+			u_winWidth: windowWidth,
+			u_winCenter: windowCenter,
+			u_slope: slope,
+			u_intercept: intercept
+		};
+
+		return {
+			active: true,
+			programInfo,
+			bufferInfo: this.unitQuadBufferInfo,
+			uniforms: [localUniforms, sharedUniforms]
+		}
+	}
+
 
 	
 	//-----------------------------------------------------------------------------

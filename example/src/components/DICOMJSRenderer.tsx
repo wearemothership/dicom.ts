@@ -33,11 +33,11 @@ const DICOMJSRenderer = ({
 
 	useEffect(() => {
 		if (dataBuffer && rendererRef.current) {
-			console.time("parse and render")
+			// console.time("parse and render")
 			const image = parseImage(new DataView(dataBuffer));
 			rendererRef.current.render(image!, 0).then(() => {
 				complete?.(canvasRef.current!)
-				console.timeEnd("parse and render")
+				// console.timeEnd("parse and render")
 			});
 		}
 		return	() => {};

@@ -35,7 +35,9 @@ class FrameInfo implements IFrameInfo {
 	}
 
 	destroy():void {
-		// this.gl.deleteTexture(this.texture);
+		// if(this.gl.isTexture(this.texture)){
+		// 	this.gl.deleteTexture(this.texture);
+		// }
 	}
 }
 

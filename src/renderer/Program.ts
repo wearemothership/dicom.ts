@@ -1,6 +1,7 @@
 import { IDisplayInfo } from "../image/Types";
 import FrameInfo from "../image/FrameInfo";
 import { ISize } from "../image/Types";
+import { ProgramInfo, BufferInfo,VertexArrayInfo } from "twgl.js";
 
 // let vertexShader = raw("./vertex.glsl");
 // let minMaxShader = raw("./minMax.glsl");
@@ -9,11 +10,14 @@ import { ISize } from "../image/Types";
 // let greyscaleLUTShader = raw("./greyscaleLUT.glsl");
 // let colorShader = raw("./color.glsl");
 
+
+export type Uniforms = {[name: string]: any};
 /* Defining the interface for the IProgram class. */
 interface IProgram {
 	gl: WebGL2RenderingContext;
 	use():void;
 	run(frame: FrameInfo, size: ISize):void
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject;
 	destroy(): void
 }
 
@@ -51,6 +55,21 @@ export interface IColorProgramType {
 	hasPaletteWithWordBits?: number; // 0, 8 or 16 bits
 	invert?: boolean
 }
+
+
+//======================================================================================
+export interface IDrawObject {
+	active?: boolean
+	type?: number
+	programInfo: ProgramInfo
+	bufferInfo?: BufferInfo
+	vertexArrayInfo?: VertexArrayInfo
+	uniforms: Uniforms
+	offset?: number
+	count?: number
+	instanceCount?: number
+}
+
 
 //======================================================================================
 /**

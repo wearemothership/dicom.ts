@@ -40,7 +40,7 @@ class OrderedMap<K extends keyof any, T> implements IOrderedMap<K, T>, TWithInde
 
 	getOrderedValues(): T[] {
 		const it = this.iterator();
-		const orderedValues: T[] = Array();//it.length());
+		const orderedValues: T[] = Array();
 
 		while (it.hasNext()) {
 			orderedValues.push(it.next()!);

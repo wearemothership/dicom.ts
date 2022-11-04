@@ -1,17 +1,19 @@
 import sha1 from "sha1";
-import { decoderForImage, Decoder } from "../decoder";
-import { IFrameInfo } from "../image/Types";
-import ContrastifyProgram from "./ContrastifyProgram";
-import ColorProgram from "./ColorProgram";
-import IProgram, { IColorProgramType, IGreyscaleProgramType, IProgramSignature } from "./Program";
-import GreyscaleProgram from "./GreyscaleProgram";
-import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
+import * as twgl from "twgl.js";
+// import { decoderForImage, Decoder } from "../decoder";
 import { ISize, ImageSize } from "../image/Types";
 import { DCMImage } from "../parser";
-import ColorPaletteProgram from "./ColorPaletteProgram";
 import { Codec, IDisplayInfo } from "../image/Types";
-import * as twgl from "twgl.js";
+import { IFrameInfo } from "../image/Types";
+import { SliceDirection } from "../parser/constants";
 import FrameInfo from "../image/FrameInfo";
+import IProgram, { Uniforms, IDrawObject,IColorProgramType, IGreyscaleProgramType, IProgramSignature } from "./Program";
+import GreyscaleProgram from "./GreyscaleProgram";
+import GreyscaleLUTProgram from "./GreyscaleLUTProgram";
+import ContrastifyProgram from "./ContrastifyProgram";
+import ColorProgram from "./ColorProgram";
+import ColorPaletteProgram from "./ColorPaletteProgram";
+import { isGeneratorFunction } from "util/types";
 
 class ImageRenderer {
 	canvas: HTMLCanvasElement;
@@ -22,7 +24,7 @@ class ImageRenderer {
 
 	private gl: WebGL2RenderingContext;
 
-	private decoder: Decoder | null = null;
+	// private decoder: Decoder | null = null;
 
 	private program: IProgram | null = null;
 
@@ -148,62 +150,6 @@ class ImageRenderer {
 	}
 
 
-	//----------------------------------------------------------------------------
-	/**
-	 * render the image frame to the canvas
-	 * @param image parsed DCMImage
-	 * @param frameNo the frame index
-	 */
-	async render(image: DCMImage, frameNo:number = 0) {
-		const { gl, canvas } = this;
-		if (!this.outSize) {
-			this.outSize = new ImageSize(image);
-		}
-		const size = this.outSize!;
-		if (size.width !== canvas.width || size.height !== canvas.height) {
-			canvas.width = 1; // near zero the canvas, makes resize much faste!
-			canvas.height = 1;
-			canvas.width = size!.width;
-			canvas.height = size!.height;
-		}
-		/*if we change the image, let's get the decoder and the 
-		image's suitable shader program*/
-		if (this.image !== image) {
-			this.image = image;
-			/* select the correct decoder for this image modality*/
-			const decoder = decoderForImage(image);
-			// decoder!.outputSize = new ImageSize(image);
-			/*this is a DisplayInfo object*/
-			const displayInfo = decoder!.image;
-			/* select the correct GLSL program for this image modality*/
-			const program = this.getProgram(displayInfo);
-			program.use();
-			this.program = program;
-			this.decoder = decoder;
-			
-		//  console.log(program.programInfo);
-		}
-		/* decode the frame's pixel buffer, to be loaded into a WebGL texture*/
-		const pixels = await this.decoder!.getFramePixels(frameNo);
-
-		const frame = new FrameInfo({
-			imageInfo: this.decoder!.image,
-			frameNo:0,
-			pixelData: pixels,
-			outputSize: this.decoder!.image.size,
-			mat4Pix2Pat: new Float32Array()
-		});
-		/* create the associated frame's WebGL texture*/
-		frame.texture = await this.createTexture(frame);
-		gl.viewport(0,0,frame.imageInfo.image.columns, frame.imageInfo.image.rows);
-		/* perform the rendering of a textured quad, using the selected shading program*/
-		this.program!.run(frame, size);
-		/*destroy the texture asynchronously*/
-		setTimeout(() => {
-			// frame.destroy();
-			this.gl.deleteTexture(frame.texture);
-		}, 0);
-	}
 
 	//----------------------------------------------------------------------------
 	async renderFrame(frames: FrameInfo, frameNo:number = 0) {
@@ -211,36 +157,145 @@ class ImageRenderer {
 		if (!this.outSize) {
 			this.outSize = frames.outputSize;
 		}
-		const size = this.outSize!;
-		if (size.width !== canvas.width || size.height !== canvas.height) {
+		
+		let viewport:number[] =[0,0, 800,600];
+		const VW = viewport[2]-viewport[0];
+		const VH = viewport[3]-viewport[1];
+
+		const {size, nFrames} = frames.imageInfo;
+		if (VW !== canvas.width || VH !== canvas.height) {
 			canvas.width = 1; // near zero the canvas, makes resize much faste!
 			canvas.height = 1;
-			canvas.width = size!.width;
-			canvas.height = size!.height;
+			canvas.width = VW;
+			canvas.height = VH;
 		}
+
 		/*if we change the image, let's get the decoder and the 
 		image's suitable shader program*/
 		if (this.frames !== frames) {
 			/*destroy the texture asynchronously*/
-			setTimeout(() => {
-				// frames.destroy();
-				this.gl.deleteTexture(this.frames!.texture);
-			}, 0);
+			// setTimeout(() => {
+			// 	// frames.destroy();
+			// 	this.gl.deleteTexture(this.frames!.texture);
+			// }, 0);
 			/* create the associated frame's WebGL texture*/
 			frames.texture = await this.createTexture(frames);
 			this.frames = frames;
 			
 			/* select the correct GLSL program for this image modality*/
 			const program = this.getProgram(frames.imageInfo);
-			program.use();
+			// program.use();
 			this.program = program;
 			
 		//  console.log(program.programInfo);
 		}
+		const renderDir:number = SliceDirection.Sagittal as number;
+		console.log("Render dir: ", renderDir);
+
+		const pixPatMinAABB:number[] = [0,0,0];
+		const pixPatMaxAABB:number[] = [size.width-1,size.height-1,nFrames-1];
+		const mmPatMinAABB:number[] = [0,0,0];
+		const mmPatMaxAABB:number[] = [0,0,0];
+
+		/*transform patient AABB in mm PCS*/
+		twgl.m4.transformPoint(frames.mat4Pix2Pat,pixPatMinAABB,mmPatMinAABB);
+		twgl.m4.transformPoint(frames.mat4Pix2Pat,pixPatMaxAABB,mmPatMaxAABB);
+		const mmPatSize = twgl.v3.subtract(mmPatMaxAABB,mmPatMinAABB);
+
 		frames.frameNo = frameNo;
-		gl.viewport(0,0,frames.imageInfo.image.columns, frames.imageInfo.image.rows);
-		/* perform the rendering of a textured quad, using the selected shading program*/
-		this.program!.run(frames, size);
+		const n2pix	= twgl.m4.inverse( 
+			twgl.m4.ortho(mmPatMinAABB[0], mmPatMaxAABB[0], 
+						  mmPatMinAABB[1], mmPatMaxAABB[1],
+						 -mmPatMinAABB[2],-mmPatMaxAABB[2]));
+	
+		let mat_model = twgl.m4.identity();
+		let mat_view = twgl.m4.identity();
+		//-------------- Axial ------------------------
+		
+		const frameOffset =frameNo/pixPatMaxAABB[renderDir]*mmPatSize[renderDir];
+
+		const rotAngles:number[] 	= [-Math.PI/2, Math.PI/2, 0];
+		const rotAxes:twgl.v3.Vec3[]= [[0,1,0],[1,0,0],[0,0,1]];
+		const frameLoc:twgl.v3.Vec3 = [0,0,0];
+		frameLoc[renderDir] 		= frameOffset;
+
+		const centerAABB:twgl.v3.Vec3 = twgl.v3.divScalar(twgl.v3.add(mmPatMinAABB,mmPatMaxAABB),2);
+		const eye = {...centerAABB}; 	eye[renderDir] = mmPatMinAABB[renderDir];
+		const target = {...centerAABB};	target[renderDir] = mmPatMaxAABB[renderDir];
+		const upVec:twgl.v3.Vec3[] 	= [[0,0,1],[0,0,1],[0,-1,0]];
+
+		const hW:number[] = [mmPatSize [1]/2,mmPatSize [0]/2,mmPatSize [0]/2];
+		const hH:number[] = [mmPatSize [2]/2,mmPatSize [2]/2,mmPatSize [1]/2]; 
+		const near:number = 0; 	
+		const far:number =  mmPatSize [renderDir];
+		//-------------- Sagittal ------------------------
+		const Tto 	= twgl.m4.translation( [1,1,1]);
+		const Ry 	= twgl.m4.axisRotation(rotAxes[renderDir], rotAngles[renderDir]);
+		const Tfo 	= twgl.m4.translation( [-1,-1,-1]);
+		const Ttf 	= twgl.m4.translation(frameLoc);
+
+		mat_model = twgl.m4.multiply(Ry, Tto);
+		mat_model = twgl.m4.multiply(Tfo, mat_model);
+		mat_model = twgl.m4.multiply(n2pix, mat_model);
+		mat_model = twgl.m4.multiply(Ttf, mat_model);
+
+
+		mat_view = twgl.m4.lookAt(eye,target,upVec[renderDir]);
+		mat_view = twgl.m4.inverse(mat_view);
+
+		
+		const VAR = VW/VH;
+		const OAR = (hW[renderDir])/(hH[renderDir]);
+
+		let mat_ortho:twgl.m4.Mat4;
+
+		if(VAR > OAR){
+			mat_ortho  = twgl.m4.ortho(
+				-hW[renderDir]*VAR/OAR,hW[renderDir]*VAR/OAR,-hH[renderDir],hH[renderDir],near,far);
+		}
+		else{
+			mat_ortho  = twgl.m4.ortho(-hW[renderDir],hW[renderDir],-hH[renderDir]*OAR/VAR,hH[renderDir]*OAR/VAR,near,far);
+		}
+				
+		gl.viewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+		gl.clearColor(0,0,0,1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		
+		const sharedUniforms: Uniforms = {
+			u_matrix_model: mat_model,
+			u_matrix_view: mat_view,
+			u_matrix_proj: mat_ortho,
+			u_matrix_pat2pix: twgl.m4.inverse(frames.mat4Pix2Pat)
+		};
+
+		let drawObjectArray: IDrawObject[] = [];
+		drawObjectArray.push(this.program!.makeDrawObject(frames, sharedUniforms));
+		twgl.drawObjectList(gl, drawObjectArray);
+
+		const outvec = [0,0,0];
+		const	testvec = [1,1,-1];
+		const roundFunc = (item:number) => item.toFixed(2);
+		
+		console.log("Eye: ", eye);
+		console.log("Target: ", target);		
+		console.log("Up: ", upVec[renderDir]);
+		
+		console.log("Patient min AABB: ", mmPatMinAABB);
+		console.log("Patient max AABB: ", mmPatMaxAABB);
+
+		twgl.m4.transformPoint(mat_model, testvec,outvec);
+		console.log("model * [1,1,-1] -> :", outvec.map(roundFunc));
+
+		let testmat4 = twgl.m4.multiply(mat_view, mat_model);
+		twgl.m4.transformPoint(testmat4, testvec,outvec);
+		console.log("view * model * [1,1,-1] -> :", outvec.map(roundFunc));
+
+		twgl.m4.multiply(mat_ortho, testmat4,testmat4);
+		twgl.m4.transformPoint(testmat4, testvec,outvec);
+		
+		console.log("ortho *view * model * [1,1,-1] -> :", outvec.map(roundFunc));
+
 	}
 //------------------------------------------------------------------------------
 
@@ -285,7 +340,7 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
 		internalFormat,
 		type: gl.UNSIGNED_BYTE,
 		min: gl.NEAREST,
-		mag: gl.NEAREST,
+		mag:  gl.NEAREST,
 		wrap: gl.CLAMP_TO_EDGE,
 	}));
 }
@@ -381,3 +436,61 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
 
 
 export default ImageRenderer;
+
+
+	//----------------------------------------------------------------------------
+	/**
+	 * render the image frame to the canvas
+	 * @param image parsed DCMImage
+	 * @param frameNo the frame index
+	 */
+	// async render(image: DCMImage, frameNo:number = 0) {
+	// 	const { gl, canvas } = this;
+	// 	if (!this.outSize) {
+	// 		this.outSize = new ImageSize(image);
+	// 	}
+	// 	const size = this.outSize!;
+	// 	if (size.width !== canvas.width || size.height !== canvas.height) {
+	// 		canvas.width = 1; // near zero the canvas, makes resize much faste!
+	// 		canvas.height = 1;
+	// 		canvas.width = size!.width;
+	// 		canvas.height = size!.height;
+	// 	}
+	// 	/*if we change the image, let's get the decoder and the 
+	// 	image's suitable shader program*/
+	// 	if (this.image !== image) {
+	// 		this.image = image;
+	// 		/* select the correct decoder for this image modality*/
+	// 		const decoder = decoderForImage(image);
+	// 		// decoder!.outputSize = new ImageSize(image);
+	// 		/*this is a DisplayInfo object*/
+	// 		const displayInfo = decoder!.image;
+	// 		/* select the correct GLSL program for this image modality*/
+	// 		const program = this.getProgram(displayInfo);
+	// 		program.use();
+	// 		this.program = program;
+	// 		this.decoder = decoder;
+			
+	// 	//  console.log(program.programInfo);
+	// 	}
+	// 	/* decode the frame's pixel buffer, to be loaded into a WebGL texture*/
+	// 	const pixels = await this.decoder!.getFramePixels(frameNo);
+
+	// 	const frame = new FrameInfo({
+	// 		imageInfo: this.decoder!.image,
+	// 		frameNo:0,
+	// 		pixelData: pixels,
+	// 		outputSize: this.decoder!.image.size,
+	// 		mat4Pix2Pat: new Float32Array()
+	// 	});
+	// 	/* create the associated frame's WebGL texture*/
+	// 	frame.texture = await this.createTexture(frame);
+	// 	gl.viewport(0,0,frame.imageInfo.image.columns, frame.imageInfo.image.rows);
+	// 	/* perform the rendering of a textured quad, using the selected shading program*/
+	// 	this.program!.run(frame, size);
+	// 	/*destroy the texture asynchronously*/
+	// 	setTimeout(() => {
+	// 		// frame.destroy();
+	// 		this.gl.deleteTexture(frame.texture);
+	// 	}, 0);
+	// }

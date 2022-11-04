@@ -507,8 +507,8 @@ class Series {
 async getFrames():Promise<FrameInfo> 
 {	
 	let frameDataAray:Blob[] = [];
-	let numImages = 0;
-	let frameIndex = 0;
+	let numImages:number = 0;
+	let frameIndex:number = 0;
 	
 	const  displayInfo = displayInfoFromDecoderInfo(new DecoderInfo(this.images[0]));
 

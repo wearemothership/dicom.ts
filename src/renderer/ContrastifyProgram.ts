@@ -3,14 +3,14 @@ import { ProgramInfo, BufferInfo, FramebufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
-import IProgram, { glslUnpackWordString, preCompileGreyscaleShader } from "./Program";
+import IProgram, {Uniforms, IDrawObject, glslUnpackWordString, preCompileGreyscaleShader } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import { ISize } from "../image/Types";
 
 const vertexShader = raw("./vertex.glsl");
 const minMaxShader = raw("./minMax.glsl");
 const contrastifyShader = raw("./contrastify.glsl");
-console.log(minMaxShader);
+// console.log(minMaxShader);
 
 const cellSize = 16;
 
@@ -21,7 +21,7 @@ class ContrastifyProgram implements IProgram {
 
 	contrastProgramInfo: ProgramInfo;
 
-	unitQuadBufferInfo: BufferInfo | null = null;
+	unitQuadBufferInfo?: BufferInfo ;
 
 	gl:WebGL2RenderingContext;
 
@@ -64,6 +64,18 @@ class ContrastifyProgram implements IProgram {
 	use() {
 		// can't really do anything here...
 	}
+
+	//-----------------------------------------------------------------------------
+	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
+		
+		return {
+			active: true,
+			programInfo: this.contrastProgramInfo,
+			bufferInfo: this.unitQuadBufferInfo,
+			uniforms: [ sharedUniforms]
+		}
+	}
+	
 
 	run(frame: FrameInfo, outputSize: ISize) {
 		const framebuffers:Array<FramebufferInfo> = [];
@@ -113,19 +125,6 @@ class ContrastifyProgram implements IProgram {
 					wrap: gl.CLAMP_TO_EDGE
 				},
 			], w, h);
-			
-		// const arrays = {
-		// 	position: [0,0,frame.frameNo, imgSize.width,0,frame.frameNo, imgSize.width, imgSize.height,frame.frameNo, 0,imgSize.height,frame.frameNo],
-		// 	indices: [0,1,2,0,2,3]
-		// }
-		// this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);//twgl.primitives.createXYQuadBufferInfo(gl);
-		// twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo!);
-		// const modviewproj = twgl.m4.ortho(imgSize.width*0.0,imgSize.width*1.0, 
-		// 									imgSize.height*1.0,imgSize.height*0.0,
-		// 									-1-frame.imageInfo.nFrames,1);
-		// //VC??? - left it here
-
-		// this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 			// WebGl2
 			gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 			framebuffers.push(fbi);
@@ -204,7 +203,7 @@ class ContrastifyProgram implements IProgram {
 			});
 		}, 0);
 	}
-
+	
 	destroy() {
 		this.gl.deleteProgram(this.contrastProgramInfo.program);
 		this.gl.deleteProgram(this.minMaxProgramInfo.program);

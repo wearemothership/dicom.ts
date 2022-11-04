@@ -32,5 +32,5 @@ void main() {
 	grey = clamp(grey, 0.0, 1.0);
 
 	// $(shouldInvert)
-	out_0 = vec4(grey, grey, 0, 1);
+	out_0 = vec4(grey, grey,grey, 1);
 }
