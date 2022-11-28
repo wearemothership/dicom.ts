@@ -27,3 +27,4 @@ yarn-error.log*
 #test out image
 image.png
 test/**/*
+src/renderer/Renderer_old.ts

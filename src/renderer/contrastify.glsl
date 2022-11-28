@@ -28,8 +28,8 @@ void main() {
 		
 	float grey = greyscale(texture(u_texture, texcoord));
 	// $(pixelPadding)
-	float minColor = minMaxWord(texture(u_minColor, vec2(0)));
-	float maxColor = minMaxWord(texture(u_maxColor, vec2(0)));
+	float minColor = minMaxWord(texture(u_minColor, vec2(0.5)));
+	float maxColor = minMaxWord(texture(u_maxColor, vec2(0.5)));
 
 	grey = grey * u_slope + u_intercept;
 	minColor = minColor * u_slope + u_intercept;
@@ -42,5 +42,5 @@ void main() {
 	grey = clamp(grey, 0.0, 1.0);
 
 	// $(shouldInvert)
-	out_0 = vec4(grey, grey, grey, 1);
+	out_0 =  vec4(grey, grey, grey, 1);
 }

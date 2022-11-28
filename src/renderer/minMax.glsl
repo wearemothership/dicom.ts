@@ -17,13 +17,7 @@ float greyscale(vec4 color) {
 }
 
 void main() {
-    
-	/* check to see if the texture coordinates are all in the valid range, or abort otherwise*/
-	const vec3 vzero = vec3(0.0,0.0,0.0);
-	const vec3 vone = vec3(1.0,1.0,1.0);
-	if(step(vzero, texcoord) != vone || step(texcoord, vone) != vone)
-		discard;
-        
+           
     // compute the first pixel the source cell
     vec2 srcPixel = floor(gl_FragCoord.xy) * float(CELL_SIZE);
 
@@ -54,7 +48,7 @@ void main() {
             }
         }
     }
-
+    
     out_0 = minColor;
     out_1 = maxColor;
 }
