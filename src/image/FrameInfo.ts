@@ -1,3 +1,4 @@
+import * as twgl from "twgl.js";
 
 import { ImageSize , IDisplayInfo, IFrameInfo} from "./Types";
 
@@ -20,18 +21,24 @@ class FrameInfo implements IFrameInfo {
 	
 	pixelData: Blob;
 
-	outputSize: ImageSize;
-
 	mat4Pix2Pat: Float32Array = new Float32Array();
 
-	texture: WebGLTexture = -1;
+	texture: WebGLTexture = 0;
 
 	constructor(info: IFrameInfoConstructor) {
 		this.imageInfo 	= info.imageInfo;
 		this.frameNo 	= info.frameNo;
 		this.pixelData 	= info.pixelData;
 		this.mat4Pix2Pat= info.mat4Pix2Pat;
-		this.outputSize = info.outputSize;
+	}
+	
+	getPix2MM(pixpnt:number[]): number[] {
+		return [...twgl.m4.transformPoint(this.mat4Pix2Pat,pixpnt)];
+	}
+	
+	getMM2Pix(patpnt:number[]): number[] {
+		let mat4Pat2Pix = twgl.m4.inverse(this.mat4Pix2Pat);
+		return [...twgl.m4.transformPoint(mat4Pat2Pix, patpnt)];
 	}
 
 	destroy():void {

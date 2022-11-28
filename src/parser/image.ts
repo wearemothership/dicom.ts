@@ -1,6 +1,7 @@
 import Tag, {
 	TagIds,
 	createTagIdWithTag,
+	TagValue,
 } from "./tag";
 
 import {
@@ -94,6 +95,70 @@ class DCMImage extends DCMObject {
 	}
 
 	/**
+	 * Returns the slice location.
+	 * @returns {number}
+	 */
+	 get sliceLocation(): number {
+		return this.getTagValueIndexed(TagIds.SliceLocation) as number;
+	}
+
+	/**
+	 * Returns the slice location vector.
+	 * @returns {number[]}
+	 */
+	get sliceLocationVector(): number[] {
+		let mmGridOffsets = this.getTagValue(TagIds.GridFrameOffsetVector);
+		if(mmGridOffsets !== null){
+			/* This could be an RTDose grid image*/
+			return mmGridOffsets as number[];
+		}
+		return this.getTagValue(TagIds.SliceLocationVector) as number[];
+	}
+	
+	/**
+	 * It returns the Data Element Tag of the Attribute that 
+	 * is used as the frame increment in Multi-frame pixel data.
+	 * @returns The value of the FrameIncrementPointer tag.
+	 */
+	get frameIncrementPointer(): TagValue {
+		return this.getTagValue(TagIds.FrameIncrementPointer) as TagValue;
+	}
+	/**
+	 * If the image has a single frame, the range is the position of that frame. If the image has multiple
+	 * frames, the range is the position of the first frame to the position of the last frame
+	 * @returns The range of the z-axis in millimeters.
+	 */
+	getFramesPositionZRange(): number[] {
+		const mmRange: number[] = [0,0];
+		const nFrames = this.numberOfFrames;
+		const mmSliceThickness = this.sliceThickness;
+		mmRange[0] = this.getImagePositionSliceDir(SliceDirection.Axial);
+		if(nFrames === 1){
+			mmRange[1] = mmRange[0];
+		}
+		else if(this.sliceLocationVector !== null){
+			mmRange[1] =  mmRange[0] + //best guess!!!
+				this.sliceLocationVector[nFrames-1] - this.sliceLocationVector[0];
+		}
+		else{//assuming even spacing, which might not be the case!!!
+			mmRange[1] = mmRange[0] + mmSliceThickness*(nFrames-1);
+		}
+		return mmRange;
+	}
+	
+	/**
+	 * Returns the image position value by index.
+	 * @param {number} sliceDir - the index
+	 * @returns {number}
+	 */
+	 getImagePositionSliceDir(sliceDir: number): number {
+		const imagePos = this.imagePosition;
+		if (imagePos && sliceDir >= 0) {
+			return imagePos[sliceDir];
+		}
+		return 0;
+	}
+	/**
 	 * Returns the image axis directions as 2 vectors of 3 elements (6 items)
 	 * @return {number[]}
 	 */
@@ -109,34 +174,6 @@ class DCMImage extends DCMObject {
 		return this.getTagValue(TagIds.PixelSpacing) as number[];
 	}
 
-	/**
-	 * Returns the image position value by index.
-	 * @param {number} sliceDir - the index
-	 * @returns {number}
-	 */
-	getImagePositionSliceDir(sliceDir: number): number {
-		const imagePos = this.imagePosition;
-		if (imagePos && sliceDir >= 0) {
-			return imagePos[sliceDir];
-		}
-		return 0;
-	}
-
-	/**
-	 * Returns the slice location.
-	 * @returns {number}
-	 */
-	get sliceLocation(): number {
-		return this.getTagValueIndexed(TagIds.SliceLocation) as number;
-	}
-
-	/**
-	 * Returns the slice location vector.
-	 * @returns {number[]}
-	 */
-	get sliceLocationVector(): number[] {
-		return this.getTagValue(TagIds.SliceLocationVector) as number[];
-	}
 
 	/**
 	 * Returns the image number.

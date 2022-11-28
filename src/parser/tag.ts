@@ -90,10 +90,12 @@ export const TagIds: Record<string, TagTupleID> = {
 	ImageNum: [0x0020, 0x0013],
 	SliceLocation: [0x0020, 0x1041],
 
-	// orientation
+	// orientation/position
 	ImageOrientation: [0x0020, 0x0037],
 	ImagePosition: [0x0020, 0x0032],
 	SliceLocationVector: [0x0018, 0x2005],
+	GridFrameOffsetVector: [0x3004, 0x000C],
+	FrameIncrementPointer: [0x0028, 0x0009],
 
 	// LUT shape
 	LutShape: [0x2050, 0x0020],

@@ -144,11 +144,13 @@ export interface IFrameInfo {
 
 	pixelData: Blob
 
-	outputSize: ImageSize
-
 	mat4Pix2Pat: Float32Array
 
 	texture: WebGLTexture
+
+	getPix2MM(pixpnt:number[]): number[] ;
+	
+	getMM2Pix(patpnt:number[]): number[] ;
 
 	destroy(): void
 }

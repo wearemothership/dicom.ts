@@ -364,13 +364,15 @@ class Series {
 		this.isElscint = image0.isElscint();
 		this.isCompressed = image0.isCompressed();
 		// check for multi-frame
-		this.numberOfFrames = image0.numberOfFrames; //as per Dicom tag
+		this.numberOfFrames = image0.numberOfFrames; //declared frames inside IOD, as per Dicom tag
 		this.numberOfFramesInFile = image0.getNumberOfImplicitFrames(); //calculated from pixel buffer size
 		this.isMultiFrame = (this.numberOfFrames > 1)
 			|| (this.isMosaic && (image0.mosaicCols * image0.mosaicRows > 1));
 		this.isMultiFrameVolume = false;
 		this.isMultiFrameTimeseries = false;
 		this.isImplicitTimeseries = false;
+
+		/*multi-frame images contain multiple pixel planes/frames in the same IOD*/
 		if (this.isMultiFrame) {
 			const hasFrameTime = (image0.getFrameTime() > 0);
 			if (this.isMosaic) {
@@ -379,18 +381,22 @@ class Series {
 			else if (hasFrameTime) {
 				this.isMultiFrameTimeseries = true;
 			}
-			else if (this.numberOfFramesInFile > 1) {
+			else if (this.numberOfFrames > 1 && this.images.length === 1) {/*not a mosaic here*/
+				/*this series represents just a 3D volume in a single IOD (e.g., RTDose)*/
+				this.isMultiFrameVolume = true;
 				this.isMultiFrameTimeseries = false;
-				this.numberOfFrames = this.images.length;
-				if(this.numberOfFrames <= 1)
-					this.isMultiFrameVolume = true;
 			}
 			else {
+				/* here we may have a series of images, each being a multi-frame. Unlikely!?*/
+				// this.numberOfFrames = this.images.length;
 				
 				this.isMultiFrameTimeseries = true;
 			}
 		}
-
+		else{
+			this.numberOfFrames = this.images.length;
+		}
+		/* if many images are in the same position, it reflects an implicit time series*/
 		if (!this.isMosaic && (this.numberOfFrames <= 1)) { // check for implicit frame count
 			let imagePos = (image0.imagePosition || []);
 			const sliceLoc = imagePos.toString();
@@ -405,6 +411,7 @@ class Series {
 				this.isImplicitTimeseries = true;
 			}
 		}
+		/*order the images in series and get their orientation*/
 		this.sliceDir = image0.acquiredSliceDirection;
 		let orderedImages: DCMImage[];
 		if (Series.useExplicitOrdering) {
@@ -472,13 +479,28 @@ class Series {
 		m4.setDefaultType(Float32Array);
 		let mat4pix2pat = new Float32Array(16);
 		
-		const imgPos = this.images[0].imagePosition;
-		const imgOrient = this.images[0].imageDirections;	
+		const imgPos = this.images[0].imagePosition;		
+		let imgLastPos:number[] = [0,0,0];
+		/*either is a 3D volume image...*/
+		if(this.isMultiFrameVolume){
+			imgLastPos[0] = imgPos[0];
+			imgLastPos[1] = imgPos[1];
+			imgLastPos[2] = this.images[0].getFramesPositionZRange()[1];			
+		}
+		/*... or a series of spatially-ordered slices*/
+		else if (!this.isMultiFrame){
+			imgLastPos = this.images[this.images.length-1].imagePosition;
+		}
+		else {
+			console.log("Can't create matrix for this image series: layout not supported");
+			return mat4pix2pat;
+		}
+		const imgOrient  = this.images[0].imageDirections;	
 		const imgOrientR = imgOrient.slice(0,3);	
 		const imgOrientC = imgOrient.slice(3,6);
 		const pixSpacing =  this.images[0].pixelSpacing;
-		const imgLastPos = this.images[this.numberOfFrames-1].imagePosition;
-		let column3;
+		
+		let column3:twgl.v3.Vec3;
 		if(this.numberOfFrames <= 1){
 			column3 = v3.normalize(v3.cross(imgOrientR, imgOrientC));
 			v3.mulScalar(column3, this.images[0].sliceThickness , column3);
