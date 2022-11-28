@@ -39,12 +39,8 @@ class GreyscaleLUTProgram implements IProgram {
 		this.info = info;
 	}
 
-	use() {
-		const { gl, programInfo } = this;
-		twgl.bindFramebufferInfo(gl, null);
-	}
 
-	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
+	makeDrawObject(frame: FrameInfo) : IDrawObject {
 		const {
 			gl,
 			unitQuadBufferInfo,
@@ -79,7 +75,7 @@ class GreyscaleLUTProgram implements IProgram {
 		const imgSize = frame.imageInfo.size;
 		const nFrames:number = frame.imageInfo.nFrames;
 
-		const localUniforms = {
+		const specificUniforms = {
 			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_lutTexture: lutTexture!,
@@ -88,11 +84,14 @@ class GreyscaleLUTProgram implements IProgram {
 			u_maxValue: 2 ** info.bitsStored
 		};
 		
+		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
+		const emptyUniforms:Uniforms = { };
+		
 		return {
 			active: true,
 			programInfo,
 			bufferInfo: unitQuadBufferInfo,
-			uniforms: [localUniforms, sharedUniforms]
+			uniforms: [emptyUniforms, specificUniforms]
 		}
 	}
 

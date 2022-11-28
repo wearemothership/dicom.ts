@@ -36,21 +36,17 @@ class ColorPaletteProgram implements IProgram {
 		const programInfo = twgl.createProgramInfo(gl, [vertexShader, programString]);
 		this.programInfo = programInfo;
 		this.gl = gl;
-		// can this be reused?
-		this.unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-	}
+		/* build a normalized unit quad as a 3D geometry, which will be transformed as required*/		
+		const arrays = {			
+			position: [-1,-1,-1,  1,-1,-1,  1,1,-1,  -1,1,-1],
+			indices: [0,1,2,0,2,3]
+		}
+		this.unitQuadBufferInfo =  twgl.createBufferInfoFromArrays(gl, arrays);
 
-	use() {
-		const { gl, programInfo, unitQuadBufferInfo } = this;
-
-		twgl.bindFramebufferInfo(gl, null);
-
-		gl.useProgram(programInfo.program);
-		twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo);
 	}
 
 	//-----------------------------------------------------------------------------
-	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
+	makeDrawObject(frame: FrameInfo) : IDrawObject {
 		const {
 			gl,
 			unitQuadBufferInfo,
@@ -114,7 +110,7 @@ class ColorPaletteProgram implements IProgram {
 		const imgSize = frame.imageInfo.size;
 		const nFrames:number = frame.imageInfo.nFrames;
 
-		const localUniforms = {
+		const specificUniforms = {
 			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_redTexture: red,
@@ -123,11 +119,14 @@ class ColorPaletteProgram implements IProgram {
 			u_paletteWidthRatio: (2 ** bitsAllocated) / palette!.nEntries,
 			u_invert: invert
 		};
+		
+		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
+		const emptyUniforms:Uniforms = { };
 		return {
 			active: true,
 			programInfo,
 			bufferInfo: unitQuadBufferInfo,
-			uniforms: [localUniforms, sharedUniforms]
+			uniforms: [emptyUniforms, specificUniforms]
 		}
 	}
 

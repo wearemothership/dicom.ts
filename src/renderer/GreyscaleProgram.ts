@@ -34,18 +34,9 @@ class GreyscaleProgram implements IProgram {
 		this.programInfo = programInfo;
 		this.gl = gl;
 	}
-	//-----------------------------------------------------------------------------
-	use() {
-		const { gl, programInfo, unitQuadBufferInfo } = this;
-
-		twgl.bindFramebufferInfo(gl, null);
-
-		gl.useProgram(programInfo.program);
-	}
-
 	
 	//-----------------------------------------------------------------------------
-	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
+	makeDrawObject(frame: FrameInfo) : IDrawObject {
 		const {
 			unitQuadBufferInfo,
 			programInfo,
@@ -79,20 +70,23 @@ class GreyscaleProgram implements IProgram {
 		const imgSize = frame.imageInfo.size;
 		const nFrames:number = frame.imageInfo.nFrames;
 
-		const localUniforms = {
+		const specificUniforms:Uniforms = {
 			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_winWidth: windowWidth,
 			u_winCenter: windowCenter,
 			u_slope: slope,
-			u_intercept: intercept
+			u_intercept: intercept,
+			u_matrix_pat2pix: twgl.m4.inverse(frame.mat4Pix2Pat)
 		};
+		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
+		const emptyUniforms:Uniforms = { };
 
 		return {
 			active: true,
 			programInfo,
 			bufferInfo: unitQuadBufferInfo,
-			uniforms: [localUniforms, sharedUniforms]
+			uniforms: [emptyUniforms, specificUniforms]
 		}
 	}
 

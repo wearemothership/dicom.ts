@@ -50,15 +50,8 @@ class ColorProgram implements IProgram {
 		this.gl = gl;
 	}
 
-	use() {
-		const { gl, programInfo, unitQuadBufferInfo } = this;
-
-		twgl.bindFramebufferInfo(gl, null);
-		gl.useProgram(programInfo.program);
-		
-	}
-
-	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject {
+	
+	makeDrawObject(frame: FrameInfo) : IDrawObject {
 		const {
 			gl,
 			programInfo,
@@ -75,18 +68,20 @@ class ColorProgram implements IProgram {
 		const imgSize = frame.imageInfo.size;
 		const nFrames:number = frame.imageInfo.nFrames;
 
-		const localUniforms = {
+		const specificUniforms = {
 			u_resolution: [imgSize.width, imgSize.height, nFrames],
 			u_texture: texture,
 			u_invert: invert,
 			u_slope: slope,
 			u_intercept: intercept
 		};
+		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
+		const emptyUniforms:Uniforms = { };
 		return {
 			active: true,
 			programInfo,
 			bufferInfo: unitQuadBufferInfo,
-			uniforms: [localUniforms, sharedUniforms]
+			uniforms: [emptyUniforms, specificUniforms]
 		}
 	}
 

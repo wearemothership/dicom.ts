@@ -15,9 +15,8 @@ export type Uniforms = {[name: string]: any};
 /* Defining the interface for the IProgram class. */
 interface IProgram {
 	gl: WebGL2RenderingContext;
-	use():void;
 	// run(frame: FrameInfo, size: ISize):void
-	makeDrawObject(frame: FrameInfo, sharedUniforms: Uniforms) : IDrawObject;
+	makeDrawObject(frame: FrameInfo) : IDrawObject;
 	destroy(): void
 }
 
@@ -62,8 +61,8 @@ export interface IDrawObject {
 	active?: boolean
 	type?: number
 	programInfo: ProgramInfo
-	bufferInfo: BufferInfo;
-	uniforms: Uniforms
+	bufferInfo: BufferInfo
+	uniforms: Uniforms[]
 	offset?: number
 	count?: number
 	instanceCount?: number

@@ -1,2 +1,2 @@
-import ImageRenderer  from "./Renderer";
-export { ImageRenderer};
+import Renderer  from "./Renderer";//"./Renderer_old";
+export { Renderer};
