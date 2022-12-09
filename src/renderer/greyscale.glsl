@@ -12,6 +12,8 @@ uniform float u_intercept;
 uniform float u_winCenter;
 uniform float u_winWidth;
 
+uniform vec4  u_modulation;
+
 in vec3 texcoord;
 
 float greyscale(vec4 color) {
@@ -35,5 +37,5 @@ void main() {
 	grey = clamp(grey, 0.0, 1.0);
 
 	// $(shouldInvert)
-	out_0 = vec4(grey, grey,grey, 1);
+	out_0 = vec4(grey, grey,grey, 1.0)*u_modulation;
 }

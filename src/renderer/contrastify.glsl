@@ -10,6 +10,7 @@ uniform highp sampler2D u_maxColor;
 uniform highp sampler3D u_texture;
 uniform float u_slope;
 uniform float u_intercept;
+uniform vec4  u_modulation;
 
 float greyscale(vec4 color) {
 	$(word)
@@ -42,5 +43,5 @@ void main() {
 	grey = clamp(grey, 0.0, 1.0);
 
 	// $(shouldInvert)
-	out_0 =  vec4(grey, grey, grey, 1);
+	out_0 =  vec4(grey, grey, grey, 1.0)*u_modulation;
 }

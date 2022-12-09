@@ -8,9 +8,9 @@ layout(location = 0) out vec4 out_0;
 
 uniform bool u_invert;
 uniform highp sampler3D u_texture;
-uniform vec2 u_resolution;
 uniform float u_slope;
 uniform float u_intercept;
+uniform vec4  u_modulation;
 
 vec4 getPlanar(vec3 coord) {
 	float third = 1.0 / 3.0;
@@ -53,6 +53,8 @@ void main() {
   	color = (color * u_slope) + u_intercept;
 
 	// $(u_invert)
-
-	out_0 = color;
+	/* use a variable alpha value equal to luminance, for an adaptable overlay trasparency.
+		Where the colour seems to be less intense, allow a more visible underlay image*/
+	// color.a = color.r*0.2126 + color.g*0.7152 + color.b*0.0722;
+	out_0 = color*u_modulation;
 }

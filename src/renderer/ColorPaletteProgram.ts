@@ -10,6 +10,7 @@ import { ISize } from "../image/Types";
 const vertexShader = raw("./vertex.glsl");
 const colorPaletteShader = raw("./colorPalette.glsl");
 
+/* It creates a WebGL program that can be used to render a frame of data using a color palette */
 class ColorPaletteProgram implements IProgram {
 	programInfo: ProgramInfo;
 
@@ -57,7 +58,7 @@ class ColorPaletteProgram implements IProgram {
 			imageInfo
 		} = frame;
 
-		const { palette, invert, bitsAllocated } = imageInfo;
+		const { palette, invert, modulationColor, bitsAllocated } = imageInfo;
 
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
@@ -117,7 +118,8 @@ class ColorPaletteProgram implements IProgram {
 			u_greenTexture: green,
 			u_blueTexture: blue,
 			u_paletteWidthRatio: (2 ** bitsAllocated) / palette!.nEntries,
-			u_invert: invert
+			u_invert: invert,
+			u_modulation: modulationColor
 		};
 		
 		/*place holder for the shared (global) uniforms, to be updated just before rendering*/

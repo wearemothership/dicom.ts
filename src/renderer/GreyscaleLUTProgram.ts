@@ -9,6 +9,7 @@ import { IDisplayInfo } from "../image/DisplayInfo";
 const vertexShader = raw("./vertex.glsl");
 const greyscaleLUTShader = raw("./greyscaleLUT.glsl");
 
+/* It creates a WebGL program that can be used to render a greyscale image with a lookup table */
 class GreyscaleLUTProgram implements IProgram {
 	programInfo: ProgramInfo;
 
@@ -52,7 +53,7 @@ class GreyscaleLUTProgram implements IProgram {
 			imageInfo
 		} = frame;
 
-		const { lut } = imageInfo;
+		const { modulationColor,lut } = imageInfo;
 
 		let format = gl.LUMINANCE_ALPHA;
 		let internalFormat = gl.LUMINANCE_ALPHA;
@@ -81,7 +82,8 @@ class GreyscaleLUTProgram implements IProgram {
 			u_lutTexture: lutTexture!,
 			u_lutWidth: lut!.data.length,
 			u_firstInputValue: lut!.firstValue,
-			u_maxValue: 2 ** info.bitsStored
+			u_maxValue: 2 ** info.bitsStored,
+			u_modulation: modulationColor,
 		};
 		
 		/*place holder for the shared (global) uniforms, to be updated just before rendering*/

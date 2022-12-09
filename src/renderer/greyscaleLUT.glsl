@@ -11,6 +11,7 @@ uniform highp sampler2D u_lutTexture;
 uniform float u_lutWidth;
 uniform float u_firstInputValue;
 uniform float u_maxValue;
+uniform vec4  u_modulation;
 
 float greyscale(vec4 color) {
 	$(word)
@@ -23,10 +24,10 @@ void main() {
 	if(step(vzero, texcoord) != vone || step(texcoord, vone) != vone)
 		discard;
 
-	float grey = greyscale(texture(u_texture, texcoord);
+	float grey = greyscale(texture(u_texture, texcoord));
 	// $(pixelPadding)
 	float lutPos = (max(u_firstInputValue, grey) - u_firstInputValue);
 	grey = greyscale(texture(u_lutTexture, vec2(lutPos / u_lutWidth, 0.5))) / u_maxValue;
 	// $(shouldInvert)
-	out_0 = vec4(grey, grey, grey, 1);
+	out_0 = vec4(grey, grey, grey, 1.0)*u_modulation;
 }

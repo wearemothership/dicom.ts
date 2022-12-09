@@ -12,6 +12,8 @@ const vertexShader = raw("./vertex.glsl");
 const colorShader = raw("./color.glsl");
 
 //======================================================================================
+/* It creates a WebGL program that draws a unit quad, and uses a fragment shader to color it based on
+the texture */
 class ColorProgram implements IProgram {
 	programInfo: ProgramInfo;
 
@@ -60,7 +62,8 @@ class ColorProgram implements IProgram {
 		const {
 			invert,
 			slope,
-			intercept
+			intercept,
+			modulationColor,
 		} = frame.imageInfo;
 		const { texture } = frame;
 
@@ -73,7 +76,8 @@ class ColorProgram implements IProgram {
 			u_texture: texture,
 			u_invert: invert,
 			u_slope: slope,
-			u_intercept: intercept
+			u_intercept: intercept,
+			u_modulation: modulationColor,
 		};
 		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
 		const emptyUniforms:Uniforms = { };

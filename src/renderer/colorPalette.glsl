@@ -11,6 +11,7 @@ uniform highp sampler2D u_redTexture;
 uniform highp sampler2D u_greenTexture;
 uniform highp sampler2D u_blueTexture;
 uniform float u_paletteWidthRatio;
+uniform vec4  u_modulation;
 
 float getWord(vec4 color) {
 	$(word)
@@ -37,7 +38,7 @@ void main() {
 	if (u_invert) {
 		color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, 1.0);
 	}
-
-	out_0 = color;
+	// color.a = color.r*0.2126 + color.g*0.7152 + color.b*0.0722;
+	out_0 = color*u_modulation;
 }
 

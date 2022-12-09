@@ -10,6 +10,7 @@ const vertexShader = raw("./vertex.glsl");
 const greyscaleShader = raw("./greyscale.glsl");
 
 //======================================================================================
+/* It creates a WebGL program that can be used to render a greyscale image */
 class GreyscaleProgram implements IProgram {
 	programInfo: ProgramInfo;
 
@@ -56,6 +57,7 @@ class GreyscaleProgram implements IProgram {
 			minPixVal,
 			slope,
 			intercept,
+			modulationColor,
 			signed,
 			bitsAllocated
 		} = imageInfo;
@@ -77,6 +79,7 @@ class GreyscaleProgram implements IProgram {
 			u_winCenter: windowCenter,
 			u_slope: slope,
 			u_intercept: intercept,
+			u_modulation: modulationColor,
 			u_matrix_pat2pix: twgl.m4.inverse(frame.mat4Pix2Pat)
 		};
 		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
