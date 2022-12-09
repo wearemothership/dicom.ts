@@ -16,6 +16,10 @@ const contrastifyShader = raw("./contrastify.glsl");
 
 const cellSize = 16;
 
+/* It creates a series of framebuffers, each with two RGBA textures attached, and then performs a
+series of min/max reductions on the source image, writing the results to the two textures. The final
+result is a single pixel, which is the min/max of the entire image. This is used to rescale the source image,
+maximizing the contrast. */
 class ContrastifyProgram implements IProgram {
 	// eslint-disable-next-line camelcase
 
@@ -103,7 +107,9 @@ class ContrastifyProgram implements IProgram {
 		const {
 			size,
 			slope,
-			intercept
+			intercept,
+			modulationColor,
+			nFrames
 		} = imageInfo;
 		const { width, height } = size;
 		let w = width;
@@ -111,7 +117,6 @@ class ContrastifyProgram implements IProgram {
 
 		const srcTex = frame.texture;
 		
-		const nFrames:number = frame.imageInfo.nFrames;
 		/*create an FBO for each intermediate reduction step*/
 		while (w > 1 || h > 1) {
 			// | 0 like floor but Infinity/NaN are zero'd
@@ -151,8 +156,6 @@ class ContrastifyProgram implements IProgram {
 
 		w = width;
 		h = height;
-		let i:number = 0;
-		const mmUnitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 		const uniforms = {
 			u_srcResolution: [width, height],
 			u_minTexture: srcTex,
@@ -175,9 +178,9 @@ class ContrastifyProgram implements IProgram {
 			// ++i;
 			
 			gl.useProgram(progInfo.program);
-			twgl.setBuffersAndAttributes(gl, progInfo, mmUnitQuadBufferInfo!);
+			twgl.setBuffersAndAttributes(gl, progInfo, unitQuadBufferInfo!);
 			twgl.setUniforms(progInfo, uniforms);
-			twgl.drawBufferInfo(gl, mmUnitQuadBufferInfo!);
+			twgl.drawBufferInfo(gl, unitQuadBufferInfo!);
 
 			[uniforms.u_minTexture, uniforms.u_maxTexture] = fbi.attachments;
 			uniforms.u_srcResolution = [w, h];
@@ -213,21 +216,22 @@ class ContrastifyProgram implements IProgram {
 			u_maxColor: lastFBI.attachments[1],
 			u_slope: slope,
 			u_intercept: intercept,
+			u_modulation: modulationColor,
 			u_matrix_pat2pix: twgl.m4.inverse(frame.mat4Pix2Pat)
 		};
-		// // cleanup on next runloop
-		// setTimeout(() => {
-		// 	framebuffers.forEach((fbi) => {
-		// 		const { attachments, framebuffer } = fbi;
-		// 		gl.deleteFramebuffer(framebuffer);
-		// 		if (attachments[0] instanceof WebGLRenderbuffer) {
-		// 			gl.deleteRenderbuffer(attachments[0]);
-		// 		}
-		// 		else {
-		// 			gl.deleteTexture(attachments[0]);
-		// 		}
-		// 	});
-		// }, 0);
+		/* cleanup on next runloop, keeping only the min/max textures in use (from last FB)*/
+		setTimeout(() => {
+			framebuffers.forEach((fbi) => {
+				const { attachments, framebuffer } = fbi;
+				gl.deleteFramebuffer(framebuffer);
+				if (attachments[0] instanceof WebGLRenderbuffer) {
+					gl.deleteRenderbuffer(attachments[0]);
+				}
+				else if(fbi !== lastFBI ) {
+					gl.deleteTexture(attachments[0]);
+				}
+			});
+		}, 0);
 
 		/*place holder for the shared (global) uniforms, to be updated just before rendering*/
 		const emptyUniforms:Uniforms = { };
