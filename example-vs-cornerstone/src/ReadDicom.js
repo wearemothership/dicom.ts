@@ -44,11 +44,26 @@ export const GPUJSClear = (/* buf */) => {
 	renderer.clear();
 };
 
-export const GPUJSDecode = (buf) => {
+export const GPUJSDecode = async (buf) => {
 	const data = new DataView(buf);
+	const imageSeries = new dicomjs.Series();
 	// this will print tags to console - slooow
 	// dicomjs.Parser.verbose = true;
 	const image = dicomjs.parseImage(data);
-	renderer.outputSize = { width: image.columns, height: image.rows };
-	return renderer.render(image, 0);
+	imageSeries.addImage(image);
+	// now build the whole series in the correct way
+	imageSeries.buildSeries();
+	// extract the series' pixels as a 3D Frame Object
+	const frameSets = [];
+	frameSets.push(await imageSeries.getFrames());
+	// imageSeries.getFrames().then((framesObj) => {
+	// 	frameSets.push(framesObj);
+	// });
+	renderer.outputSize = [0, 0, renderer.canvas.width, renderer.canvas.height];
+	renderer.setFrameSets(frameSets)
+		.then(() => {
+			renderer.slicingDirection = dicomjs.SliceDirection.Axial;
+			renderer.cutIndex = [256, 256, 0];
+			renderer.render();
+		});
 };

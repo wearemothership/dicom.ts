@@ -8,7 +8,7 @@
 		"build": "react-app-rewired build",
 		"test": "react-app-rewired test",
 		"eject": "react-scripts eject",
-		"postinstall": "rimraf ./public/images && cp -r ../node_modules/dicom-test-files/vpop-pro.com ./public/images"
+		"postinstall": "rimraf ./public/images && copy -r ../node_modules/dicom-test-files/vpop-pro.com ./public/images"
 	},
 	"dependencies": {
 		"browserify-fs": "^1.0.0",
