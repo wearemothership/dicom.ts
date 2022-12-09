@@ -11,6 +11,17 @@ import { displayInfoFromDecoderInfo } from "./DisplayInfo";
 
 type Images = DCMImage[];
 //--------------------------------------------------------
+/**
+ * It takes a bunch of parameters and returns a number
+ * @param {number} mosaicCols - number of columns in the mosaic
+ * @param {number} mosaicColWidth - The width of each column in the mosaic.
+ * @param {number} mosaicRowHeight - The height of each row in the mosaic.
+ * @param {number} mosaicWidth - The width of the mosaic image in pixels.
+ * @param {number} xLocVal - The x location of the pixel in the mosaic
+ * @param {number} yLocVal - The y location of the pixel in the mosaic.
+ * @param {number} zLocVal - The index of the image in the mosaic.
+ * @returns The offset of the pixel in the mosaic image.
+ */
 const getMosaicOffset = (
 	mosaicCols: number,
 	mosaicColWidth: number,
@@ -30,6 +41,13 @@ const getMosaicOffset = (
 	return (xLoc + yLoc);
 };
 //--------------------------------------------------------
+/**
+ * It takes an array of DICOM images and a slice direction (0, 1, or 2) and returns an array of DICOM
+ * images ordered by the slice direction
+ * @param {Images} images - Images - this is the array of images that you want to sort
+ * @param {number} sliceDir - 0 = axial, 1 = sagittal, 2 = coronal
+ * @returns An array of images sorted by the slice direction.
+ */
 const orderByImagePosition = (images: Images, sliceDir: number): Images => {
 	const dicomMap = new OrderedMap<number, any>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
@@ -39,6 +57,14 @@ const orderByImagePosition = (images: Images, sliceDir: number): Images => {
 };
 
 //--------------------------------------------------------
+/**
+ * "Given an array of images, return an array of images ordered by slice location."
+ * 
+ * The first thing we do is create a new OrderedMap. This is a data structure that allows us to store
+ * key-value pairs, and then retrieve the values in the order that they were inserted
+ * @param {Images} images - Images - this is the array of images that you want to sort.
+ * @returns An array of DCMImage objects.
+ */
 const orderBySliceLocation = (images: Images): Images => {
 	const dicomMap = new OrderedMap<number, DCMImage>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
@@ -48,6 +74,12 @@ const orderBySliceLocation = (images: Images): Images => {
 };
 
 //--------------------------------------------------------
+/**
+ * It takes an array of images, creates a map of image numbers to images, and then returns the values
+ * of the map in order
+ * @param {Images} images - Images - this is the array of images that you want to sort.
+ * @returns An array of DCMImage objects.
+ */
 const orderByImageNumber = (images: Images): Images => {
 	const dicomMap = new OrderedMap<number, DCMImage>();
 	for (let ctr = 0; ctr < images.length; ctr += 1) {
@@ -57,6 +89,20 @@ const orderByImageNumber = (images: Images): Images => {
 };
 
 //--------------------------------------------------------
+/**
+ * It checks to see if the image number, image position, or slice location of the image matches any of
+ * the images in the data group
+ * @param {Images} dg - Images - the images that have already been loaded
+ * @param {DCMImage} image - The image to check for a matching slice
+ * @param {number} sliceDir - The direction of the slice.  This is the direction that the slice is
+ * moving in.  For example, if the slice is moving in the X direction, then the sliceDir is 0.  If the
+ * slice is moving in the Y direction, then the sliceDir is 1.  If the
+ * @param {boolean} doImagePos - If true, then the image position will be used to determine if the
+ * image is a duplicate.
+ * @param {boolean} doSliceLoc - boolean - If true, then the slice location will be used to determine
+ * if the image is a duplicate.
+ * @returns A boolean value.
+ */
 const hasMatchingSlice = (
 	dg: Images,
 	image: DCMImage,
@@ -103,6 +149,16 @@ const hasMatchingSlice = (
 };
 
 //--------------------------------------------------------
+/**
+ * It takes a list of images and returns a map of images, where the keys are the timepoints and the
+ * values are the images at that timepoint
+ * @param {Images} images - Images - the array of images to sort
+ * @param {number} numFrames - the number of frames in the series
+ * @param {number} sliceDir - The direction of the slice.
+ * @param {boolean} hasImagePosition - boolean
+ * @param {boolean} hasSliceLocation - boolean
+ * @returns An ordered map of images.
+ */
 const orderByTime = (
 	images: Images,
 	numFrames:number,
@@ -199,6 +255,13 @@ const orderByTime = (
 };
 
 //--------------------------------------------------------
+/**
+ * It takes a list of images, and returns a list of images, ordered by time and space
+ * @param {Images} images - The images to order.
+ * @param {number} numFrames - The number of frames in the image.
+ * @param {number} sliceDir - The direction of the slices.
+ * @returns An array of images.
+ */
 const orderDicoms = (
 	images: Images,
 	numFrames: number,
@@ -251,11 +314,9 @@ const orderDicoms = (
 ////////////////////////////////////////////////////////////////////////////////
 //********************************* SERIES of IMAGES ************************ */
 ////////////////////////////////////////////////////////////////////////////////
-/**
- * The Series constructor.
- * @property {DCMImage[]} images
- * @type {Function}
- */
+
+/* It's a container for a series of images, and it provides methods to order the images in the series,
+and to get the pixel data for the series */
 class Series {
 	// static parserError: Error | null = null;
 
@@ -471,6 +532,10 @@ class Series {
 		this.images = orderedImages;
 	}
 //============================================================================
+	/**
+	 * It creates a 4x4 matrix that transforms a pixel coordinate to a patient coordinate
+	 * @returns A 4x4 matrix that transforms pixel coordinates to patient coordinates.
+	 */
 	getMat4PixToPat()  {
 
 		const m4 = twgl.m4;
@@ -496,6 +561,9 @@ class Series {
 			return mat4pix2pat;
 		}
 		const imgOrient  = this.images[0].imageDirections;	
+		if(imgOrient === null){
+			return twgl.m4.identity() as Float32Array;
+		}
 		const imgOrientR = imgOrient.slice(0,3);	
 		const imgOrientC = imgOrient.slice(3,6);
 		const pixSpacing =  this.images[0].pixelSpacing;
@@ -564,6 +632,7 @@ async getFrames():Promise<FrameInfo>
 }
 
 //============================================================================
+/* Converting a mosaic image into a non-mosaic image. */
 getMosaicData(image: DCMImage, data:Uint16Array | Uint8Array): ArrayBuffer {
 		const [image0] = this.images;
 

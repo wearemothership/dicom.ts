@@ -17,6 +17,7 @@ export enum PixelDataType {
 
 //--------------------------------------------------------
 
+/* It's a wrapper around the `DCMImage` class that provides a more convenient interface for the decoder */
 export class DecoderInfo implements IDecoderInfo {
 	image: DCMImage;
 

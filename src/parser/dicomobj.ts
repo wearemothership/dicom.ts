@@ -26,6 +26,7 @@ interface IDicomObjInfo {
 
 
 //=======================================================================================
+/* It's a class that holds a bunch of tags, defining a generic Dicom object */
 class DCMObject implements IDicomObjInfo {
 
 	tags: Record<TagStringID, Tag> = {};

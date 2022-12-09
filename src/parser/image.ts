@@ -25,6 +25,13 @@ enum Axis {
 
 // originally from: http://public.kitware.com/pipermail/insight-users/2005-March/012246.html
 const ObliquityThresholdCosineValue = 0.8;
+/**
+ * Given a vector, return the axis that is closest to the vector
+ * @param {number} x - number,
+ * @param {number} y - The y-coordinate of the patient-based coordinate system direction cosine
+ * @param {number} z - number
+ * @returns the axis that is closest to the patient's orientation.
+ */
 const getMajorAxisFromPatientRelativeDirectionCosine = (
 	x: number,
 	y: number,
@@ -54,6 +61,7 @@ const getMajorAxisFromPatientRelativeDirectionCosine = (
 };
 //======================================================================
 
+/* This class represents a DICOM image. */
 class DCMImage extends DCMObject {
 	static skipPaletteConversion = false;
 

@@ -14,6 +14,7 @@ interface IFrameInfoConstructor {
 }
 
 //--------------------------------------------------------
+/* `FrameInfo` is a class that holds the information about a single frame set of a DICOM image */
 class FrameInfo implements IFrameInfo {
 	frameNo: number;
 

@@ -7,6 +7,16 @@ import {IDecoderInfo, IImageLutInfo, IImagePaletteInfo,IDisplayInfo} from "./Typ
 export type {IDisplayInfo};
 
 //--------------------------------------------------------
+/**
+ * It takes a DICOM image and returns an object that describes the image's LUT, or null if the image
+ * doesn't have a LUT
+ * @param {DCMImage} image - DCMImage - the image object
+ * @returns An object with the following properties:
+ * nEntries: number;
+ * firstValue: number;
+ * bitsStored: number;
+ * data: Uint8Array | Uint16Array;
+ */
 const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 	const lutDescriptor = image.getTagValue(TagIds.VoiLutDescriptor) as number[];
 	if (lutDescriptor?.length !== 3) {
@@ -40,6 +50,17 @@ const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 
 
 //--------------------------------------------------------
+/**
+ * It returns an object containing the palette information from the image, or null if the image does
+ * not have a palette
+ * @param {IDecoderInfo} info - IDecoderInfo
+ * @returns An object with the following properties:
+ * - nEntries: number
+ * - bitsAllocated: number
+ * - r: DataView
+ * - g: DataView
+ * - b: DataView
+ */
 const paletteInfoFromImage = (info: IDecoderInfo): IImagePaletteInfo | null => {
 	const { image } = info;
 	const reds = image.getTagValue(TagIds.PaletteRed) as DataView;
@@ -63,6 +84,8 @@ const paletteInfoFromImage = (info: IDecoderInfo): IImagePaletteInfo | null => {
 
 
 //--------------------------------------------------------
+
+
 /**
  * It takes a decoder info object and returns a display info object
  * @param {IDecoderInfo} info - The decoder info object.
@@ -99,6 +122,8 @@ export const displayInfoFromDecoderInfo = (info:IDecoderInfo): IDisplayInfo => {
 
 		slope: image.dataScaleSlope || 1.0,
 		intercept: image.dataScaleIntercept || 0.0,
+
+		modulationColor: [1,1,1,1],
 
 		invert
 	};

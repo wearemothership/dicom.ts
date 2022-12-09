@@ -3,13 +3,6 @@ import FrameInfo from "../image/FrameInfo";
 import { ISize } from "../image/Types";
 import { ProgramInfo, BufferInfo,VertexArrayInfo } from "twgl.js";
 
-// let vertexShader = raw("./vertex.glsl");
-// let minMaxShader = raw("./minMax.glsl");
-// let contrastifyShader = raw("./contrastify.glsl");
-// let greyscaleShader = raw("./greyscale.glsl");
-// let greyscaleLUTShader = raw("./greyscaleLUT.glsl");
-// let colorShader = raw("./color.glsl");
-
 
 export type Uniforms = {[name: string]: any};
 /* Defining the interface for the IProgram class. */

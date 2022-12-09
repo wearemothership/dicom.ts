@@ -35,6 +35,11 @@ const isMagicCookieFound = (data: DataView): boolean => {
 
 //--------------------------------------------------------
 
+/**
+ * It searches for the magic cookie, and if it finds it, it returns the offset of the first tag
+ * @param {DataView} data - DataView - the data to search
+ * @returns The offset of the first tag in the ID3v2 header.
+ */
 const findFirstTagOffset = (data: DataView): number => {
 	const magicCookieLength = MAGIC_COOKIE.length;
 	if (isMagicCookieFound(data)) {
@@ -74,7 +79,9 @@ interface IParserPublic {
 //--------------------------------------------------------
 
 /**
- * Parser class
+ * Parser class: It takes a DataView object and returns a DCMImage object
+ * @param {DataView} data - DataView
+ * @returns A DCMImage object.
  */
 class Parser implements IParserPublic {
 	/**

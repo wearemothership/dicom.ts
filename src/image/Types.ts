@@ -20,6 +20,7 @@ export interface IImageSize extends ISize {
 	columns: number
 }
 //--------------------------------------------------------
+/* `ImageSize` is a class that represents the size of an image */
 export class ImageSize implements IImageSize {
 	readonly width: number;
 
@@ -58,6 +59,7 @@ export class ImageSize implements IImageSize {
 
 
 //--------------------------------------------------------
+/* Defining an enum for the different types of codecs that can be used. */
 /* eslint-disable no-bitwise */
 export enum Codec {
 	Uncompressed	= 0x0,
@@ -113,7 +115,7 @@ export interface IImagePaletteInfo {
 }
 
 //--------------------------------------------------------
-/* Defining an interface for a lookup table. */
+/* Defining an interface for a display info. */
 export interface IDisplayInfo extends IDecoderInfo {
 
 	nFrames: number
@@ -133,6 +135,8 @@ export interface IDisplayInfo extends IDecoderInfo {
 
 	slope: number
 	intercept: number
+
+	modulationColor: number[]
 }
 
 //--------------------------------------------------------

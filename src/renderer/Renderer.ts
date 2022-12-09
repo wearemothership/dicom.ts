@@ -80,7 +80,7 @@ class Renderer {
      * GLSL program for each one, and then creates a DrawObject for each one
      * @param framesArray - Array<FrameInfo | null>
      */
-    async setFrameSets(framesArray: Array<FrameInfo | null>){
+    async setFrameSets(framesArray: Array<FrameInfo | null>): Promise<void> {
 		const { gl } = this;
         let {imgDrawObjectArray} = this;
         /*clear up the draw objects list*/
@@ -101,7 +101,8 @@ class Renderer {
         const {width, height} =this.frameSets[0]!.imageInfo!.size;
         this.cutIndex = [width/2,height/2,0];	
         /* select the rendering program and populate the DrawObject List*/
-        this.frameSets.forEach(async (frames) => {
+        // this.frameSets.forEach(async (frames) => {
+		for (const frames of this.frameSets) {
             if(frames !== null){
                 /* only create a new texture if there's no valid one already*/
                 if(!frames.texture || gl.isTexture(frames.texture) === false){
@@ -114,8 +115,11 @@ class Renderer {
 				drawObj.uniforms[0] = this.sharedUniforms;
                 this.imgDrawObjectArray.push(drawObj);
             }
-        });
-        /*there you go! :)*/
+		}
+        // });
+
+		return Promise.resolve();
+		/*there you go! :)*/
     }
 
 	
@@ -123,23 +127,20 @@ class Renderer {
      * > We set the viewport, clear the canvas, and then draw all the objects in the
      * `imgDrawObjectArray` array
      */
-    async render() {
+    render() {
 		const { gl } = this;		
 		const {viewport} =this;
-
         /* let's set the viewport as xo, yo, width, height respectively*/
 		gl.viewport(viewport[0],viewport[1],viewport[2],viewport[3]);
 		gl.clearColor(0,0,0,1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
-		/*update the shared uniforms for each object, as these change with the slicing view and position*/
-		// this.imgDrawObjectArray.forEach((drawObj) => {
-		// 	drawObj.uniforms[0] = this.sharedUniforms;
-		// });
-        /* draw all the object list in one go*/
-		// console.log("shareduniform: ", this.sharedUniforms);
-		// console.log("obj.uniforms[0]: ", this.imgDrawObjectArray[0].uniforms[0]);
-		// console.log("cut_index: ", this.cutIndex);
+		/*here we will blend all the images according to their alpha (use modulation colour)*/
+		gl.enable(gl.BLEND);
+		gl.blendEquation(gl.FUNC_ADD);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		// gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_COLOR);
 		twgl.drawObjectList(gl, this.imgDrawObjectArray);
+		gl.disable(gl.BLEND);
 	}
     /**
      * It returns the number of frame sets in the animation
@@ -401,10 +402,14 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
     /* we always use a 3D texture, as they are also available on mobile devices nowadays*/
 	let depth = frame.imageInfo.nFrames;
 	let texTarget = gl.TEXTURE_3D;
-						
+	console.log("Tex3D W, H, D :", width,	height,	depth);
+	
+	console.log("Max tex2D size: ",gl.MAX_TEXTURE_SIZE);
+	console.log("Max tex3D size: ",gl.MAX_3D_TEXTURE_SIZE);
 	return Promise.resolve(twgl.createTexture(gl, {
 		src: bytes,
 		target: texTarget,
+		level: 0,
 		width,
 		height,
 		depth,
@@ -420,8 +425,8 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
 	//----------------------------------------------------------------------------
 	clear(): void {
 		const { gl, canvas } = this;
-		canvas.width = 0; // zero the canvas, makes resize much faster!
-		canvas.height = 0;
+		// canvas.width = 0; // zero the canvas, makes resize much faster!
+		// canvas.height = 0;
 		// eslint-disable-next-line no-bitwise
 		gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 	}
@@ -539,7 +544,8 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
 			windowCenter: knownWindow ? 0.5 : null,
 			windowWidth: knownWindow ? 1 : null,
 			slope: 1,
-			intercept: 0
+			intercept: 0,
+			modulationColor: [1,1,1,1]
 		};
 		this.getProgram(imageType);
 	}
@@ -588,7 +594,8 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
 			windowCenter: null,
 			windowWidth: null,
 			slope: 1,
-			intercept: 0
+			intercept: 0,
+			modulationColor: [1,1,1,1]
 		};
 		this.getProgram(imageType);
 	}
