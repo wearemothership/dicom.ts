@@ -48,8 +48,9 @@ class Renderer {
 
     /* we accept multiple image sets, to be overlaid and mixed*/
 
-    private imgDrawObjectArray: Array<IDrawObject> = Array(0);
-    private toolsDrawObjectArray: Array<IDrawObject | null> = Array(0);
+    private   imgDrawObjectArray: Array<IDrawObject> = Array(0);
+    protected toverlayDrawObjectArray: Array<IDrawObject> = Array(0);
+    protected soverlayDrawObjectArray: Array<IDrawObject> = Array(0);
 
     
 
@@ -106,7 +107,11 @@ class Renderer {
             if(frames !== null){
                 /* only create a new texture if there's no valid one already*/
                 if(!frames.texture || gl.isTexture(frames.texture) === false){
-                    frames.texture = await this.createTexture(frames);
+					try {
+                    	frames.texture = await this.createTexture(frames);
+					}	catch(err){
+							console.log(err)
+					};
                 }			
                 /* select the correct GLSL program for this image modality*/
                 const program = this.getProgram(frames.imageInfo);
@@ -140,7 +145,9 @@ class Renderer {
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		// gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_COLOR);
 		twgl.drawObjectList(gl, this.imgDrawObjectArray);
+		twgl.drawObjectList(gl, this.toverlayDrawObjectArray);
 		gl.disable(gl.BLEND);
+		twgl.drawObjectList(gl, this.soverlayDrawObjectArray);
 	}
     /**
      * It returns the number of frame sets in the animation
@@ -149,6 +156,24 @@ class Renderer {
     getFrameSetsCount(): number {
         return this.frameSets.length;
     }
+
+	/**
+	 * This function returns an array of twgl.m4.Mat4 objects, which are the projection, view, and model
+	 * matrices.
+	 * @returns An array of twgl.m4.Mat4 objects.
+	 */
+	getMatrixChain(): twgl.m4.Mat4[] {
+        return [this.sharedUniforms.u_matrix_proj, 
+				this.sharedUniforms.u_matrix_view,
+				this.sharedUniforms.u_matrix_model];
+    }
+	
+	/**
+	 * @returns The WebGL2RenderingContext object.
+	 */
+	get wgl2():WebGL2RenderingContext {		
+		return this.gl;
+	}
 
 	/**
      * The function takes a 4-element array of numbers as an argument, and assigns the array to the
@@ -216,6 +241,39 @@ class Renderer {
             return this.frameSets[0]!.getMM2Pix([...this.cutPoint]) ;	
         }
 		return [-1,-1,-1];
+	}
+
+	/**
+	 * The function takes an array of objects that implement the IDrawObject interface and assigns it to
+	 * the toverlayDrawObjectArray property. 
+	 * It renders a possibly alpha-transparent overlay, which could be annotation, segmentation, etc.
+	 * @param tools - Array<IDrawObject> - This is the array of objects that you want to draw on top of the
+	 * images, but below the tools.
+	 */
+	set toverlayObjects(tools: Array<IDrawObject> )  {
+		this.toverlayDrawObjectArray = tools;
+	}
+	/**
+	 * This function returns an array of IDrawObjects, forming the transparent overlay (annotation, segmentation, etc.).
+	 * @returns An array of overlay IDrawObjects.
+	 */
+	get toverlayObjects(): Array<IDrawObject>  {
+		return this.toverlayDrawObjectArray;
+	}
+	/**
+	 * This function takes an array of IDrawObjects and assigns it to the soverlayDrawObjectArray property.
+	 * It draws a set of solid opaque objects on the very top, usually used for temporary tools (rulers, protractor,etc.)
+	 * @param tools - Array<IDrawObject> - This is the array of solid objects that you want to add to the canvas.
+	 */
+	set soverlayObjects(tools: Array<IDrawObject> )  {
+		this.soverlayDrawObjectArray = tools;
+	}
+	/**
+	 * This function returns an array of IDrawObjects, which are drawn at the end, as solid opaque entities (usually screen tools).
+	 * @returns The soverlayDrawObjectArray
+	 */
+	get soverlayObjects(): Array<IDrawObject>  {
+		return this.soverlayDrawObjectArray;
 	}
 
     /**
@@ -402,10 +460,9 @@ protected async createTexture(frame: IFrameInfo):Promise<WebGLTexture> {
     /* we always use a 3D texture, as they are also available on mobile devices nowadays*/
 	let depth = frame.imageInfo.nFrames;
 	let texTarget = gl.TEXTURE_3D;
-	console.log("Tex3D W, H, D :", width,	height,	depth);
-	
-	console.log("Max tex2D size: ",gl.MAX_TEXTURE_SIZE);
-	console.log("Max tex3D size: ",gl.MAX_3D_TEXTURE_SIZE);
+	const maxSize3D = gl.getParameter(gl.MAX_3D_TEXTURE_SIZE);
+	if(width > maxSize3D ||  height > maxSize3D || depth  > maxSize3D)
+		return Promise.reject("Texture size too large");
 	return Promise.resolve(twgl.createTexture(gl, {
 		src: bytes,
 		target: texTarget,

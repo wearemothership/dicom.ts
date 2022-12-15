@@ -92,7 +92,8 @@ const DICOMJSRenderer = ({
 				/*parse each raw image as a Dicom image*/
 				let dcmImage:DCMImage = parseImage(new DataView(dataBufferArray[bufferIndex])) as DCMImage;
 				/* add this Dicom image to the Sries*/
-				imageSeries.addImage(dcmImage);
+				if(imageSeries.matchesSeries(dcmImage))
+					imageSeries.addImage(dcmImage);
 			}
 			/*now build the whole series in the correct way*/
 			imageSeries.buildSeries();
@@ -130,10 +131,7 @@ const DICOMJSRenderer = ({
 			// console.time("parse and render");
 			
 			renderer!.cutIndex = cutIndex;// [256,256,0.0];
-			renderer!.render().then(() => {
-				// complete?.(canvasRef.current!)
-				// console.timeEnd("parse and render")
-			});	
+			renderer!.render();	
 			const sliceStep:number[] = [2,3,1];	
 			const timeStep = 100;
 			const countMax = studySize[renderer!.slicingDirection];

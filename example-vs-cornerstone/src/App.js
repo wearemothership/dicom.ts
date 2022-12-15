@@ -66,6 +66,11 @@ const Status = ({
 	}
 }
 
+/**
+ * It renders a canvas element with a unique id, and then uses the canvasRef to enable the cornerstone
+ * library to render the canvas.
+ * @returns A React component.
+ */
 const DICOMDiv = ({
 	heading,
 	id,
@@ -228,6 +233,11 @@ const Example = (props) => {
 		setFileBuffer(buff);
 	};
 
+	/**
+	 * It takes a file name as an argument, sets the file name, sets the file buffer to null, fetches the
+	 * file, and then sets the file buffer to the array buffer of the file.
+	 * @param file - The name of the file to load.
+	 */
 	const loadFile = (file) => {
 		setFileName(file);
 		setFileBuffer(null);
