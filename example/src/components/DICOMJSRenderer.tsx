@@ -3,9 +3,9 @@ import React, {
 	ReactElement,
 	useRef,
 	useEffect,
-	ReactChildren,
 } from "react";
 import { parseImage, render, Renderer } from "dicom.ts";
+import DICOMCanvas from "../components/DICOMCanvas";
 
 const parseDecodeAndRender = (buf: ArrayBuffer, canvas: HTMLCanvasElement): Promise<void> => {
 	const data = new DataView(buf);
@@ -19,7 +19,7 @@ type RenderProps = {
 	renderMethod: (buf: ArrayBuffer, canvas: HTMLCanvasElement) => Promise<void>
 	complete: ((canvas: HTMLCanvasElement) => void) | null;
 	dataBuffer: ArrayBuffer,
-	children: ReactChildren
+	children: ReactElement<typeof DICOMCanvas>
 }
 
 const DICOMJSRenderer = ({
