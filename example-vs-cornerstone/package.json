@@ -15,19 +15,19 @@
 		"cornerstone-core": "^2.6.1",
 		"cornerstone-file-image-loader": "^0.3.0",
 		"cornerstone-wado-image-loader": "git+https://github.com/webnamics/cornerstoneWADOImageLoader.git",
-		"dicom-parser": "^1.8.13",
+		"dicom-parser": "^1.8.21",
 		"dicom.ts": "file:..",
 		"path-browserify": "^1.0.1",
-		"react": "^18.2.0",
+		"react": "^18.3.1",
 		"react-app-rewired": "^2.2.1",
-		"react-dom": "^18.2.0",
-		"react-icons": "^4.3.1",
-		"react-router-dom": "^6.22.3",
+		"react-dom": "^18.3.1",
+		"react-icons": "^5.2.1",
+		"react-router-dom": "^6.23.1",
 		"react-scripts": "^5.0.1"
 	},
 	"devDependencies": {
 		"@babel/plugin-syntax-object-rest-spread": "^7.8.3",
-		"@types/react": "^18.2.65"
+		"@types/react": "^18.3.2"
 	},
 	"eslintConfig": {
 		"extends": [

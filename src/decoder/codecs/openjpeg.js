@@ -57,10 +57,6 @@ var OpenJPEGWASM = (function () {
 			ENVIRONMENT_IS_NODE = ENVIRONMENT_HAS_NODE && !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_WORKER;
 			ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
 
-			if (ENVIRONMENT_IS_NODE && globalThis && !globalThis.fetch) {
-				globalThis.fetch = require("node-fetch");
-			}
-
 			var scriptDirectory = "";
 
 			function locateFile(path) {
