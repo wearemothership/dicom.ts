@@ -13,7 +13,9 @@ import {
   } from "react-router-dom";
 import { GPUJSClear, GPUJSDecode, GPUJSInit } from "./ReadDicom";
 import { CornerstoneClear, CornerstoneDecode, CornerstoneInit } from "./CornerstoneDecoder";
-import { GoClippy, GoMarkGithub, GoDashboard, GoSync, GoAlert, GoFileMedia } from "react-icons/go";
+import { FaGithub } from "react-icons/fa";
+import { MdSpeed } from "react-icons/md";
+import { GoRepo, GoSync, GoAlert, GoFileMedia } from "react-icons/go";
 
 const renderQ = [];
 
@@ -39,7 +41,7 @@ const Status = ({
 	if (renderState === "complete") {
 		return (
 			<Flex flexDirection="row" alignItems="center">
-				<GoDashboard />&nbsp;{renderTime}ms
+				<MdSpeed />&nbsp;{renderTime}ms
 			</Flex>
 		)
 	}
@@ -246,8 +248,8 @@ const Example = (props) => {
 					flexDirection="row"
 					alignItems="center"
 				>
-					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.ts"} className="yellow"><GoMarkGithub /> View on Github</button>
-					<button className="blue"  onClick={copyText}><GoClippy /> npm install --save dicom.ts</button>
+					<button onClick={() =>  window.location.href="https://github.com/wearemothership/dicom.ts"} className="yellow"><FaGithub /> View on Github</button>
+					<button className="blue"  onClick={copyText}><GoRepo /> npm install --save dicom.ts</button>
 					{copied && <small>Copied…</small>}
 				</Flex>
 			</Flex>

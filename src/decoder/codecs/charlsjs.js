@@ -49,10 +49,6 @@ var CharLS = (function (opts) {
 	ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
 	var scriptDirectory = "";
 
-	if (ENVIRONMENT_IS_NODE && globalThis && !globalThis.fetch) {
-		globalThis.fetch = require("node-fetch");
-	}
-
 	function locateFile(path) {
 		if (Module["locateFile"]) {
 			return Module["locateFile"](path, scriptDirectory)
