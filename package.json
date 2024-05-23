@@ -28,7 +28,7 @@
   "exports": {
     "require": "./dist/index.js",
     "browser": "./dist/browser.js",
-	"default": "./dist/index.modern.mjs"
+    "default": "./dist/index.modern.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -51,10 +51,10 @@
     "browserify-fs": "^1.0.0",
     "jpeg-lossless-decoder-js": "^2.1.2",
     "pako": "^2.1.0",
-    "raw.macro": "0.4.2",
+    "raw.macro": "git@github.com:wearemothership/raw.macro.git#allow-install",
     "sha1": "^1.1.1",
     "twgl.js": "^5.5.4",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
@@ -64,10 +64,10 @@
     "@babel/preset-typescript": "^7.24.1",
     "@types/node": "^20.12.12",
     "@types/sha1": "^1.1.5",
-    "@typescript-eslint/eslint-plugin": "^7.9.0",
-    "@typescript-eslint/parser": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
     "babel-jest": "^29.7.0",
-    "babel-plugin-macros": "^2.8.0",
+    "babel-plugin-macros": "^3.1.0",
     "blob-util": "^2.0.2",
     "brfs": "^2.0.2",
     "browserify": "^17.0.0",
