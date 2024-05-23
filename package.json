@@ -27,7 +27,8 @@
   "types": "dist/index.d.ts",
   "exports": {
     "require": "./dist/index.js",
-    "default": "./dist/index.modern.mjs"
+    "browser": "./dist/browser.js",
+	"default": "./dist/index.modern.mjs"
   },
   "engines": {
     "node": ">=18"
