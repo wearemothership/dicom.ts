@@ -1,4 +1,5 @@
-import { lossless as jpegLossless } from "jpeg-lossless-decoder-js";
+// @ts-ignore
+import { Decoder as JpegLossless } from "jpeg-lossless-decoder-js";
 import Decoder from "./Decoder";
 import { getJpegData } from "./util";
 
@@ -13,7 +14,7 @@ class JPEGLosslessDecoder extends Decoder {
 		if (!this.jpegs?.length) {
 			return Promise.reject(new Error("No JPEG lossless image data"));
 		}
-		const decoder = new jpegLossless.Decoder();
+		const decoder = new JpegLossless();
 		const jpeg = this.jpegs![frameNo];
 		const buffer = new Uint8Array(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
 		const temp = decoder.decode(buffer);

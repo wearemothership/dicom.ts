@@ -1,5 +1,5 @@
 import * as twgl from "twgl.js";
-import { ProgramInfo, BufferInfo } from "twgl.js";
+import type { ProgramInfo, BufferInfo } from "twgl.js";
 
 import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
@@ -17,7 +17,7 @@ class GreyscaleLUTProgram implements IProgram {
 
 	info: IDisplayInfo;
 
-	gl:WebGLRenderingContext;
+	gl: WebGLRenderingContext;
 
 	static programStringForInfo(info: IDisplayInfo): string {
 		return preCompileGreyscaleShader(info, greyscaleLUTShader);
@@ -59,12 +59,9 @@ class GreyscaleLUTProgram implements IProgram {
 
 		const { lut } = imageInfo;
 
-		let format = gl.LUMINANCE_ALPHA;
-		let internalFormat = gl.LUMINANCE_ALPHA;
-		if (info.bitsAllocated <= 8) {
-			format = gl.LUMINANCE;
-			internalFormat = gl.LUMINANCE;
-		}
+		const format = info.bitsAllocated <= 8 ? gl.LUMINANCE : gl.LUMINANCE_ALPHA;
+		const internalFormat = info.bitsAllocated <= 8 ? gl.LUMINANCE : gl.LUMINANCE_ALPHA;
+
 		// 1D tex
 		const lutTexture = twgl.createTexture(gl, {
 			src: new Uint8Array(lut!.data.buffer),

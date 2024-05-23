@@ -27,7 +27,6 @@
   "types": "dist/index.d.ts",
   "exports": {
     "require": "./dist/index.js",
-    "browser": "./dist/browser.js",
     "default": "./dist/index.modern.mjs"
   },
   "engines": {

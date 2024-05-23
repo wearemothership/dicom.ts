@@ -26,20 +26,16 @@ export interface IGreyscaleProgramType {
 	bitsStored?: number
 	signed?: boolean
 	littleEndian?: boolean
-
 	hasLut?: boolean
 	hasPixelPaddingValue?: boolean;
 	invert?: boolean
-
 	knownWindow?: boolean
 }
 export interface IColorProgramType {
 	planar?: boolean
-
 	bitsAllocated: number
 	signed?: boolean
 	littleEndian?: boolean
-
 	hasPaletteWithWordBits?: number; // 0, 8 or 16 bits
 	invert?: boolean
 }
