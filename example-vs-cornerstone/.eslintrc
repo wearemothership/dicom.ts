@@ -72,9 +72,9 @@
 		"files": ["*.ts", "*.tsx", ".d.ts"],
 		"rules": {
 			"no-shadow": "off",
-			"@typescript-eslint/explicit-module-boundary-types": ["error"],
-			"@typescript-eslint/no-use-before-define": ["error"],
-			"@typescript-eslint/no-shadow": ["error"],
+			"@typescript-eslint/explicit-module-boundary-types": "error",
+			"@typescript-eslint/no-use-before-define": "error",
+			"@typescript-eslint/no-shadow": "error",
 			"react/require-default-props": ["off"],
 			"@typescript-eslint/indent": [2, "tab", { "SwitchCase": 1, "VariableDeclarator": 1 }],
 			"promise/always-return": ["error", { "ignoreLastCallback": true }],
@@ -84,9 +84,7 @@
 				"double"
 			],
 			"@typescript-eslint/brace-style": [2, "stroustrup"],
-			"@typescript-eslint/no-unused-vars": "error",
-			"@typescript-eslint/no-shadow": ["error"],
-			"@typescript-eslint/no-use-before-define": ["error"]
+			"@typescript-eslint/no-unused-vars": "error"
 		}
-	}
+	}]
 }
