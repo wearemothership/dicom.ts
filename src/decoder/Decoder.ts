@@ -50,8 +50,8 @@ class Decoder implements IDecoder {
 		let { height } = this.outputSize;
 		const { width } = this.outputSize;
 		const { image } = this;
-		let format = gl.LUMINANCE_ALPHA;
-		let internalFormat = gl.LUMINANCE_ALPHA;
+		let format: number = gl.LUMINANCE_ALPHA;
+		let internalFormat: number = gl.LUMINANCE_ALPHA;
 		if (image.rgb && !image.planar && !image.palette) {
 			format = gl.RGB;
 			internalFormat = gl.RGB;

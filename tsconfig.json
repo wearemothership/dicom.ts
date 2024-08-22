@@ -21,7 +21,8 @@
   },
   "include": [
     "src/**/*",
-    "types/jpeg-lossless-decoder-js.d.ts"
+    "types/jpeg-lossless-decoder-js.d.ts",
+    "jest.config.js"
   ],
   "exclude": [
 	"coverage",

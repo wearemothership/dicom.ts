@@ -3,6 +3,7 @@
  */
 
 /* eslint-disable import/first */
+/* eslint-disable no-undef */
 import fs from "fs";
 
 import {
@@ -30,10 +31,10 @@ if (globalThis.window && !window.TextDecoder) {
 
 expect.extend({ toMatchImageSnapshot });
 
-/* eslint-disable */
-if (!globalThis.fetch) {
-	globalThis.fetch = fetch;
-}
+// /* eslint-disable */
+// if (!globalThis.fetch) {
+// 	globalThis.fetch = fetch;
+// }
 
 // need to be global (as they would be in browser) for twgl to get them!
 if (globalThis.window) {
@@ -89,7 +90,7 @@ describe("dicom.ts", () => {
 		// console.log(str);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		// fs.writeFileSync("./image.png", buffer);
+		fs.writeFileSync("./image.png", buffer);
 		expect(buffer).toMatchImageSnapshot();
 	});
 
@@ -130,7 +131,7 @@ describe("dicom.ts", () => {
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(buffer).toMatchImageSnapshot();
 	});
 
