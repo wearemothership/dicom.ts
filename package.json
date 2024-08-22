@@ -1,6 +1,6 @@
 {
   "name": "dicom.ts",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A small, fast, typescript DICOM renderer",
   "author": "wearemothership",
   "keywords": [
@@ -53,8 +53,7 @@
     "pako": "^2.1.0",
     "raw.macro": "0.4.2",
     "sha1": "^1.1.1",
-    "twgl.js": "^5.5.4",
-    "typescript": "^4.9.5"
+    "twgl.js": "^5.5.4"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
@@ -90,7 +89,8 @@
     "npm-run-all": "^4.1.5",
     "patch-package": "^8.0.0",
     "prettier": "^3.2.5",
-    "rimraf": "^5.0.7"
+    "rimraf": "^5.0.7",
+    "typescript": "^5.5.4"
   },
   "files": [
     "dist"

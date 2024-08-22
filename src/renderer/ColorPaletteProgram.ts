@@ -62,8 +62,8 @@ class ColorPaletteProgram implements IProgram {
 
 		const { palette, invert, bitsAllocated } = imageInfo;
 
-		let format = gl.LUMINANCE_ALPHA;
-		let internalFormat = gl.LUMINANCE_ALPHA;
+		let format: number = gl.LUMINANCE_ALPHA;
+		let internalFormat: number = gl.LUMINANCE_ALPHA;
 		if (palette!.bitsAllocated === 8) {
 			format = gl.LUMINANCE;
 			internalFormat = gl.LUMINANCE;

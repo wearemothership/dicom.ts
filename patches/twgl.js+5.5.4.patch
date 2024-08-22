@@ -1,0 +1,14 @@
+diff --git a/node_modules/twgl.js/dist/5.x/twgl-full.js b/node_modules/twgl.js/dist/5.x/twgl-full.js
+index 4c8f000..7022fee 100644
+--- a/node_modules/twgl.js/dist/5.x/twgl-full.js
++++ b/node_modules/twgl.js/dist/5.x/twgl-full.js
+@@ -1408,6 +1408,9 @@ function isType(object, type) {
+   if (!object || _typeof(object) !== 'object') {
+     return false;
+   }
++  if (object instanceof window[type]) {
++    return true;
++  }
+   var weakMap = isTypeWeakMaps.get(type);
+   if (!weakMap) {
+     weakMap = new WeakMap();
