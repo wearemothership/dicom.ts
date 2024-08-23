@@ -59,8 +59,8 @@ class GreyscaleLUTProgram implements IProgram {
 
 		const { lut } = imageInfo;
 
-		let format = gl.LUMINANCE_ALPHA;
-		let internalFormat = gl.LUMINANCE_ALPHA;
+		let format: number = gl.LUMINANCE_ALPHA;
+		let internalFormat: number = gl.LUMINANCE_ALPHA;
 		if (info.bitsAllocated <= 8) {
 			format = gl.LUMINANCE;
 			internalFormat = gl.LUMINANCE;

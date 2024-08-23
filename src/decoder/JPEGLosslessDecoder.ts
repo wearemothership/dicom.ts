@@ -1,4 +1,4 @@
-import { lossless as jpegLossless } from "jpeg-lossless-decoder-js";
+import * as jpegLossless from "jpeg-lossless-decoder-js";
 import Decoder from "./Decoder";
 import { getJpegData } from "./util";
 
