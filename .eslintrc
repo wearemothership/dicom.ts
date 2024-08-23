@@ -51,20 +51,20 @@
 		"no-unused-vars": "off",
 		"@typescript-eslint/no-unused-vars": "error",
 		"no-shadow": "off",
-  		"@typescript-eslint/no-shadow": ["error"],
+  		"@typescript-eslint/no-shadow": "error",
 		"no-use-before-define": "off",
-		"@typescript-eslint/no-use-before-define": ["error"]
+		"@typescript-eslint/no-use-before-define": "error"
 	},
 	"parserOptions": {
 		"sourceType": "module",
 		"project": "./tsconfig.json"
 	},
 	"parser": "@typescript-eslint/parser",
-	"ignorePatterns": ["!.storybook"],
+	"ignorePatterns": ["!.storybook", "jest.config.js"],
 	"settings": {
 		"import/extensions": [
 		  ".js",
 		  ".ts"
 		]
-	  }
+	},
 }

@@ -5,10 +5,12 @@ import {
 	parseImage,
 } from "./parser";
 
-export {
+const dicomts = {
 	TransferSyntax,
 	parseImage,
 	render,
 	Renderer,
 	Parser,
 };
+
+export default dicomts;

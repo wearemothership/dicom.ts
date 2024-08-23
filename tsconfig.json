@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "target": "es2020",
+    "target": "ESNext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -21,8 +21,8 @@
   },
   "include": [
     "src/**/*",
-    "types/jpeg-lossless-decoder-js.d.ts",
-    "jest.config.js"
+    // "types/jpeg-lossless-decoder-js.d.ts",
+    // "jest.config.js"
   ],
   "exclude": [
 	"coverage",

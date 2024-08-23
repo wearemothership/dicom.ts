@@ -22,7 +22,7 @@ import {
 } from "node-canvas-webgl";
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 import util from "util";
-import * as dicomjs from ".";
+import dicomjs from ".";
 
 // eslint-disable-next-line no-undef
 if (globalThis.window && !window.TextDecoder) {
@@ -90,7 +90,7 @@ describe("dicom.ts", () => {
 		// console.log(str);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
-		fs.writeFileSync("./image.png", buffer);
+		// fs.writeFileSync("./image.png", buffer);
 		expect(buffer).toMatchImageSnapshot();
 	});
 
