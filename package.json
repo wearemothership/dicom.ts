@@ -40,7 +40,6 @@
     "node": ">=18"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "build": "rimraf dist && microbundle --no-compress -f modern,cjs",
     "start": "rimraf dist && microbundle watch --no-compress -f modern,cjs",
     "prepare": "run-s build",
