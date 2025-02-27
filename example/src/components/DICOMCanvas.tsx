@@ -1,14 +1,14 @@
 import React, { RefObject } from "react";
 
 type DicomCanvasProps = {
-	id:string,
-	canvasRef: RefObject<HTMLCanvasElement>,
+	id?:string,
+	canvasRef?: RefObject<HTMLCanvasElement>,
 	width: number,
 	height: number
 }
 
 const DICOMCanvas = ({
-	id,
+	id = "dicom-canvas",
 	canvasRef,
 	width = 512,
 	height = 512
@@ -16,8 +16,6 @@ const DICOMCanvas = ({
 	<canvas
 		ref={canvasRef}
 		id={id}
-		width={width}
-		height={height}
 		style={{ width: `${width}px`, height: `${height}px` }}
 	/>
 );

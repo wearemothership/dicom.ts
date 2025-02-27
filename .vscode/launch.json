@@ -16,13 +16,11 @@
 			],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
-			"protocol": "inspector",
-			"internalConsoleOptions": "neverOpen",
-			"disableOptimisticBPs": true
+			"internalConsoleOptions": "neverOpen"
 		},
 
         {
-            "type": "pwa-chrome",
+            "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:3000",

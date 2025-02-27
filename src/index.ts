@@ -9,8 +9,11 @@ const dicomts = {
 	TransferSyntax,
 	parseImage,
 	render,
-	Renderer,
-	Parser,
 };
 
 export default dicomts;
+
+export {
+	Renderer,
+	Parser
+};
