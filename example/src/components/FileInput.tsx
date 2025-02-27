@@ -1,4 +1,4 @@
-import React, { RefObject } from "react";
+import { RefObject } from "react";
 
 export const readFile = (file: File):Promise<ArrayBuffer> => new Promise((resolve, reject) => {
 	if (!file) {
