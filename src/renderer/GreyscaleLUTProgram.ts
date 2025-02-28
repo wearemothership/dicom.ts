@@ -1,14 +1,13 @@
 import * as twgl from "twgl.js";
 import { ProgramInfo, BufferInfo } from "twgl.js";
 
-import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { preCompileGreyscaleShader } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import { ISize } from "../image/Types";
 
-const vertexShader = raw("./vertex.glsl");
-const greyscaleLUTShader = raw("./greyscaleLUT.glsl");
+import vertexShader from "./vertex.glsl";
+import greyscaleLUTShader from "./greyscaleLUT.glsl";
 
 class GreyscaleLUTProgram implements IProgram {
 	programInfo: ProgramInfo;

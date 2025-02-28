@@ -1,6 +1,4 @@
 import crypto from "crypto";
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import { createObjectURL, revokeObjectURL } from "blob-util";
 
 import util from "util";
 

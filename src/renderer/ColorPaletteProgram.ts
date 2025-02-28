@@ -1,14 +1,13 @@
 import * as twgl from "twgl.js";
 import { ProgramInfo, BufferInfo } from "twgl.js";
 
-import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import { ISize } from "../image/Types";
 
-const vertexShader = raw("./vertex.glsl");
-const colorPaletteShader = raw("./colorPalette.glsl");
+import vertexShader from "./vertex.glsl";
+import colorPaletteShader from "./colorPalette.glsl";
 
 class ColorPaletteProgram implements IProgram {
 	programInfo: ProgramInfo;

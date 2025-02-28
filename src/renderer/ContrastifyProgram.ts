@@ -1,15 +1,14 @@
 import * as twgl from "twgl.js";
 import { ProgramInfo, BufferInfo, FramebufferInfo } from "twgl.js";
 
-import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram, { glslUnpackWordString, preCompileGreyscaleShader } from "./Program";
 import { IDisplayInfo } from "../image/DisplayInfo";
 import { ISize } from "../image/Types";
 
-const vertexShader = raw("./vertex.glsl");
-const minMaxShader = raw("./minMax.glsl");
-const contrastifyShader = raw("./contrastify.glsl");
+import vertexShader from "./vertex.glsl";
+import minMaxShader from "./minMax.glsl";
+import contrastifyShader from "./contrastify.glsl";
 
 const cellSize = 16;
 

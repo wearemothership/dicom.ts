@@ -138,8 +138,8 @@ class Parser implements IParserPublic {
 					const copyMeta = data.buffer.slice(0, tag.offsetEnd);
 					const copyDeflated = data.buffer.slice(tag.offsetEnd);
 					this.inflated = Utils.concatArrayBuffers(
-						copyMeta,
-						<ArrayBuffer> pako.inflateRaw(copyDeflated)
+						copyMeta as ArrayBuffer,
+						pako.inflateRaw(copyDeflated) as ArrayBuffer
 					);
 					data = new DataView(this.inflated!);
 				}

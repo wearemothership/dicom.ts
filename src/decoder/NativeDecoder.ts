@@ -31,6 +31,7 @@ class NativeDecoder extends Decoder {
 				wrap: gl.CLAMP_TO_EDGE,
 			}, (error, texture) => {
 				URL.revokeObjectURL(src);
+				console.log("ERROR", error, texture);
 				if (error) {
 					reject(error);
 				}

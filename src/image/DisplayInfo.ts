@@ -58,6 +58,7 @@ const lutInfoFromImage = (image: DCMImage): IImageLutInfo | null => {
 	}
 	const data = new ArrayType(
 		lutDataTagValue,
+		// @ts-ignore-error new Uint8Array(buffer, byteOffset, length) is valid!
 		0,
 		Math.min(lutDescriptor[0] || 2 ** 16, lutDataTagValue.length)
 	);

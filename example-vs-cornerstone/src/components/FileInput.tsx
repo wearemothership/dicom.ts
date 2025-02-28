@@ -1,4 +1,4 @@
-import React, { RefObject } from "react";
+import { RefObject } from "react";
 
 export const readFile = (file: File):Promise<ArrayBuffer> => new Promise((resolve, reject) => {
 	if (!file) {
@@ -20,8 +20,8 @@ export const readFile = (file: File):Promise<ArrayBuffer> => new Promise((resolv
 
 type FileInputProps = {
 	onFileSelected(data:ArrayBuffer): void,
-	onReadError:((error: Error) => void) | null,
-	inputRef: RefObject<HTMLInputElement> | null,
+	onReadError?:((error: Error) => void) | null,
+	inputRef?: RefObject<HTMLInputElement> | null,
 };
 
 const FileInput = ({
