@@ -4,7 +4,6 @@
 
 /* eslint-disable import/first */
 /* eslint-disable no-undef */
-import fs from "fs";
 
 import {
 	createCanvas,
@@ -23,6 +22,8 @@ import {
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 import util from "util";
 import dicomjs, { Renderer } from ".";
+
+const fs = require("node:fs");
 
 // eslint-disable-next-line no-undef
 if (globalThis.window && !window.TextDecoder) {

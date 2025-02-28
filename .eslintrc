@@ -60,7 +60,7 @@
 		"project": "./tsconfig.json"
 	},
 	"parser": "@typescript-eslint/parser",
-	"ignorePatterns": ["!.storybook", "jest.config.js", "vite.config.ts"],
+	"ignorePatterns": ["!.storybook", "vite.config.ts", "vitest.config.ts"],
 	"settings": {
 		"import/extensions": [
 		  ".js",

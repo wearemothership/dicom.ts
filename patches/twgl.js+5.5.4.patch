@@ -1,5 +1,5 @@
 diff --git a/node_modules/twgl.js/dist/5.x/twgl-full.js b/node_modules/twgl.js/dist/5.x/twgl-full.js
-index 4c8f000..7022fee 100644
+index 4c8f000..2b004f0 100644
 --- a/node_modules/twgl.js/dist/5.x/twgl-full.js
 +++ b/node_modules/twgl.js/dist/5.x/twgl-full.js
 @@ -1408,6 +1408,9 @@ function isType(object, type) {
@@ -12,3 +12,21 @@ index 4c8f000..7022fee 100644
    var weakMap = isTypeWeakMaps.get(type);
    if (!weakMap) {
      weakMap = new WeakMap();
+@@ -9835,10 +9838,13 @@ function getTypedArrayTypeForGLType(type) {
+   }
+   return CTOR;
+ }
+-var isArrayBuffer = exports.isArrayBuffer = typeof SharedArrayBuffer !== 'undefined' ? function isArrayBufferOrSharedArrayBuffer(a) {
+-  return a && a.buffer && (a.buffer instanceof ArrayBuffer || a.buffer instanceof SharedArrayBuffer);
+-} : function isArrayBuffer(a) {
+-  return a && a.buffer && a.buffer instanceof ArrayBuffer;
++var isArrayBuffer = exports.isArrayBuffer = function isArrayBuffer(a) {
++  // Check if it's a typed array (like Uint8Array) with a buffer property
++  return Boolean(a && 
++                (ArrayBuffer.isView(a) || 
++                 (a.buffer && 
++                  (a.buffer instanceof ArrayBuffer || 
++                   (typeof SharedArrayBuffer !== 'undefined' && a.buffer instanceof SharedArrayBuffer)))));
+ };
+ 
+ /***/ }),

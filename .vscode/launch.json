@@ -6,13 +6,12 @@
     "configurations": [
 		{
 			"type": "node",
-			"name": "vscode-jest-tests",
+			"name": "vitest-tests",
 			"request": "launch",
-			"runtimeExecutable": "${workspaceFolder}/node_modules/.bin/react-scripts",
+			"runtimeExecutable": "npm",
 			"args": [
-				"test",
-				"--env=jsdom",
-				"--runInBand"
+				"run",
+				"test:unit"
 			],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
