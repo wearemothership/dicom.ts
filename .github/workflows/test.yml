@@ -23,6 +23,15 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     
+    - name: Install GCC 11
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-11 g++-11
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+        sudo update-alternatives --set gcc /usr/bin/gcc-11
+        gcc --version
+        g++ --version
+    
     - name: Install system dependencies for canvas
       run: |
         sudo apt-get update
