@@ -21,19 +21,16 @@
   "license": "MIT",
   "repository": "wearemothership/dicom.ts",
   "homepage": "https://wearemothership.github.io/dicom.ts",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
   "type": "module",
-  "module": "dist/index.modern.mjs",
+  "module": "./dist/index.js",
   "source": "src/index.ts",
   "types": "./dist/index.d.ts",
   "exports": {
-    "require": {
+    ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "default": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.modern.mjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "engines": {
@@ -41,8 +38,8 @@
   },
   "scripts": {
     "postinstall": "patch-package",
-    "build": "rimraf dist && microbundle --no-compress -f modern,cjs",
-    "start": "rimraf dist && microbundle watch --no-compress -f modern,cjs",
+    "build": "vite build",
+    "start": "vite build --watch",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
@@ -56,7 +53,6 @@
     "@wearemothership/dicom-character-set": "^1.0.4-opt.1",
     "jpeg-lossless-decoder-js": "^2.1.2",
     "pako": "^2.1.0",
-    "raw.macro": "0.4.2",
     "sha1": "^1.1.1",
     "twgl.js": "^5.5.4"
   },
@@ -87,13 +83,19 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-image-snapshot": "^6.4.0",
-    "microbundle": "^0.15.1",
     "node-canvas-webgl": "git+https://github.com/wearemothership/node-canvas-webgl.git#update",
     "npm-run-all": "^4.1.5",
     "patch-package": "^8.0.0",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.7",
-    "typescript": "^5.5.4"
+    "typescript": "5.4.2",
+    "vite": "^5.0.0",
+    "vite-plugin-arraybuffer": "^0.1.0",
+    "vite-plugin-dts": "^3.0.0",
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "vite-plugin-string": "^1.2.3",
+    "vite-plugin-top-level-await": "^1.5.0",
+    "vite-plugin-wasm": "^3.4.1"
   },
   "files": [
     "dist",

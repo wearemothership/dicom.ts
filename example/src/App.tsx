@@ -10,16 +10,16 @@ let renderer: Renderer;
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  const fileSelected = (buff: ArrayBuffer) => {
-    console.time("parse");
-    console.time("render");
+  const fileSelected = (buff: ArrayBuffer, name: string) => {
+    console.time(`parse ${name}`);
+    console.time(`render ${name}`);
     const image = dicomts.parseImage(new DataView(buff));
-    console.timeEnd("parse");
+    console.timeEnd(`parse ${name}`);
     if (!renderer || renderer.canvas !== canvasRef.current) {
         renderer = new Renderer(canvasRef.current);
     }
     renderer.render(image!, 0).then(() => {
-      console.timeEnd("render")
+      console.timeEnd(`render ${name}`)
     });
   };
 

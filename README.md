@@ -4,7 +4,7 @@
 <!-- INTRODUCTION -->
 We had a requirement to display greyscale, single frame dicom files as quickly as possible in the browser. Cornerstone.js, which seems ubiquitous and feature rich - just seemed too big and complex for the task, and saw that performance could be improved. We thought it was worth investigating accelerating things as much as possible with WebGl.
 
-By tightly integrating the parser, decoders and renderer, moving as much as possibile to the GPU (LUT & palette conversion etc), only allowing modern browsers and using browsers jpeg decoder & safari's native jpeg2000 decoder, some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1800% faster, depending on the image type and wether it was the first decode of the library. Also library size is about a 5th of using cornerstone core & wado loader, so page load times will be quicker too.
+By tightly integrating the parser, decoders and renderer, moving as much as possibile to the GPU (LUT & palette conversion etc), only allowing modern browsers and using browsers jpeg decoder & safari's native jpeg2000 decoder (now deprecated!), some decent perfomance improvements over cornerstone can be seen; ranging from 10% to 1800% faster, depending on the image type and wether it was the first decode of the library. Also library size is about a 5th of using cornerstone core & wado loader, so page load times will be quicker too.
 ****
 
 
@@ -133,18 +133,8 @@ Contributions are what make the open source community such an amazing place to b
 Distributed under the MIT License.
 https://github.com/wearemothership/dicom.ts/blob/main/LICENSE.md
 
-Copyright (c) 2021 [Mothership Software Ltd.](https://github.com/wearemothership.com)
+Copyright (c) 2025 [Mothership Software Ltd.](https://github.com/wearemothership.com)
 ****
-
-
-
-<!-- USED IN... -->
-### dicom.ts is used in…
-- [vPOP PRO](https://vpop-pro.com)
-
-*Please let us know if you wish us to add your project to this list.*
-****
-
 
 
 <!-- ACKNOWLEDGEMENTS -->

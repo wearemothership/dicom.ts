@@ -23,7 +23,7 @@
 /* istanbul ignore file */
 
 /* eslint-disable */
-import raw from "raw.macro";
+import charlsjsWasm from "./charlsjs.wasm?arraybuffer";
 
 var CharLS = (function (opts) {
 	var Module = typeof opts !== "undefined" ? opts : {};
@@ -795,10 +795,7 @@ var CharLS = (function (opts) {
 	function isFileURI(filename) {
 		return hasPrefix(filename, fileURIPrefix)
 	}
-	var wasmBinaryFile = ENVIRONMENT_IS_NODE && "charlsjs.wasm" || raw("./charLSjs.wasm.base64");
-	if (!isDataURI(wasmBinaryFile)) {
-		wasmBinaryFile = locateFile(wasmBinaryFile)
-	}
+	var wasmBinaryFile = undefined;
 
 	function getBinary() {
 		try {
@@ -884,7 +881,18 @@ var CharLS = (function (opts) {
 				return false
 			}
 		}
-		instantiateAsync();
+
+		if (charlsjsWasm) {
+			return WebAssembly
+				.instantiate(charlsjsWasm, info)
+				.then(receiveInstantiatedSource, function (reason) {
+				err("failed to asynchronously prepare wasm: " + reason);
+				abort(reason)
+			})
+		}
+		else {
+			instantiateAsync();
+		}
 		return {}
 	}
 	var tempDouble;

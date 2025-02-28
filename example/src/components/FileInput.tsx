@@ -20,7 +20,7 @@ export const readFile = (file: File):Promise<ArrayBuffer> => new Promise((resolv
 });
 
 type FileInputProps = {
-	onFileSelected(data:ArrayBuffer): void,
+	onFileSelected(data:ArrayBuffer, filename: string): void,
 	onReadError?:((error: Error) => void) | null,
 	inputRef?: RefObject<HTMLInputElement> | null,
 }
@@ -38,7 +38,7 @@ const FileInput = ({
 			const { files = null } = ev.target;
 			if ((files?.length ?? 0) > 0) {
 				readFile(files![0])
-					.then(onFileSelected)
+					.then((data) => onFileSelected(data, files?.[0]?.name ?? "??"))
 					.catch((err) => {
 						console.error(err);
 						onReadError?.(err);

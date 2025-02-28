@@ -1,6 +1,6 @@
 ## dicom.ts
 MIT License
-Copyright (c) 2021 Mothership software Ltd
+Copyright (c) 2025 Mothership software Ltd
 
 https://wearemothership.com
 
