@@ -310,7 +310,12 @@ describe("dicom.ts", () => {
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
-		expect(buffer).toMatchImageSnapshot();
+		// TODO: why is this different on different GPUs?  MacOS / Linux / xvfb
+		expect(buffer).toMatchImageSnapshot({
+			customDiffConfig: {
+				threshold: 0.05
+			}
+		});
 	});
 
 	it("Fails gracefully when no pixel data", async () => {
