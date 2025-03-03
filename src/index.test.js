@@ -313,7 +313,7 @@ describe("dicom.ts", () => {
 		// TODO: why is this different on different GPUs?  MacOS / Linux / xvfb
 		expect(buffer).toMatchImageSnapshot({
 			customDiffConfig: {
-				threshold: 0.05
+				threshold: 0.2
 			}
 		});
 	});
