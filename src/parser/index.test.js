@@ -1,6 +1,8 @@
-import fs from "fs";
 import util from "util";
 import { parseImage } from ".";
+
+// not sure why vitest seems to not support import fs
+const fs = require("fs");
 
 // eslint-disable-next-line no-undef
 if (globalThis.window && !window.TextDecoder) {
@@ -150,6 +152,7 @@ describe("parser tests", () => {
 		expect(image.tags).toBeTruthy();
 		expect(image.tags).toMatchSnapshot();
 	});
+	
 	const specificKey = "multiframe/DISCIMG/IMAGES/BRMULTI"; // fileKeys[1];
 	it("Parses specific file OK", () => {
 		const data = fs.readFileSync(`${path}${specificKey}`);

@@ -1,15 +1,14 @@
 import * as twgl from "twgl.js";
 import { ProgramInfo, BufferInfo } from "twgl.js";
 
-import raw from "raw.macro";
 import FrameInfo from "../image/FrameInfo";
 import IProgram from "./Program";
 import { ISize } from "../image/Types";
 import { IDisplayInfo } from "../image/DisplayInfo";
 // import { IDisplayInfo } from "../image/DisplayInfo";
+import vertexShader from "./vertex.glsl";
+import colorShader from "./color.glsl";
 
-const vertexShader = raw("./vertex.glsl");
-const colorShader = raw("./color.glsl");
 class ColorProgram implements IProgram {
 	programInfo: ProgramInfo;
 

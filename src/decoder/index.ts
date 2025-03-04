@@ -29,11 +29,6 @@ export const decoderForImage = (image:DCMImage):Decoder | null => {
 		case Codec.JPEGLossless:
 			return new JPEGLosslesDecoder(info);
 		case Codec.JPEG2000:
-			// safari support native JPEG2000 decode
-			if (hasCreateObjectURL && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
-				/* istanbul ignore next */
-				return new NativeDecoder(info);
-			}
 			return new JPEG2000Decoder(info);
 		case Codec.RLE:
 			return new RLEDecoder(info);

@@ -23,8 +23,7 @@
 /* istanbul ignore file */
 
 /* eslint-disable */
-import raw from "raw.macro";
-
+import openjpegWasm from "./openjpeg.wasm?arraybuffer";
 
 var OpenJPEGWASM = (function () {
 	var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
@@ -684,10 +683,7 @@ var OpenJPEGWASM = (function () {
 			function isDataURI(filename) {
 				return String.prototype.startsWith ? filename.startsWith(dataURIPrefix) : filename.indexOf(dataURIPrefix) === 0
 			}
-			var wasmBinaryFile =  !ENVIRONMENT_HAS_NODE && raw("./openjpeg.wasm.base64") || "openjpeg.wasm";
-			if (!isDataURI(wasmBinaryFile)) {
-				wasmBinaryFile = locateFile(wasmBinaryFile)
-			}
+			var wasmBinaryFile = undefined;
 
 			function getBinary() {
 				try {
@@ -779,7 +775,17 @@ var OpenJPEGWASM = (function () {
 						return false
 					}
 				}
-				instantiateAsync();
+				if (openjpegWasm) {
+					return WebAssembly
+						.instantiate(openjpegWasm, info)
+						.then(receiveInstantiatedSource, function (reason) {
+						err("failed to asynchronously prepare wasm: " + reason);
+						abort(reason)
+					})
+				}
+				else {
+					instantiateAsync();
+				}
 				return {}
 			}
 			Module["asm"] = createWasm;

@@ -4,7 +4,6 @@
 
 /* eslint-disable import/first */
 /* eslint-disable no-undef */
-import fs from "fs";
 
 import {
 	createCanvas,
@@ -22,7 +21,9 @@ import {
 } from "node-canvas-webgl";
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 import util from "util";
-import dicomjs from ".";
+import dicomjs, { Renderer } from ".";
+
+const fs = require("node:fs");
 
 // eslint-disable-next-line no-undef
 if (globalThis.window && !window.TextDecoder) {
@@ -80,7 +81,7 @@ describe("dicom.ts", () => {
 		const data = fs.readFileSync("./node_modules/dicom-test-files/medical.nema.org/compsamples_rle_20040210/IMAGES/RLE/CT1_RLE");
 		const image = dicomjs.parseImage(new Uint8Array(data).buffer); // use array buffer
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		// let str = "";
 		// Object.keys(image.tags).forEach((key) => {
@@ -100,7 +101,7 @@ describe("dicom.ts", () => {
 		const image = dicomjs.parseImage(dataView); // use DataView
 		// logImageTags(image);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -113,7 +114,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		// logImageTags(image);
 		expect(image).toBeTruthy();
@@ -127,7 +128,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -140,7 +141,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -153,7 +154,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -166,7 +167,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -179,7 +180,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -192,7 +193,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -207,7 +208,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -221,7 +222,7 @@ describe("dicom.ts", () => {
 		const image = dicomjs.parseImage(dataView);
 		expect(image).toBeTruthy();
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		for (let i = 0; i < image.numberOfFrames; i += 1) {
 			// eslint-disable-next-line no-await-in-loop
 			await renderer.render(image, i);
@@ -290,7 +291,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
@@ -304,12 +305,19 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		await renderer.render(image, 0);
 		expect(image).toBeTruthy();
 		const buffer = canvas.toBuffer("image/png");
 		// fs.writeFileSync("./image.png", buffer);
-		expect(buffer).toMatchImageSnapshot();
+
+		// TODO: why is this different on different GPUs?  MacOS / Linux / xvfb
+		// looks like this issue - https://github.com/wearemothership/dicom.ts/issues/34
+		expect(buffer).toMatchImageSnapshot({
+			customDiffConfig: {
+				threshold: 0.2
+			}
+		});
 	});
 
 	it("Fails gracefully when no pixel data", async () => {
@@ -337,7 +345,7 @@ describe("dicom.ts", () => {
 		const dataView = new DataView(new Uint8Array(data).buffer);
 		const image = dicomjs.parseImage(dataView);
 		const canvas = createCanvas(512, 512);
-		const renderer = new dicomjs.Renderer(canvas);
+		const renderer = new Renderer(canvas);
 		let error = null;
 		try {
 			// expect this to fail

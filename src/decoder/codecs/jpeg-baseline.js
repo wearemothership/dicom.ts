@@ -26,6 +26,9 @@
 
 /* eslint-disable */
 const ColorSpace = {Unkown: 0, Grayscale: 1, AdobeRGB: 2, RGB: 3, CYMK: 4};
+/**
+ * @type Class
+ */
 const JpegImage = (function jpegImage() {
     "use strict";
     var dctZigZag = new Int32Array([
@@ -1023,5 +1026,3 @@ export {
 	JpegImage,
 	ColorSpace
 };
-
-

@@ -10,7 +10,12 @@ const dicomts = {
 	parseImage,
 	render,
 	Renderer,
-	Parser,
+	Parser
 };
 
 export default dicomts;
+
+export {
+	Renderer,
+	Parser
+};

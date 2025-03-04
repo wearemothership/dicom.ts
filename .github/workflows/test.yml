@@ -1,0 +1,56 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install GCC 10
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-10 g++-10
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10
+        sudo update-alternatives --set gcc /usr/bin/gcc-10
+        gcc --version
+        g++ --version
+    
+    - name: Install system dependencies for canvas
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libgl-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libx11-dev libxcomposite-dev libglx-dev libxext-dev libxi-dev libxrender-dev
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run tests
+      uses: coactions/setup-xvfb@v1
+      with:
+        run: npm run test:unit
+      
+    # - name: Generate coverage report
+    #   run: npm run test:coverage
+      
+    # - name: Upload coverage reports
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     directory: ./coverage/
+    #     fail_ci_if_error: false 
