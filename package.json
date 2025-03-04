@@ -19,7 +19,10 @@
   ],
   "email": "nick@wearemothership.com",
   "license": "MIT",
-  "repository": "wearemothership/dicom.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wearemothership/dicom.ts.git"
+  },
   "homepage": "https://wearemothership.github.io/dicom.ts",
   "main": "./dist/index.js",
   "type": "module",
@@ -74,7 +77,7 @@
     "gh-pages": "^6.1.1",
     "jest-image-snapshot": "^6.4.0",
     "jsdom": "^26.0.0",
-    "node-canvas-webgl": "https://github.com/wearemothership/node-canvas-webgl.git#c238b04b10229a79d061820399f2129108afe63b",
+    "node-canvas-webgl": "git+https://github.com/wearemothership/node-canvas-webgl.git#c238b04b10229a79d061820399f2129108afe63b",
     "npm-run-all": "^4.1.5",
     "patch-package": "^8.0.0",
     "rimraf": "^5.0.7",
