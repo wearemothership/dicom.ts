@@ -8,11 +8,11 @@ import vitePluginString from 'vite-plugin-string';
 
 export default defineConfig({
   build: {
-    minify: false, // TODO: Disable minification - remove
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       fileName: 'index',
-      formats: ['es', 'cjs'],
+      formats: ['es', 'cjs', 'umd'],
+      name: 'dicom.ts',
     },
     rollupOptions: {
       external: [
@@ -27,7 +27,11 @@ export default defineConfig({
         // Provide global variables to use in the UMD build
         // for externalized deps if needed
         globals: {
-          // Add if needed for UMD builds
+          '@wearemothership/dicom-character-set': 'DicomCharacterSet',
+          'jpeg-lossless-decoder-js': 'JpegLosslessDecoder',
+          'pako': 'pako',
+          'sha1': 'sha1',
+          'twgl.js': 'twgl'
         }
       }
     }
