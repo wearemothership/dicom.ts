@@ -684,9 +684,6 @@ var OpenJPEGWASM = (function () {
 				return String.prototype.startsWith ? filename.startsWith(dataURIPrefix) : filename.indexOf(dataURIPrefix) === 0
 			}
 			var wasmBinaryFile = undefined;
-			// if (!isDataURI(wasmBinaryFile)) {
-			// 	wasmBinaryFile = locateFile(wasmBinaryFile)
-			// }
 
 			function getBinary() {
 				try {
