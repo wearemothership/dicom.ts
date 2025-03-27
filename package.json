@@ -51,7 +51,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "predeploy": "cd example-vs-cornerstone && npm install && SKIP_PREFLIGHT_CHECK=true npm run build",
-    "deploy": "gh-pages -d example-vs-cornerstone/build"
+    "deploy": "gh-pages -d example-vs-cornerstone/dist"
   },
   "dependencies": {
     "@wearemothership/dicom-character-set": "^1.0.4-opt.1",
@@ -68,7 +68,7 @@
     "@typescript-eslint/parser": "^7.9.0",
     "@vitest/coverage-v8": "^1.4.0",
     "canvas": "^3.1.0",
-    "dicom-test-files": "github:wearemothership/dicom-test-files#v1.0.7",
+    "dicom-test-files": "git+https://github.com/wearemothership/dicom-test-files.git#v1.0.7",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",

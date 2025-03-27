@@ -1,0 +1,1 @@
+Contains special case DICOMs obtained from various public sources

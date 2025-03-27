@@ -318,6 +318,7 @@ const Example: React.FC<ExampleProps> = (props) => {
 					<ExampleFileButton fileName="jpeg-2000-lossless.dcm" selectedFile={fileName} loadFile={loadFile}/>
 					<ExampleFileButton fileName="greyscale-with-lut.dcm" selectedFile={fileName} loadFile={loadFile}/>
 					<ExampleFileButton fileName="greyscale-windowed.dcm" selectedFile={fileName} loadFile={loadFile}/>
+          <ExampleFileButton fileName="rle-color.dcm" selectedFile={fileName} loadFile={loadFile}/>
 				</div>
 				<FileInput onFileSelected={fileSelected} />
 			</Flex>

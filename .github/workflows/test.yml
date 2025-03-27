@@ -36,9 +36,12 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential libgl-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libx11-dev libxcomposite-dev libglx-dev libxext-dev libxi-dev libxrender-dev
-    
-    - name: Install dependencies
-      run: npm ci
+
+    - name: Clone dicom-test-files repo manually
+      run: |
+        git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/wearemothership/dicom-test-files.git
+        npm i ./dicom-test-files
+        npm i
     
     - name: Run tests
       uses: coactions/setup-xvfb@v1
