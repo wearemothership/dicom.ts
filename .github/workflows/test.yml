@@ -26,7 +26,7 @@ jobs:
     - name: Clone dicom-test-files repo manually
       run: |
         git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/wearemothership/dicom-test-files.git
-        cd dicom-test-files && npm install && npm link
+        cd dicom-test-files && npm link
         cd .. && npm link dicom-test-files
     
     - name: Install GCC 10
